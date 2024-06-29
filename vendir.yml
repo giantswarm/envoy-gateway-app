@@ -1,0 +1,16 @@
+apiVersion: vendir.k14s.io/v1alpha1
+kind: Config
+directories:
+- path: vendor
+  contents:
+  - path: gateway-helm
+    git:
+      url: https://github.com/envoyproxy/gateway
+      ref: refs/tags/v1.0.0
+    includePaths:
+    - charts/**/*
+- path: helm/envoy-gateway/templates
+  contents:
+  - path: .
+    directory:
+      path: vendor/gateway-helm/charts/gateway-helm/templates

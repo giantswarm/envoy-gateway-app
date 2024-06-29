@@ -8,10 +8,10 @@ workflows:
       - architect/push-to-app-catalog:
           context: architect
           executor: app-build-suite
-          name: package-and-push-chart
+          name: package and push envoy-gateway chart
           app_catalog: giantswarm-playground-catalog
           app_catalog_test: giantswarm-playground-test-catalog
-          chart: "{APP-NAME}"
+          chart: envoy-gateway
           # Trigger job on git tag.
           filters:
             tags:
