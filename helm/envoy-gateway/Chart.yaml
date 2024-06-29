@@ -1,18 +1,18 @@
 apiVersion: v2
-appVersion: 0.6.0
+appVersion: 1.0.2
 name: envoy-gateway
 
 ### ....
-description: Please add description
+description: Envoy Gateway
 
 home: https://github.com/giantswarm/envoy-gateway-app
 
 # If you have an icon/logo, you should add it to https://github.com/giantswarm/web-assets
 # and set the final URL as a value here and uncomment.
-#icon: https://s.giantswarm.io/app-icons/example/1/light.svg
+icon: https://s.giantswarm.io/app-icons/example/1/light.svg
 
 sources:
-- https://github.com/envoy/gateway
+- https://github.com/envoyproxy/gateway
 
 version: 0.0.0-dev
 
