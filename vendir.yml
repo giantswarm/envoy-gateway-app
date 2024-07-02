@@ -6,7 +6,7 @@ directories:
   - path: gateway-helm
     git:
       url: https://github.com/envoyproxy/gateway
-      ref: refs/tags/v1.0.0
+      ref: v1.0.2
     includePaths:
     - charts/**/*
 - path: helm/envoy-gateway/templates
