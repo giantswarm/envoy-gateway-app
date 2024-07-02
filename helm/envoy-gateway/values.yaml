@@ -1,0 +1,7 @@
+serviceType: managed
+
+image:
+  registry: quay.io
+  name: giantswarm/envoy-gateway
+  tag: v0.0.1
+  pullPolicy: IfNotPresent
