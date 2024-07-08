@@ -61,7 +61,7 @@ This app has been tested to work with the following workload cluster release ver
 Some apps have restrictions on how they can be deployed.
 Not following these limitations will most likely result in a broken deployment.
 
-- The [Gateway API App](https://github.com/giantswarm/gateway-api-app) needs to be deployed hand.
+- The [Gateway API App](https://github.com/giantswarm/gateway-api-app) needs to be deployed beforehand.
 
 ## Credit
 
