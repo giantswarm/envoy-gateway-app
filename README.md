@@ -54,15 +54,15 @@ See our [full reference on how to configure apps](https://docs.giantswarm.io/get
 
 This app has been tested to work with the following workload cluster release versions:
 
-- _add release version_
+- CAPI >= v25
 
 ## Limitations
 
 Some apps have restrictions on how they can be deployed.
 Not following these limitations will most likely result in a broken deployment.
 
-- _add limitation_
+- The [Gateway API App](https://github.com/giantswarm/gateway-api-app) needs to be deployed beforehand.
 
 ## Credit
 
-- {APP HELM REPOSITORY}
+- https://github.com/envoyproxy/gateway
