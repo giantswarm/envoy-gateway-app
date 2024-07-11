@@ -4,13 +4,13 @@ directories:
 - path: vendor
   contents:
   - path: gateway-helm
-    git:
-      url: https://github.com/envoyproxy/gateway
-      ref: refs/tags/v1.0.0
-    includePaths:
-    - charts/**/*
-- path: helm/envoy-gateway/templates
+    helmChart:
+      name: gateway-helm
+      version: v1.0.2
+      repository:
+        url: oci://docker.io/envoyproxy
+- path: helm/envoy-gateway
   contents:
   - path: .
     directory:
-      path: vendor/gateway-helm/charts/gateway-helm/templates
+      path: vendor/gateway-helm
