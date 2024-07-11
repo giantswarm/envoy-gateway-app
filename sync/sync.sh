@@ -30,10 +30,15 @@ $HELM_DOCS --template-files=sync/readme.gotmpl -g helm/envoy-gateway -f values.y
 # Store diffs
 rm -f ./diffs/*
 for f in $(git --no-pager diff --no-exit-code --no-color --no-index vendor/gateway-helm helm/envoy-gateway --name-only) ; do
+        base_file="vendor/gateway-helm/${f#"helm/envoy-gateway/"}"
+        [[ ! -e $base_file ]] && base_file="/dev/null"
+
         set +e
         set -x
-        git --no-pager diff --no-exit-code --no-color --no-index "vendor/gateway-helm/${f#"helm/envoy-gateway/"}" "${f}" \
+
+        git --no-pager diff --no-exit-code --no-color --no-index $base_file "${f}" \
                 > "./diffs/${f//\//__}.patch" # ${f//\//__} replaces all "/" with "__"
+
         ret=$?
         { set +x; } 2>/dev/null
         set -e

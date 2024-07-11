@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/Chart.yaml b/helm/envoy-gateway/Chart.yaml
-index 7dca3a5..1a0cfdd 100644
+index 7dca3a5..896d46d 100644
 --- a/vendor/gateway-helm/Chart.yaml
 +++ b/helm/envoy-gateway/Chart.yaml
 @@ -1,20 +1,17 @@
@@ -9,7 +9,7 @@ index 7dca3a5..1a0cfdd 100644
 -home: https://gateway.envoyproxy.io/
 -icon: https://raw.githubusercontent.com/envoyproxy/gateway/main/site/assets/icons/logo.svg
 +home: https://github.com/giantswarm/envoy-gateway-app
-+icon: https://s.giantswarm.io/app-icons/example/1/light.svg
++icon: https://s.giantswarm.io/app-icons/giantswarm/1/light.svg
  keywords:
  - gateway-api
  - envoyproxy

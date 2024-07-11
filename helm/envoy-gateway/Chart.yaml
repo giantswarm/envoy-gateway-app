@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: v1.0.2
 description: The Helm chart for Envoy Gateway
 home: https://github.com/giantswarm/envoy-gateway-app
-icon: https://s.giantswarm.io/app-icons/example/1/light.svg
+icon: https://s.giantswarm.io/app-icons/giantswarm/1/light.svg
 keywords:
 - gateway-api
 - envoyproxy
