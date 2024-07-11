@@ -24,6 +24,8 @@ for patch in ./sync/patches/*.patch; do
     set -e
 done
 
+HELM_DOCS="docker run --rm -u $(id -u) -v ${PWD}:/helm-docs -w /helm-docs jnorwood/helm-docs:v1.11.0"
+$HELM_DOCS --template-files=sync/readme.gotmpl -g helm/envoy-gateway -f values.yaml -o README.md
 
 # Store diffs
 rm -f ./diffs/*
@@ -39,3 +41,4 @@ for f in $(git --no-pager diff --no-exit-code --no-color --no-index vendor/gatew
                 exit $ret
         fi
 done
+
