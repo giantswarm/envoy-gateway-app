@@ -53,7 +53,8 @@ To uninstall the chart:
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | certgen.job.annotations | object | `{}` |  |
-| certgen.job.resources | object | `{}` |  |
+| certgen.job.resources.requests.cpu | string | `"50m"` |  |
+| certgen.job.resources.requests.memory | string | `"100Mi"` |  |
 | certgen.job.ttlSecondsAfterFinished | int | `0` |  |
 | certgen.rbac.annotations | object | `{}` |  |
 | certgen.rbac.labels | object | `{}` |  |

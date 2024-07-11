@@ -48,7 +48,10 @@ kubernetesClusterDomain: cluster.local
 certgen:
   job:
     annotations: {}
-    resources: {}
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
     ttlSecondsAfterFinished: 0
   rbac:
     annotations: {}

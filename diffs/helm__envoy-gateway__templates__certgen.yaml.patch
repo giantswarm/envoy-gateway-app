@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/templates/certgen.yaml b/helm/envoy-gateway/templates/certgen.yaml
-index 78d5ec2..48dbd28 100644
+index 78d5ec2..0d19bb5 100644
 --- a/vendor/gateway-helm/templates/certgen.yaml
 +++ b/helm/envoy-gateway/templates/certgen.yaml
 @@ -31,7 +31,7 @@ spec:
@@ -11,3 +11,11 @@ index 78d5ec2..48dbd28 100644
          imagePullPolicy: {{ .Values.deployment.envoyGateway.imagePullPolicy }}
          name: envoy-gateway-certgen
          {{- with .Values.certgen.job.resources }}
+@@ -44,6 +44,7 @@ spec:
+       {{- end }}
+       restartPolicy: Never
+       securityContext:
++        readOnlyRootFilesystem: true
+         runAsGroup: 65534
+         runAsNonRoot: true
+         runAsUser: 65534

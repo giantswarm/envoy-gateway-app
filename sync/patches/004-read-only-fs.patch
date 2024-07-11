@@ -1,0 +1,24 @@
+diff --git a/helm/envoy-gateway/templates/certgen.yaml b/helm/envoy-gateway/templates/certgen.yaml
+index 48dbd28..c9bb6c7 100644
+--- a/helm/envoy-gateway/templates/certgen.yaml
++++ b/helm/envoy-gateway/templates/certgen.yaml
+@@ -44,6 +44,7 @@ spec:
+       {{- end }}
+       restartPolicy: Never
+       securityContext:
++        readOnlyRootFilesystem: true
+         runAsGroup: 65534
+         runAsNonRoot: true
+         runAsUser: 65534
+diff --git a/helm/envoy-gateway/templates/envoy-gateway-deployment.yaml b/helm/envoy-gateway/templates/envoy-gateway-deployment.yaml
+index 8dd1100..8fc3298 100644
+--- a/helm/envoy-gateway/templates/envoy-gateway-deployment.yaml
++++ b/helm/envoy-gateway/templates/envoy-gateway-deployment.yaml
+@@ -86,6 +86,7 @@ spec:
+         {{- toYaml . | nindent 8 }}
+       {{- end }}
+       securityContext:
++        readOnlyRootFilesystem: true
+         runAsNonRoot: true
+       serviceAccountName: envoy-gateway
+       terminationGracePeriodSeconds: 10

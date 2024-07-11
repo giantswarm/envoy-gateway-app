@@ -44,6 +44,7 @@ spec:
       {{- end }}
       restartPolicy: Never
       securityContext:
+        readOnlyRootFilesystem: true
         runAsGroup: 65534
         runAsNonRoot: true
         runAsUser: 65534
