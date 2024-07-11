@@ -1,7 +1,10 @@
+image:
+  registry: gsoci.azurecr.io
+
 deployment:
   envoyGateway:
     image:
-      repository: docker.io/envoyproxy/gateway
+      name: envoyproxy-gateway
       tag: 'v1.0.2'
     imagePullPolicy: Always
     imagePullSecrets: []
