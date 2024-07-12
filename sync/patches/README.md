@@ -22,9 +22,11 @@ TODO: Generate that in sync.sh
 
 TODO: Discuss with upstream to include as default values.
 
-### 004-read-only-fs.patch
+### 004-pss-comply.patch
 
 - Add `readOnlyRootFilesystem=true` to container SecurityContext.
+- Add `seccompProfile.type=RuntimeDefault` to SecurityContext.
+- Drop ALL capabilities.
 
 TODO: Push to upstream as default or make it configurable through values.
 

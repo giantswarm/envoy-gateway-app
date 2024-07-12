@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/templates/envoy-gateway-deployment.yaml b/helm/envoy-gateway/templates/envoy-gateway-deployment.yaml
-index 1ee5c7f..1dd79a7 100644
+index 1ee5c7f..ecc12fa 100644
 --- a/vendor/gateway-helm/templates/envoy-gateway-deployment.yaml
 +++ b/helm/envoy-gateway/templates/envoy-gateway-deployment.yaml
 @@ -49,7 +49,7 @@ spec:
@@ -11,7 +11,7 @@ index 1ee5c7f..1dd79a7 100644
          imagePullPolicy: {{ .Values.deployment.envoyGateway.imagePullPolicy }}
          livenessProbe:
            httpGet:
-@@ -71,9 +71,9 @@ spec:
+@@ -71,10 +71,13 @@ spec:
              port: 8081
            initialDelaySeconds: 5
            periodSeconds: 10
@@ -19,7 +19,23 @@ index 1ee5c7f..1dd79a7 100644
 -          }}
 +        resources: {{- toYaml .Values.deployment.envoyGateway.resources | nindent 10 }}
          securityContext:
-+          readOnlyRootFilesystem: true
            allowPrivilegeEscalation: false
++          capabilities:
++            drop:
++              - ALL
++          readOnlyRootFilesystem: true
          volumeMounts:
          - mountPath: /config
+           name: envoy-gateway-config
+@@ -87,7 +90,11 @@ spec:
+         {{- toYaml . | nindent 8 }}
+       {{- end }}
+       securityContext:
++        runAsGroup: 65534
+         runAsNonRoot: true
++        runAsUser: 65534
++        seccompProfile:
++          type: RuntimeDefault
+       serviceAccountName: envoy-gateway
+       terminationGracePeriodSeconds: 10
+       volumes:
