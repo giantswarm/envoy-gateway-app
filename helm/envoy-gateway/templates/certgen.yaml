@@ -34,6 +34,8 @@ spec:
         image: {{ printf "%s/%s" .Values.image.registry .Values.deployment.envoyGateway.image.name }}:{{ .Values.deployment.envoyGateway.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.deployment.envoyGateway.imagePullPolicy }}
         name: envoy-gateway-certgen
+        securityContext:
+          readOnlyRootFilesystem: true
         {{- with .Values.certgen.job.resources }}
         resources:
           {{- toYaml . | nindent 10 }}
@@ -44,7 +46,6 @@ spec:
       {{- end }}
       restartPolicy: Never
       securityContext:
-        readOnlyRootFilesystem: true
         runAsGroup: 65534
         runAsNonRoot: true
         runAsUser: 65534

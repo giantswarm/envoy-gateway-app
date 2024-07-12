@@ -73,6 +73,7 @@ spec:
           periodSeconds: 10
         resources: {{- toYaml .Values.deployment.envoyGateway.resources | nindent 10 }}
         securityContext:
+          readOnlyRootFilesystem: true
           allowPrivilegeEscalation: false
         volumeMounts:
         - mountPath: /config
@@ -86,7 +87,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       securityContext:
-        readOnlyRootFilesystem: true
         runAsNonRoot: true
       serviceAccountName: envoy-gateway
       terminationGracePeriodSeconds: 10

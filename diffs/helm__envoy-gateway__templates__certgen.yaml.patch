@@ -1,8 +1,8 @@
 diff --git a/vendor/gateway-helm/templates/certgen.yaml b/helm/envoy-gateway/templates/certgen.yaml
-index 78d5ec2..0d19bb5 100644
+index 78d5ec2..ceab7d4 100644
 --- a/vendor/gateway-helm/templates/certgen.yaml
 +++ b/helm/envoy-gateway/templates/certgen.yaml
-@@ -31,7 +31,7 @@ spec:
+@@ -31,9 +31,11 @@ spec:
                fieldPath: metadata.namespace
          - name: KUBERNETES_CLUSTER_DOMAIN
            value: {{ .Values.kubernetesClusterDomain }}
@@ -10,12 +10,8 @@ index 78d5ec2..0d19bb5 100644
 +        image: {{ printf "%s/%s" .Values.image.registry .Values.deployment.envoyGateway.image.name }}:{{ .Values.deployment.envoyGateway.image.tag | default .Chart.AppVersion }}
          imagePullPolicy: {{ .Values.deployment.envoyGateway.imagePullPolicy }}
          name: envoy-gateway-certgen
++        securityContext:
++          readOnlyRootFilesystem: true
          {{- with .Values.certgen.job.resources }}
-@@ -44,6 +44,7 @@ spec:
-       {{- end }}
-       restartPolicy: Never
-       securityContext:
-+        readOnlyRootFilesystem: true
-         runAsGroup: 65534
-         runAsNonRoot: true
-         runAsUser: 65534
+         resources:
+           {{- toYaml . | nindent 10 }}
