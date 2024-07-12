@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/README.md b/helm/envoy-gateway/README.md
-index c2d5f63..c441af9 100644
+index c2d5f63..ece12d7 100644
 --- a/vendor/gateway-helm/README.md
 +++ b/helm/envoy-gateway/README.md
 @@ -1,17 +1,10 @@
@@ -42,7 +42,7 @@ index c2d5f63..c441af9 100644
  ```
  You can find all helm chart release in [Dockerhub](https://hub.docker.com/r/envoyproxy/gateway-helm/tags)
  
-@@ -52,40 +45,45 @@ You can install the eg chart along without Gateway API CRDs and Envoy Gateway CR
+@@ -52,40 +45,46 @@ You can install the eg chart along without Gateway API CRDs and Envoy Gateway CR
  To uninstall the chart:
  
  ``` shell
@@ -87,6 +87,7 @@ index c2d5f63..c441af9 100644
 +| Key | Type | Default | Description |
 +|-----|------|---------|-------------|
 +| certgen.job.annotations | object | `{}` |  |
++| certgen.job.resources.limits.memory | string | `"500Mi"` |  |
 +| certgen.job.resources.requests.cpu | string | `"50m"` |  |
 +| certgen.job.resources.requests.memory | string | `"100Mi"` |  |
 +| certgen.job.ttlSecondsAfterFinished | int | `0` |  |
