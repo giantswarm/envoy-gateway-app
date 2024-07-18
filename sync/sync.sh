@@ -13,16 +13,10 @@ vendir sync
 { set +x; } 2>/dev/null
 
 # Patches
-# ./sync/patches/values/patch.sh
-# ./sync/patches/image_registries/patch.sh
-
-for patch in ./sync/patches/*.patch; do
-    set +e
-    set -x
-    git apply $patch
-    { set +x; } 2>/dev/null
-    set -e
-done
+./sync/patches/image-registry/patch.sh
+./sync/patches/pss-comply/patch.sh
+./sync/patches/team-label/patch.sh
+./sync/patches/values/patch.sh
 
 HELM_DOCS="docker run --rm -u $(id -u) -v ${PWD}:/helm-docs -w /helm-docs jnorwood/helm-docs:v1.11.0"
 $HELM_DOCS --template-files=sync/readme.gotmpl -g helm/envoy-gateway -f values.yaml -o README.md
