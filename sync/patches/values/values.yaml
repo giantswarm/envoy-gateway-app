@@ -1,0 +1,60 @@
+image:
+  registry: gsoci.azurecr.io
+
+deployment:
+  envoyGateway:
+    image:
+      name: envoyproxy-gateway
+      tag: 'v1.0.2'
+    imagePullPolicy: Always
+    imagePullSecrets: []
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1024Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+  ports:
+    - name: grpc
+      port: 18000
+      targetPort: 18000
+    - name: ratelimit
+      port: 18001
+      targetPort: 18001
+  replicas: 1
+  pod:
+    affinity: {}
+    annotations: {}
+    labels: {}
+
+config:
+  envoyGateway:
+    gateway:
+      controllerName: gateway.envoyproxy.io/gatewayclass-controller
+    provider:
+      type: Kubernetes
+    logging:
+      level:
+        default: info
+
+envoyGatewayMetricsService:
+  port: 19001
+
+createNamespace: false
+
+kubernetesClusterDomain: cluster.local
+
+certgen:
+  job:
+    annotations: {}
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        memory: 500Mi
+    ttlSecondsAfterFinished: 0
+  rbac:
+    annotations: {}
+    labels: {}

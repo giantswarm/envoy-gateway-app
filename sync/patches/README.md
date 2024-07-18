@@ -1,28 +1,26 @@
 # Patches
 
-### 000-image-registry.patch
+### image-registry
 
 - Adapt image templating to use the `image.registry` value.
 - Set `image.registry` as the `gsoci.azurecr.io`.
 - Use `name` instead of `repository` as image name.
 
-### 001-team-label.patch
+### team-label
 
 - Include team label in `eg.labels` template function.
 
-### 002-values-schema.patch
+### values
 
+- Add GS values
 - Add values.schema.json.
-
-TODO: Generate that in sync.sh
-
-### 003-certgen-resources.patch
-
 - Set resources requests and limits for certgen Job.
 
-TODO: Discuss with upstream to include as default values.
+TODO: 
+- Generate values.schema.json in sync.sh
+- Discuss with upstream to include as default values.
 
-### 004-pss-comply.patch
+### pss-comply
 
 - Add `readOnlyRootFilesystem=true` to container SecurityContext.
 - Add `seccompProfile.type=RuntimeDefault` to SecurityContext.
