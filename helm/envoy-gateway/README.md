@@ -1,7 +1,5 @@
 # envoy-gateway
 
-![Version: 0.0.0-dev](https://img.shields.io/badge/Version-0.0.0--dev-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.0.2](https://img.shields.io/badge/AppVersion-v1.0.2-informational?style=flat-square)
-
 The Helm chart for Envoy Gateway
 
 **Homepage:** <https://github.com/giantswarm/envoy-gateway-app>
