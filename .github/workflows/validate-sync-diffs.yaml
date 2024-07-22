@@ -1,8 +1,6 @@
 name: "Validate sync diffs"
 on:
-  pull_request:
-    branches:
-      - main
+  pull_request: {}
   push: {}
 
 jobs:
