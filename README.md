@@ -63,6 +63,10 @@ Not following these limitations will most likely result in a broken deployment.
 
 - The [Gateway API App](https://github.com/giantswarm/gateway-api-app) needs to be deployed beforehand.
 
+## Development
+
+Information about chart and version development can be found in [sync/README.md](https://github.com/giantswarm/envoy-gateway-app/blob/main/sync/README.md).
+
 ## Credit
 
 - https://github.com/envoyproxy/gateway
