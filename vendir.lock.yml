@@ -1,15 +1,13 @@
 apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
-  - git:
-      commitTitle: '[release/v1.0] cherry pick from main to release/v1.0 (#2911)...'
-      sha: 72c0cc757c7c4703dfc14345dbd995240af663d7
-      tags:
-      - v1.0.0
+  - helmChart:
+      appVersion: v1.0.2
+      version: v1.0.2
     path: gateway-helm
   path: vendor
 - contents:
   - directory: {}
     path: .
-  path: helm/envoy-gateway/templates
+  path: helm/envoy-gateway
 kind: LockConfig

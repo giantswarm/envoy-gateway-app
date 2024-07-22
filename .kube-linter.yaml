@@ -1,0 +1,5 @@
+checks:
+  exclude:
+  - "unset-cpu-requirements"
+  - "liveness-port"
+  - "readiness-port"
