@@ -6,6 +6,20 @@ metadata:
   labels:
   {{- include "eg.labels" . | nindent 4 }}
 ---
+{{- if and .Values.podDisruptionBudget.minAvailable (ge (int .Values.podDisruptionBudget.minAvailable) 1) }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: envoy-gateway
+  namespace: '{{ .Release.Namespace }}'
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      control-plane: envoy-gateway
+    {{- include "eg.selectorLabels" . | nindent 6 }}
+---
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -37,6 +51,14 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.deployment.pod.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.deployment.pod.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - args:
         - server
@@ -49,8 +71,8 @@ spec:
               fieldPath: metadata.namespace
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ .Values.kubernetesClusterDomain }}
-        image: {{ printf "%s/%s" .Values.image.registry .Values.deployment.envoyGateway.image.name }}:{{ .Values.deployment.envoyGateway.image.tag | default .Chart.AppVersion }}
-        imagePullPolicy: {{ .Values.deployment.envoyGateway.imagePullPolicy }}
+        image: {{ include "eg.image" . }}
+        imagePullPolicy: {{ include "eg.image.pullPolicy" . }}
         livenessProbe:
           httpGet:
             path: /healthz
@@ -63,21 +85,16 @@ spec:
         - containerPort: {{ .port }}
           name: {{ .name }}
         {{- end}}
-        - containerPort: 19001
-          name: http-metrics
         readinessProbe:
           httpGet:
             path: /readyz
             port: 8081
           initialDelaySeconds: 5
           periodSeconds: 10
-        resources: {{- toYaml .Values.deployment.envoyGateway.resources | nindent 10 }}
+        resources: {{- toYaml .Values.deployment.envoyGateway.resources | nindent 10
+          }}
         securityContext:
           allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          readOnlyRootFilesystem: true
         volumeMounts:
         - mountPath: /config
           name: envoy-gateway-config
@@ -85,16 +102,9 @@ spec:
         - mountPath: /certs
           name: certs
           readOnly: true
-      {{- with .Values.deployment.envoyGateway.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "eg.image.pullSecrets" . | nindent 6 }}
       securityContext:
-        runAsGroup: 65534
         runAsNonRoot: true
-        runAsUser: 65534
-        seccompProfile:
-          type: RuntimeDefault
       serviceAccountName: envoy-gateway
       terminationGracePeriodSeconds: 10
       volumes:
