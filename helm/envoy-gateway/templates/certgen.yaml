@@ -31,30 +31,19 @@ spec:
               fieldPath: metadata.namespace
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ .Values.kubernetesClusterDomain }}
-        image: {{ printf "%s/%s" .Values.image.registry .Values.deployment.envoyGateway.image.name }}:{{ .Values.deployment.envoyGateway.image.tag | default .Chart.AppVersion }}
-        imagePullPolicy: {{ .Values.deployment.envoyGateway.imagePullPolicy }}
+        image: {{ include "eg.image" . }}
+        imagePullPolicy: {{ include "eg.image.pullPolicy" . }}
         name: envoy-gateway-certgen
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          readOnlyRootFilesystem: true
         {{- with .Values.certgen.job.resources }}
         resources:
           {{- toYaml . | nindent 10 }}
         {{- end }}
-      {{- with .Values.deployment.envoyGateway.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "eg.image.pullSecrets" . | nindent 6 }}
       restartPolicy: Never
       securityContext:
         runAsGroup: 65534
         runAsNonRoot: true
         runAsUser: 65534
-        seccompProfile:
-          type: RuntimeDefault
       serviceAccountName: {{ include "eg.fullname" . }}-certgen
   {{- if not ( kindIs "invalid" .Values.certgen.job.ttlSecondsAfterFinished) }}
   ttlSecondsAfterFinished: {{ .Values.certgen.job.ttlSecondsAfterFinished }}
