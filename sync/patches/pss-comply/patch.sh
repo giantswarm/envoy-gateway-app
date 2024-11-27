@@ -12,6 +12,6 @@ cd "${repo_dir}"
 readonly script_dir_rel=".${script_dir#"${repo_dir}"}"
 
 set -x
-git apply "${script_dir_rel}/000-pss-comply.patch"
+# git apply "${script_dir_rel}/000-pss-comply.patch"
 
 { set +x; } 2>/dev/null
