@@ -1,20 +1,29 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 5ae25f3..a721781 100644
+index 56cf308..039ed6f 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
-@@ -1,7 +1,10 @@
+@@ -22,11 +22,14 @@ podDisruptionBudget:
+   minAvailable: 0
+   # maxUnavailable: 1
+ 
 +image:
 +  registry: gsoci.azurecr.io
 +
  deployment:
    envoyGateway:
      image:
--      repository: docker.io/envoyproxy/gateway
+-      repository: ""
+-      tag: ""
 +      name: envoyproxy-gateway
-       tag: 'v1.0.2'
-     imagePullPolicy: Always
++      tag: 'v1.2.1'
+     imagePullPolicy: ""
      imagePullSecrets: []
-@@ -45,7 +48,12 @@ kubernetesClusterDomain: cluster.local
+     resources:
+@@ -88,11 +91,15 @@ createNamespace: false
+ 
+ kubernetesClusterDomain: cluster.local
+ 
+-# -- Certgen is used to generate the certificates required by EnvoyGateway. If you want to construct a custom certificate, you can generate a custom certificate through Cert-Manager before installing EnvoyGateway. Certgen will not overwrite the custom certificate. Please do not manually modify `values.yaml` to disable certgen, it may cause EnvoyGateway OIDC,OAuth2,etc. to not work as expected.
  certgen:
    job:
      annotations: {}
@@ -25,6 +34,6 @@ index 5ae25f3..a721781 100644
 +        memory: 100Mi
 +      limits:
 +        memory: 500Mi
-     ttlSecondsAfterFinished: 0
-   rbac:
-     annotations: {}
+     affinity: {}
+     tolerations: []
+     nodeSelector: {}
