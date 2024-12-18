@@ -4,6 +4,10 @@ kind: CiliumNetworkPolicy
 metadata:
   name: {{ include "eg.fullname" . }}
   namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": "pre-install,pre-upgrade"
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
   labels:
     control-plane: envoy-gateway
     {{- include "eg.labels" . | nindent 4 }}

@@ -1,15 +1,19 @@
 diff --git a/helm/envoy-gateway/templates/certgen-cnp.yaml b/helm/envoy-gateway/templates/certgen-cnp.yaml
 new file mode 100644
-index 0000000..03bf520
+index 0000000..d3ce4f6
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/certgen-cnp.yaml
-@@ -0,0 +1,28 @@
+@@ -0,0 +1,32 @@
 +---
 +apiVersion: "cilium.io/v2"
 +kind: CiliumNetworkPolicy
 +metadata:
 +  name: {{ include "eg.fullname" . }}-certgen
 +  namespace: {{ .Release.Namespace }}
++  annotations:
++    "helm.sh/hook": "pre-install,pre-upgrade"
++    "helm.sh/hook-weight": "-10"
++    "helm.sh/hook-delete-policy": "before-hook-creation"
 +  labels:
 +    app.kubernetes.io/component: "certgen"
 +    {{- include "eg.labels" . | nindent 4 }}
@@ -32,3 +36,4 @@ index 0000000..03bf520
 +              protocol: UDP
 +            - port: "53"
 +              protocol: TCP
+\ No newline at end of file
