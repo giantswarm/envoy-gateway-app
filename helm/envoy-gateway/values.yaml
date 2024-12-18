@@ -47,7 +47,6 @@ deployment:
       runAsNonRoot: true
       runAsGroup: 65532
       runAsUser: 65532
-      readOnlyRootFilesystem: true
       seccompProfile:
         type: RuntimeDefault
   ports:
