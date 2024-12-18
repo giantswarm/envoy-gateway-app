@@ -6,7 +6,7 @@ directories:
   - path: gateway-helm
     helmChart:
       name: gateway-helm
-      version: v1.0.2
+      version: v1.2.4
       repository:
         url: oci://docker.io/envoyproxy
 - path: helm/envoy-gateway
