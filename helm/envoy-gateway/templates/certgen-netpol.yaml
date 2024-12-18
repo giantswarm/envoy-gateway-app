@@ -24,7 +24,14 @@ spec:
         - namespaceSelector: {}
           podSelector:
             matchLabels:
-              k8s-app: kube-apiserver
+              component: kube-apiserver
+              tier: control-plane
+    - to:
+        - ipBlock:
+            cidr: 172.31.0.1/32
+      ports:
+        - port: 443
+          protocol: TCP
     - ports:
         - port: 53
           protocol: UDP

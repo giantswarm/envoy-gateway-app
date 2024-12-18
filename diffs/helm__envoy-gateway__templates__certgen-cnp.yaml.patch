@@ -1,9 +1,9 @@
 diff --git a/helm/envoy-gateway/templates/certgen-cnp.yaml b/helm/envoy-gateway/templates/certgen-cnp.yaml
 new file mode 100644
-index 0000000..d3ce4f6
+index 0000000..2af4f5c
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/certgen-cnp.yaml
-@@ -0,0 +1,32 @@
+@@ -0,0 +1,43 @@
 +---
 +apiVersion: "cilium.io/v2"
 +kind: CiliumNetworkPolicy
@@ -25,15 +25,25 @@ index 0000000..d3ce4f6
 +  egress:
 +    - toEntities:
 +        - kube-apiserver
-+        - cluster
++    - toEndpoints:
++        - matchLabels:
++            k8s:io.kubernetes.pod.namespace: default
++            k8s:k8s-app: kubernetes
++      toPorts:
++        - ports:
++            - port: "443"
++              protocol: TCP
++    - toEndpoints:
++        - matchLabels:
++            k8s:component: kube-apiserver
++            k8s:tier: control-plane
 +    - toEndpoints:
 +        - matchLabels:
 +            k8s:io.kubernetes.pod.namespace: kube-system
-+            k8s-app: kube-dns
++            k8s:k8s-app: kube-dns
 +      toPorts:
 +        - ports:
 +            - port: "53"
 +              protocol: UDP
 +            - port: "53"
 +              protocol: TCP
-\ No newline at end of file
