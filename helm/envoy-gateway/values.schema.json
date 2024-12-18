@@ -222,6 +222,9 @@
                                 "runAsUser": {
                                     "type": "integer"
                                 },
+                                "readOnlyRootFilesystem": {
+                                    "type": "integer"
+                                },
                                 "seccompProfile": {
                                     "type": "object",
                                     "properties": {

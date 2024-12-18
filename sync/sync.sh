@@ -16,7 +16,6 @@ vendir sync
 ./sync/patches/image-registry/patch.sh
 ./sync/patches/pss-comply/patch.sh
 ./sync/patches/team-label/patch.sh
-./sync/patches/security-context/patch.sh
 ./sync/patches/values/patch.sh
 
 HELM_DOCS="docker run --rm -u $(id -u) -v ${PWD}:/helm-docs -w /helm-docs jnorwood/helm-docs:v1.11.0"
