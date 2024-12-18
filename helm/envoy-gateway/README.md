@@ -82,6 +82,7 @@ To uninstall the chart:
 | deployment.envoyGateway.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | deployment.envoyGateway.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | deployment.envoyGateway.securityContext.privileged | bool | `false` |  |
+| deployment.envoyGateway.securityContext.readOnlyRootFilesystem | bool | `true` |  |
 | deployment.envoyGateway.securityContext.runAsGroup | int | `65532` |  |
 | deployment.envoyGateway.securityContext.runAsNonRoot | bool | `true` |  |
 | deployment.envoyGateway.securityContext.runAsUser | int | `65532` |  |

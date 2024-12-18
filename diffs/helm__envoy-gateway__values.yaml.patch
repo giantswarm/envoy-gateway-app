@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 56cf308..039ed6f 100644
+index 56cf308..810dabd 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -22,11 +22,14 @@ podDisruptionBudget:
@@ -19,7 +19,15 @@ index 56cf308..039ed6f 100644
      imagePullPolicy: ""
      imagePullSecrets: []
      resources:
-@@ -88,11 +91,15 @@ createNamespace: false
+@@ -44,6 +47,7 @@ deployment:
+       runAsNonRoot: true
+       runAsGroup: 65532
+       runAsUser: 65532
++      readOnlyRootFilesystem: true
+       seccompProfile:
+         type: RuntimeDefault
+   ports:
+@@ -88,11 +92,15 @@ createNamespace: false
  
  kubernetesClusterDomain: cluster.local
  
