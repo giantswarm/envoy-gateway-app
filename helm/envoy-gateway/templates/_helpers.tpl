@@ -66,12 +66,8 @@ Create the name of the service account to use
 The name of the Envoy Gateway image.
 */}}
 {{- define "eg.image" -}}
-{{- if .Values.deployment.envoyGateway.image.repository }}
 {{- if .Values.image.registry }}
-{{- .Values.image.registry }}/{{- .Values.deployment.envoyGateway.image.name }}:{{ .Values.deployment.envoyGateway.image.tag | default .Values.global.images.envoyGateway.tag | default .Chart.AppVersion }}
-{{- else }}
-{{- .Values.deployment.envoyGateway.image.repository }}:{{ .Values.deployment.envoyGateway.image.tag | default .Values.global.images.envoyGateway.tag | default .Chart.AppVersion }}
-{{- end }}
+{{- .Values.image.registry }}/{{- .Values.deployment.envoyGateway.image.name }}:{{ .Values.deployment.envoyGateway.image.tag | default .Chart.AppVersion }}
 {{- else if .Values.global.images.envoyGateway.image }}
 {{- .Values.global.images.envoyGateway.image }}
 {{- else }}
