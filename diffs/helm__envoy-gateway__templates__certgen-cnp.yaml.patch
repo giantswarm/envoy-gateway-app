@@ -1,26 +1,34 @@
 diff --git a/helm/envoy-gateway/templates/certgen-cnp.yaml b/helm/envoy-gateway/templates/certgen-cnp.yaml
 new file mode 100644
-index 0000000..5a94a5a
+index 0000000..03bf520
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/certgen-cnp.yaml
-@@ -0,0 +1,20 @@
+@@ -0,0 +1,28 @@
 +---
 +apiVersion: "cilium.io/v2"
 +kind: CiliumNetworkPolicy
 +metadata:
-+  name: {{ template "envoy-gateway.fullname" . }}-certgen
-+  namespace: {{ include "envoy-gateway.namespace" . }}
++  name: {{ include "eg.fullname" . }}-certgen
++  namespace: {{ .Release.Namespace }}
 +  labels:
++    app.kubernetes.io/component: "certgen"
 +    {{- include "eg.labels" . | nindent 4 }}
 +spec:
 +  endpointSelector:
 +    matchLabels:
-+      app.kubernetes.io/instance: {{ .Release.Name }}
 +      app.kubernetes.io/component: "certgen"
++      {{- include "eg.selectorLabels" . | nindent 6 }}
 +  egress:
 +    - toEntities:
 +        - kube-apiserver
 +        - cluster
-+  ingress:
-+    - fromEntities:
-+        - kube-apiserver
++    - toEndpoints:
++        - matchLabels:
++            k8s:io.kubernetes.pod.namespace: kube-system
++            k8s-app: kube-dns
++      toPorts:
++        - ports:
++            - port: "53"
++              protocol: UDP
++            - port: "53"
++              protocol: TCP

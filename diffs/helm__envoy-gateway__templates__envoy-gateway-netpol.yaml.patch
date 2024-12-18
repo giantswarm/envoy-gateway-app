@@ -1,15 +1,15 @@
 diff --git a/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml b/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml
 new file mode 100644
-index 0000000..38b3cea
+index 0000000..37d3be0
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml
-@@ -0,0 +1,45 @@
+@@ -0,0 +1,41 @@
 +---
 +apiVersion: networking.k8s.io/v1
 +kind: NetworkPolicy
 +metadata:
-+  name: {{ template "envoy-gateway.fullname" . }}
-+  namespace: {{ include "envoy-gateway.namespace" . }}
++  name: {{ include "eg.fullname" . }}
++  namespace: {{ .Release.Namespace }}
 +  labels:
 +    control-plane: envoy-gateway
 +    {{- include "eg.labels" . | nindent 4 }}
@@ -39,13 +39,9 @@ index 0000000..38b3cea
 +          protocol: TCP
 +  ingress:
 +    - ports:
-+        - port: 18000
++        {{- range .Values.deployment.envoyGateway.ports }}
++        - port: {{ .port }}
 +          protocol: TCP
-+        - port: 18001
-+          protocol: TCP
-+        - port: 18002
-+          protocol: TCP
-+        - port: 19001
-+          protocol: TCP
++        {{- end }}
 +      from:
 +        - namespaceSelector: {}

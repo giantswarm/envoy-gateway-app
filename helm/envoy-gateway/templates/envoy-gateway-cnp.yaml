@@ -2,8 +2,8 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: {{ template "envoy-gateway.fullname" . }}
-  namespace: {{ include "envoy-gateway.namespace" . }}
+  name: {{ include "eg.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     control-plane: envoy-gateway
     {{- include "eg.labels" . | nindent 4 }}
@@ -31,11 +31,7 @@ spec:
         - cluster
       toPorts:
         - ports:
-            - port: "18000"
+            {{- range .Values.deployment.envoyGateway.ports }}
+            - port: {{ printf "\"%d\"" .port }}
               protocol: TCP
-            - port: "18001"
-              protocol: TCP
-            - port: "18002"
-              protocol: TCP
-            - port: "19001"
-              protocol: TCP
+            {{- end }}

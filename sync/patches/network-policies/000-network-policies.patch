@@ -1,48 +1,57 @@
 diff --git a/helm/envoy-gateway/templates/certgen-cnp.yaml b/helm/envoy-gateway/templates/certgen-cnp.yaml
 new file mode 100644
-index 0000000..5a94a5a
+index 0000000..03bf520
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/certgen-cnp.yaml
-@@ -0,0 +1,20 @@
+@@ -0,0 +1,28 @@
 +---
 +apiVersion: "cilium.io/v2"
 +kind: CiliumNetworkPolicy
 +metadata:
-+  name: {{ template "envoy-gateway.fullname" . }}-certgen
-+  namespace: {{ include "envoy-gateway.namespace" . }}
++  name: {{ include "eg.fullname" . }}-certgen
++  namespace: {{ .Release.Namespace }}
 +  labels:
++    app.kubernetes.io/component: "certgen"
 +    {{- include "eg.labels" . | nindent 4 }}
 +spec:
 +  endpointSelector:
 +    matchLabels:
-+      app.kubernetes.io/instance: {{ .Release.Name }}
 +      app.kubernetes.io/component: "certgen"
++      {{- include "eg.selectorLabels" . | nindent 6 }}
 +  egress:
 +    - toEntities:
 +        - kube-apiserver
 +        - cluster
-+  ingress:
-+    - fromEntities:
-+        - kube-apiserver
++    - toEndpoints:
++        - matchLabels:
++            k8s:io.kubernetes.pod.namespace: kube-system
++            k8s-app: kube-dns
++      toPorts:
++        - ports:
++            - port: "53"
++              protocol: UDP
++            - port: "53"
++              protocol: TCP
 diff --git a/helm/envoy-gateway/templates/certgen-netpol.yaml b/helm/envoy-gateway/templates/certgen-netpol.yaml
 new file mode 100644
-index 0000000..92933c8
+index 0000000..27b8842
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/certgen-netpol.yaml
-@@ -0,0 +1,38 @@
+@@ -0,0 +1,33 @@
 +---
 +apiVersion: networking.k8s.io/v1
 +kind: NetworkPolicy
 +metadata:
-+  name: {{ template "envoy-gateway.fullname" . }}-certgen
-+  namespace: {{ include "envoy-gateway.namespace" . }}
++  name: {{ include "eg.fullname" . }}-certgen
++  namespace: {{ .Release.Namespace }}
 +  labels:
++    app.kubernetes.io/component: "certgen"
 +    {{- include "eg.labels" . | nindent 4 }}
 +spec:
 +  podSelector:
 +    matchLabels:
-+      app.kubernetes.io/instance: {{ .Release.Name }}
 +      app.kubernetes.io/component: "certgen"
++      {{- include "eg.selectorLabels" . | nindent 6 }}
 +  policyTypes:
 +    - Ingress
 +    - Egress
@@ -62,24 +71,18 @@ index 0000000..92933c8
 +          podSelector:
 +            matchLabels:
 +              k8s-app: kube-dns
-+  ingress:
-+    - from:
-+        - namespaceSelector: {}
-+          podSelector:
-+            matchLabels:
-+              k8s-app: kube-apiserver
 diff --git a/helm/envoy-gateway/templates/envoy-gateway-cnp.yaml b/helm/envoy-gateway/templates/envoy-gateway-cnp.yaml
 new file mode 100644
-index 0000000..1b4547f
+index 0000000..1b8f5dd
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/envoy-gateway-cnp.yaml
-@@ -0,0 +1,41 @@
+@@ -0,0 +1,37 @@
 +---
 +apiVersion: "cilium.io/v2"
 +kind: CiliumNetworkPolicy
 +metadata:
-+  name: {{ template "envoy-gateway.fullname" . }}
-+  namespace: {{ include "envoy-gateway.namespace" . }}
++  name: {{ include "eg.fullname" . }}
++  namespace: {{ .Release.Namespace }}
 +  labels:
 +    control-plane: envoy-gateway
 +    {{- include "eg.labels" . | nindent 4 }}
@@ -107,26 +110,22 @@ index 0000000..1b4547f
 +        - cluster
 +      toPorts:
 +        - ports:
-+            - port: "18000"
++            {{- range .Values.deployment.envoyGateway.ports }}
++            - port: {{ printf "\"%d\"" .port }}
 +              protocol: TCP
-+            - port: "18001"
-+              protocol: TCP
-+            - port: "18002"
-+              protocol: TCP
-+            - port: "19001"
-+              protocol: TCP
++            {{- end }}
 diff --git a/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml b/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml
 new file mode 100644
-index 0000000..38b3cea
+index 0000000..37d3be0
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml
-@@ -0,0 +1,45 @@
+@@ -0,0 +1,41 @@
 +---
 +apiVersion: networking.k8s.io/v1
 +kind: NetworkPolicy
 +metadata:
-+  name: {{ template "envoy-gateway.fullname" . }}
-+  namespace: {{ include "envoy-gateway.namespace" . }}
++  name: {{ include "eg.fullname" . }}
++  namespace: {{ .Release.Namespace }}
 +  labels:
 +    control-plane: envoy-gateway
 +    {{- include "eg.labels" . | nindent 4 }}
@@ -156,13 +155,9 @@ index 0000000..38b3cea
 +          protocol: TCP
 +  ingress:
 +    - ports:
-+        - port: 18000
++        {{- range .Values.deployment.envoyGateway.ports }}
++        - port: {{ .port }}
 +          protocol: TCP
-+        - port: 18001
-+          protocol: TCP
-+        - port: 18002
-+          protocol: TCP
-+        - port: 19001
-+          protocol: TCP
++        {{- end }}
 +      from:
 +        - namespaceSelector: {}

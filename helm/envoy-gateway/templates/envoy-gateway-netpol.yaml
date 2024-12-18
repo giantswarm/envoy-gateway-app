@@ -2,8 +2,8 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ template "envoy-gateway.fullname" . }}
-  namespace: {{ include "envoy-gateway.namespace" . }}
+  name: {{ include "eg.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     control-plane: envoy-gateway
     {{- include "eg.labels" . | nindent 4 }}
@@ -33,13 +33,9 @@ spec:
           protocol: TCP
   ingress:
     - ports:
-        - port: 18000
+        {{- range .Values.deployment.envoyGateway.ports }}
+        - port: {{ .port }}
           protocol: TCP
-        - port: 18001
-          protocol: TCP
-        - port: 18002
-          protocol: TCP
-        - port: 19001
-          protocol: TCP
+        {{- end }}
       from:
         - namespaceSelector: {}
