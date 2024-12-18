@@ -223,7 +223,7 @@
                                     "type": "integer"
                                 },
                                 "readOnlyRootFilesystem": {
-                                    "type": "integer"
+                                    "type": "boolean"
                                 },
                                 "seccompProfile": {
                                     "type": "object",
