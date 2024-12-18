@@ -67,7 +67,7 @@ The name of the Envoy Gateway image.
 */}}
 {{- define "eg.image" -}}
 {{- if .Values.image.registry }}
-{{- .Values.image.registry }}/{{- .Values.deployment.envoyGateway.image.name }}:{{ .Values.deployment.envoyGateway.image.tag | default .Chart.AppVersion }}
+{{- .Values.image.registry }}/{{- .Values.image.repository }}/{{- .Values.deployment.envoyGateway.image.name }}:{{ .Values.deployment.envoyGateway.image.tag | default .Chart.AppVersion }}
 {{- else if .Values.global.images.envoyGateway.image }}
 {{- .Values.global.images.envoyGateway.image }}
 {{- else }}

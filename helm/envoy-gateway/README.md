@@ -115,6 +115,7 @@ To uninstall the chart:
 | global.images.ratelimit.pullPolicy | string | `"IfNotPresent"` |  |
 | global.images.ratelimit.pullSecrets | list | `[]` |  |
 | image.registry | string | `"gsoci.azurecr.io"` |  |
+| image.repository | string | `"giantswarm"` |  |
 | kubernetesClusterDomain | string | `"cluster.local"` |  |
 | podDisruptionBudget.minAvailable | int | `0` |  |
 | service.annotations | object | `{}` |  |

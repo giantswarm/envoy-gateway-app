@@ -24,6 +24,7 @@ podDisruptionBudget:
 
 image:
   registry: gsoci.azurecr.io
+  repository: giantswarm
 
 deployment:
   envoyGateway:

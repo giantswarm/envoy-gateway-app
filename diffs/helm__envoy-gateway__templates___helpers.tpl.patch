@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/templates/_helpers.tpl b/helm/envoy-gateway/templates/_helpers.tpl
-index d9aefc2..d3bb56d 100644
+index d9aefc2..2645585 100644
 --- a/vendor/gateway-helm/templates/_helpers.tpl
 +++ b/helm/envoy-gateway/templates/_helpers.tpl
 @@ -40,6 +40,7 @@ helm.sh/chart: {{ include "eg.chart" . }}
@@ -17,7 +17,7 @@ index d9aefc2..d3bb56d 100644
 -{{- if .Values.deployment.envoyGateway.image.repository }}
 -{{- .Values.deployment.envoyGateway.image.repository }}:{{ .Values.deployment.envoyGateway.image.tag | default .Values.global.images.envoyGateway.tag | default .Chart.AppVersion }}
 +{{- if .Values.image.registry }}
-+{{- .Values.image.registry }}/{{- .Values.deployment.envoyGateway.image.name }}:{{ .Values.deployment.envoyGateway.image.tag | default .Chart.AppVersion }}
++{{- .Values.image.registry }}/{{- .Values.image.repository }}/{{- .Values.deployment.envoyGateway.image.name }}:{{ .Values.deployment.envoyGateway.image.tag | default .Chart.AppVersion }}
  {{- else if .Values.global.images.envoyGateway.image }}
  {{- .Values.global.images.envoyGateway.image }}
  {{- else }}
