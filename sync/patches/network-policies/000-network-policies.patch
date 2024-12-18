@@ -1,8 +1,8 @@
-diff --git a/helm/envoy-gateway/certgen-cnp.yaml b/helm/envoy-gateway/certgen-cnp.yaml
+diff --git a/helm/envoy-gateway/templates/certgen-cnp.yaml b/helm/envoy-gateway/templates/certgen-cnp.yaml
 new file mode 100644
 index 0000000..5a94a5a
 --- /dev/null
-+++ b/helm/envoy-gateway/certgen-cnp.yaml
++++ b/helm/envoy-gateway/templates/certgen-cnp.yaml
 @@ -0,0 +1,20 @@
 +---
 +apiVersion: "cilium.io/v2"
@@ -24,11 +24,11 @@ index 0000000..5a94a5a
 +  ingress:
 +    - fromEntities:
 +        - kube-apiserver
-diff --git a/helm/envoy-gateway/certgen-netpol.yaml b/helm/envoy-gateway/certgen-netpol.yaml
+diff --git a/helm/envoy-gateway/templates/certgen-netpol.yaml b/helm/envoy-gateway/templates/certgen-netpol.yaml
 new file mode 100644
 index 0000000..92933c8
 --- /dev/null
-+++ b/helm/envoy-gateway/certgen-netpol.yaml
++++ b/helm/envoy-gateway/templates/certgen-netpol.yaml
 @@ -0,0 +1,38 @@
 +---
 +apiVersion: networking.k8s.io/v1
@@ -68,11 +68,11 @@ index 0000000..92933c8
 +          podSelector:
 +            matchLabels:
 +              k8s-app: kube-apiserver
-diff --git a/helm/envoy-gateway/envoy-gateway-cnp.yaml b/helm/envoy-gateway/envoy-gateway-cnp.yaml
+diff --git a/helm/envoy-gateway/templates/envoy-gateway-cnp.yaml b/helm/envoy-gateway/templates/envoy-gateway-cnp.yaml
 new file mode 100644
 index 0000000..1b4547f
 --- /dev/null
-+++ b/helm/envoy-gateway/envoy-gateway-cnp.yaml
++++ b/helm/envoy-gateway/templates/envoy-gateway-cnp.yaml
 @@ -0,0 +1,41 @@
 +---
 +apiVersion: "cilium.io/v2"
@@ -115,11 +115,11 @@ index 0000000..1b4547f
 +              protocol: TCP
 +            - port: "19001"
 +              protocol: TCP
-diff --git a/helm/envoy-gateway/envoy-gateway-netpol.yaml b/helm/envoy-gateway/envoy-gateway-netpol.yaml
+diff --git a/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml b/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml
 new file mode 100644
 index 0000000..38b3cea
 --- /dev/null
-+++ b/helm/envoy-gateway/envoy-gateway-netpol.yaml
++++ b/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml
 @@ -0,0 +1,45 @@
 +---
 +apiVersion: networking.k8s.io/v1

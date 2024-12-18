@@ -1,8 +1,8 @@
-diff --git a/helm/envoy-gateway/envoy-gateway-netpol.yaml b/helm/envoy-gateway/envoy-gateway-netpol.yaml
+diff --git a/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml b/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml
 new file mode 100644
 index 0000000..38b3cea
 --- /dev/null
-+++ b/helm/envoy-gateway/envoy-gateway-netpol.yaml
++++ b/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml
 @@ -0,0 +1,45 @@
 +---
 +apiVersion: networking.k8s.io/v1
