@@ -17,6 +17,7 @@ vendir sync
 ./sync/patches/pss-comply/patch.sh
 ./sync/patches/team-label/patch.sh
 ./sync/patches/values/patch.sh
+./sync/patches/network-policies/patch.sh
 
 HELM_DOCS="docker run --rm -u $(id -u) -v ${PWD}:/helm-docs -w /helm-docs jnorwood/helm-docs:v1.11.0"
 $HELM_DOCS --template-files=sync/readme.gotmpl -g helm/envoy-gateway -f values.yaml -o README.md

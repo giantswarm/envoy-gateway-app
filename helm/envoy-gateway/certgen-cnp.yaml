@@ -1,0 +1,20 @@
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: {{ template "envoy-gateway.fullname" . }}-certgen
+  namespace: {{ include "envoy-gateway.namespace" . }}
+  labels:
+    {{- include "eg.labels" . | nindent 4 }}
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: "certgen"
+  egress:
+    - toEntities:
+        - kube-apiserver
+        - cluster
+  ingress:
+    - fromEntities:
+        - kube-apiserver

@@ -1,0 +1,44 @@
+diff --git a/helm/envoy-gateway/certgen-netpol.yaml b/helm/envoy-gateway/certgen-netpol.yaml
+new file mode 100644
+index 0000000..92933c8
+--- /dev/null
++++ b/helm/envoy-gateway/certgen-netpol.yaml
+@@ -0,0 +1,38 @@
++---
++apiVersion: networking.k8s.io/v1
++kind: NetworkPolicy
++metadata:
++  name: {{ template "envoy-gateway.fullname" . }}-certgen
++  namespace: {{ include "envoy-gateway.namespace" . }}
++  labels:
++    {{- include "eg.labels" . | nindent 4 }}
++spec:
++  podSelector:
++    matchLabels:
++      app.kubernetes.io/instance: {{ .Release.Name }}
++      app.kubernetes.io/component: "certgen"
++  policyTypes:
++    - Ingress
++    - Egress
++  egress:
++    - to:
++        - namespaceSelector: {}
++          podSelector:
++            matchLabels:
++              k8s-app: kube-apiserver
++    - ports:
++        - port: 53
++          protocol: UDP
++        - port: 53
++          protocol: TCP
++      to:
++        - namespaceSelector: {}
++          podSelector:
++            matchLabels:
++              k8s-app: kube-dns
++  ingress:
++    - from:
++        - namespaceSelector: {}
++          podSelector:
++            matchLabels:
++              k8s-app: kube-apiserver
