@@ -8,7 +8,13 @@
                 "job": {
                     "type": "object",
                     "properties": {
+                        "affinity": {
+                            "type": "object"
+                        },
                         "annotations": {
+                            "type": "object"
+                        },
+                        "nodeSelector": {
                             "type": "object"
                         },
                         "resources": {
@@ -34,6 +40,51 @@
                                     }
                                 }
                             }
+                        },
+                        "securityContext": {
+                            "type": "object",
+                            "properties": {
+                                "allowPrivilegeEscalation": {
+                                    "type": "boolean"
+                                },
+                                "capabilities": {
+                                    "type": "object",
+                                    "properties": {
+                                        "drop": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "privileged": {
+                                    "type": "boolean"
+                                },
+                                "readOnlyRootFilesystem": {
+                                    "type": "boolean"
+                                },
+                                "runAsGroup": {
+                                    "type": "integer"
+                                },
+                                "runAsNonRoot": {
+                                    "type": "boolean"
+                                },
+                                "runAsUser": {
+                                    "type": "integer"
+                                },
+                                "seccompProfile": {
+                                    "type": "object",
+                                    "properties": {
+                                        "type": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "tolerations": {
+                            "type": "array"
                         },
                         "ttlSecondsAfterFinished": {
                             "type": "integer"
@@ -124,9 +175,6 @@
                                 "limits": {
                                     "type": "object",
                                     "properties": {
-                                        "cpu": {
-                                            "type": "string"
-                                        },
                                         "memory": {
                                             "type": "string"
                                         }
@@ -144,6 +192,48 @@
                                     }
                                 }
                             }
+                        },
+                        "securityContext": {
+                            "type": "object",
+                            "properties": {
+                                "allowPrivilegeEscalation": {
+                                    "type": "boolean"
+                                },
+                                "capabilities": {
+                                    "type": "object",
+                                    "properties": {
+                                        "drop": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "privileged": {
+                                    "type": "boolean"
+                                },
+                                "runAsGroup": {
+                                    "type": "integer"
+                                },
+                                "runAsNonRoot": {
+                                    "type": "boolean"
+                                },
+                                "runAsUser": {
+                                    "type": "integer"
+                                },
+                                "readOnlyRootFilesystem": {
+                                    "type": "boolean"
+                                },
+                                "seccompProfile": {
+                                    "type": "object",
+                                    "properties": {
+                                        "type": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 },
@@ -154,10 +244,27 @@
                             "type": "object"
                         },
                         "annotations": {
-                            "type": "object"
+                            "type": "object",
+                            "properties": {
+                                "prometheus.io/port": {
+                                    "type": "string"
+                                },
+                                "prometheus.io/scrape": {
+                                    "type": "string"
+                                }
+                            }
                         },
                         "labels": {
                             "type": "object"
+                        },
+                        "nodeSelector": {
+                            "type": "object"
+                        },
+                        "tolerations": {
+                            "type": "array"
+                        },
+                        "topologySpreadConstraints": {
+                            "type": "array"
                         }
                     }
                 },
@@ -178,16 +285,49 @@
                         }
                     }
                 },
+                "priorityClassName": {
+                    "type": "null"
+                },
                 "replicas": {
                     "type": "integer"
                 }
             }
         },
-        "envoyGatewayMetricsService": {
+        "global": {
             "type": "object",
             "properties": {
-                "port": {
-                    "type": "integer"
+                "images": {
+                    "type": "object",
+                    "properties": {
+                        "envoyGateway": {
+                            "type": "object",
+                            "properties": {
+                                "image": {
+                                    "type": "string"
+                                },
+                                "pullPolicy": {
+                                    "type": "string"
+                                },
+                                "pullSecrets": {
+                                    "type": "array"
+                                }
+                            }
+                        },
+                        "ratelimit": {
+                            "type": "object",
+                            "properties": {
+                                "image": {
+                                    "type": "string"
+                                },
+                                "pullPolicy": {
+                                    "type": "string"
+                                },
+                                "pullSecrets": {
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -201,6 +341,22 @@
         },
         "kubernetesClusterDomain": {
             "type": "string"
+        },
+        "podDisruptionBudget": {
+            "type": "object",
+            "properties": {
+                "minAvailable": {
+                    "type": "integer"
+                }
+            }
+        },
+        "service": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "object"
+                }
+            }
         }
     }
 }

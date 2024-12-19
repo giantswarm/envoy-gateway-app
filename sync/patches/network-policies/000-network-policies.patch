@@ -1,0 +1,197 @@
+diff --git a/helm/envoy-gateway/templates/certgen-cnp.yaml b/helm/envoy-gateway/templates/certgen-cnp.yaml
+new file mode 100644
+index 0000000..2af4f5c
+--- /dev/null
++++ b/helm/envoy-gateway/templates/certgen-cnp.yaml
+@@ -0,0 +1,43 @@
++---
++apiVersion: "cilium.io/v2"
++kind: CiliumNetworkPolicy
++metadata:
++  name: {{ include "eg.fullname" . }}-certgen
++  namespace: {{ .Release.Namespace }}
++  annotations:
++    "helm.sh/hook": "pre-install,pre-upgrade"
++    "helm.sh/hook-weight": "-10"
++    "helm.sh/hook-delete-policy": "before-hook-creation"
++  labels:
++    app.kubernetes.io/component: "certgen"
++    {{- include "eg.labels" . | nindent 4 }}
++spec:
++  endpointSelector:
++    matchLabels:
++      app.kubernetes.io/component: "certgen"
++      {{- include "eg.selectorLabels" . | nindent 6 }}
++  egress:
++    - toEntities:
++        - kube-apiserver
++    - toEndpoints:
++        - matchLabels:
++            k8s:io.kubernetes.pod.namespace: default
++            k8s:k8s-app: kubernetes
++      toPorts:
++        - ports:
++            - port: "443"
++              protocol: TCP
++    - toEndpoints:
++        - matchLabels:
++            k8s:component: kube-apiserver
++            k8s:tier: control-plane
++    - toEndpoints:
++        - matchLabels:
++            k8s:io.kubernetes.pod.namespace: kube-system
++            k8s:k8s-app: kube-dns
++      toPorts:
++        - ports:
++            - port: "53"
++              protocol: UDP
++            - port: "53"
++              protocol: TCP
+diff --git a/helm/envoy-gateway/templates/certgen-netpol.yaml b/helm/envoy-gateway/templates/certgen-netpol.yaml
+new file mode 100644
+index 0000000..0e9f09a
+--- /dev/null
++++ b/helm/envoy-gateway/templates/certgen-netpol.yaml
+@@ -0,0 +1,44 @@
++---
++apiVersion: networking.k8s.io/v1
++kind: NetworkPolicy
++metadata:
++  name: {{ include "eg.fullname" . }}-certgen
++  namespace: {{ .Release.Namespace }}
++  annotations:
++    "helm.sh/hook": "pre-install,pre-upgrade"
++    "helm.sh/hook-weight": "-10"
++    "helm.sh/hook-delete-policy": "before-hook-creation"
++  labels:
++    app.kubernetes.io/component: "certgen"
++    {{- include "eg.labels" . | nindent 4 }}
++spec:
++  podSelector:
++    matchLabels:
++      app.kubernetes.io/component: "certgen"
++      {{- include "eg.selectorLabels" . | nindent 6 }}
++  policyTypes:
++    - Ingress
++    - Egress
++  egress:
++    - to:
++        - namespaceSelector: {}
++          podSelector:
++            matchLabels:
++              component: kube-apiserver
++              tier: control-plane
++    - to:
++        - ipBlock:
++            cidr: 172.31.0.1/32
++      ports:
++        - port: 443
++          protocol: TCP
++    - ports:
++        - port: 53
++          protocol: UDP
++        - port: 53
++          protocol: TCP
++      to:
++        - namespaceSelector: {}
++          podSelector:
++            matchLabels:
++              k8s-app: kube-dns
+diff --git a/helm/envoy-gateway/templates/envoy-gateway-cnp.yaml b/helm/envoy-gateway/templates/envoy-gateway-cnp.yaml
+new file mode 100644
+index 0000000..a44b6ee
+--- /dev/null
++++ b/helm/envoy-gateway/templates/envoy-gateway-cnp.yaml
+@@ -0,0 +1,41 @@
++---
++apiVersion: "cilium.io/v2"
++kind: CiliumNetworkPolicy
++metadata:
++  name: {{ include "eg.fullname" . }}
++  namespace: {{ .Release.Namespace }}
++  annotations:
++    "helm.sh/hook": "pre-install,pre-upgrade"
++    "helm.sh/hook-weight": "-10"
++    "helm.sh/hook-delete-policy": "before-hook-creation"
++  labels:
++    control-plane: envoy-gateway
++    {{- include "eg.labels" . | nindent 4 }}
++spec:
++  endpointSelector:
++    matchLabels:
++      control-plane: envoy-gateway
++      {{- include "eg.selectorLabels" . | nindent 6 }}
++  egress:
++    - toEntities:
++        - kube-apiserver
++        - cluster
++    - toEndpoints:
++        - matchLabels:
++            k8s:io.kubernetes.pod.namespace: kube-system
++            k8s-app: kube-dns
++      toPorts:
++        - ports:
++            - port: "53"
++              protocol: UDP
++            - port: "53"
++              protocol: TCP
++  ingress:
++    - fromEntities:
++        - cluster
++      toPorts:
++        - ports:
++            {{- range .Values.deployment.envoyGateway.ports }}
++            - port: {{ printf "\"%d\"" .port }}
++              protocol: TCP
++            {{- end }}
+diff --git a/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml b/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml
+new file mode 100644
+index 0000000..9d9049d
+--- /dev/null
++++ b/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml
+@@ -0,0 +1,45 @@
++---
++apiVersion: networking.k8s.io/v1
++kind: NetworkPolicy
++metadata:
++  name: {{ include "eg.fullname" . }}
++  namespace: {{ .Release.Namespace }}
++  annotations:
++    "helm.sh/hook": "pre-install,pre-upgrade"
++    "helm.sh/hook-weight": "-10"
++    "helm.sh/hook-delete-policy": "before-hook-creation"
++  labels:
++    control-plane: envoy-gateway
++    {{- include "eg.labels" . | nindent 4 }}
++spec:
++  podSelector:
++    matchLabels:
++      control-plane: envoy-gateway
++      {{- include "eg.selectorLabels" . | nindent 6 }}
++  policyTypes:
++    - Ingress
++    - Egress
++  egress:
++    - to:
++        - namespaceSelector: {}
++          podSelector:
++            matchLabels:
++              k8s-app: kube-apiserver
++    - to:
++        - namespaceSelector: {}
++          podSelector:
++            matchLabels:
++              k8s-app: kube-dns
++      ports:
++        - port: 53
++          protocol: UDP
++        - port: 53
++          protocol: TCP
++  ingress:
++    - ports:
++        {{- range .Values.deployment.envoyGateway.ports }}
++        - port: {{ .port }}
++          protocol: TCP
++        {{- end }}
++      from:
++        - namespaceSelector: {}

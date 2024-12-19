@@ -1,0 +1,41 @@
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: {{ include "eg.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": "pre-install,pre-upgrade"
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+  labels:
+    control-plane: envoy-gateway
+    {{- include "eg.labels" . | nindent 4 }}
+spec:
+  endpointSelector:
+    matchLabels:
+      control-plane: envoy-gateway
+      {{- include "eg.selectorLabels" . | nindent 6 }}
+  egress:
+    - toEntities:
+        - kube-apiserver
+        - cluster
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+  ingress:
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            {{- range .Values.deployment.envoyGateway.ports }}
+            - port: {{ printf "\"%d\"" .port }}
+              protocol: TCP
+            {{- end }}

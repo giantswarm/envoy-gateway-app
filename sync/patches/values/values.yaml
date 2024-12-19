@@ -1,20 +1,61 @@
+# The global settings for the Envoy Gateway Helm chart.
+# These values will be used if the values are not overridden in the other sections.
+global:
+  images:
+    envoyGateway:
+      # This is the full image name including the hub, repo, and tag.
+      image: docker.io/envoyproxy/gateway:v1.2.1
+      # Specify image pull policy if default behavior isn't desired.
+      # Default behavior: latest images will be Always else IfNotPresent.
+      pullPolicy: IfNotPresent
+      # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
+      pullSecrets: []
+    ratelimit:
+      # This is the full image name including the hub, repo, and tag.
+      image: "docker.io/envoyproxy/ratelimit:master"
+      # Specify image pull policy if default behavior isn't desired.
+      # Default behavior: latest images will be Always else IfNotPresent.
+      pullPolicy: IfNotPresent
+      # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
+      pullSecrets: []
+
+name: envoy-gateway
+namespace: envoy-gateway-system
+serviceType: managed
+
+podDisruptionBudget:
+  minAvailable: 0
+  # maxUnavailable: 1
+
 image:
   registry: gsoci.azurecr.io
+  repository: giantswarm
 
 deployment:
   envoyGateway:
     image:
       name: envoyproxy-gateway
-      tag: 'v1.0.2'
-    imagePullPolicy: Always
+      tag: 'v1.2.1'
+    imagePullPolicy: ""
     imagePullSecrets: []
     resources:
       limits:
-        cpu: 500m
         memory: 1024Mi
       requests:
         cpu: 100m
         memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      runAsNonRoot: true
+      runAsGroup: 65532
+      runAsUser: 65532
+      readOnlyRootFilesystem: true
+      seccompProfile:
+        type: RuntimeDefault
   ports:
     - name: grpc
       port: 18000
@@ -22,11 +63,26 @@ deployment:
     - name: ratelimit
       port: 18001
       targetPort: 18001
+    - name: wasm
+      port: 18002
+      targetPort: 18002
+    - name: metrics
+      port: 19001
+      targetPort: 19001
+  priorityClassName: null
   replicas: 1
   pod:
     affinity: {}
-    annotations: {}
+    annotations:
+      prometheus.io/scrape: 'true'
+      prometheus.io/port: '19001'
     labels: {}
+    topologySpreadConstraints: []
+    tolerations: []
+    nodeSelector: {}
+
+service:
+  annotations: {}
 
 config:
   envoyGateway:
@@ -37,9 +93,6 @@ config:
     logging:
       level:
         default: info
-
-envoyGatewayMetricsService:
-  port: 19001
 
 createNamespace: false
 
@@ -54,7 +107,22 @@ certgen:
         memory: 100Mi
       limits:
         memory: 500Mi
-    ttlSecondsAfterFinished: 0
+    affinity: {}
+    tolerations: []
+    nodeSelector: {}
+    ttlSecondsAfterFinished: 30
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsGroup: 65534
+      runAsUser: 65534
+      seccompProfile:
+        type: RuntimeDefault
   rbac:
     annotations: {}
     labels: {}
