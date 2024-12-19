@@ -12,10 +12,14 @@ set -x
 vendir sync
 { set +x; } 2>/dev/null
 
+# Remove trailing whitespace end of lines (hack to fix vendir bug)
+find vendor/ -type f -exec sed -i 's/[[:space:]]*$//' {} \;
+
 # Patches
 ./sync/patches/image-registry/patch.sh
 ./sync/patches/pss-comply/patch.sh
 ./sync/patches/team-label/patch.sh
+./sync/patches/namespace-values/patch.sh
 ./sync/patches/values/patch.sh
 ./sync/patches/network-policies/patch.sh
 

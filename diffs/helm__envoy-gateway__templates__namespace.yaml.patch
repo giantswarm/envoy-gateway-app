@@ -1,0 +1,12 @@
+diff --git a/helm/envoy-gateway/templates/namespace.yaml b/helm/envoy-gateway/templates/namespace.yaml
+new file mode 100644
+index 0000000..c68c79a
+--- /dev/null
++++ b/helm/envoy-gateway/templates/namespace.yaml
+@@ -0,0 +1,6 @@
++{{ if .Values.createNamespace }}
++apiVersion: v1
++kind: Namespace
++metadata:
++  name: '{{ .Values.namespace }}'
++{{ end }}

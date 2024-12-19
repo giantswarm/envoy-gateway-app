@@ -1,17 +1,8 @@
-# gateway-helm
-
-![Version: v0.0.0-latest](https://img.shields.io/badge/Version-v0.0.0--latest-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
+# envoy-gateway
 
 The Helm chart for Envoy Gateway
 
-**Homepage:** <https://gateway.envoyproxy.io/>
-
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| envoy-gateway-steering-committee |  | <https://github.com/envoyproxy/gateway/blob/main/GOVERNANCE.md> |
-| envoy-gateway-maintainers |  | <https://github.com/envoyproxy/gateway/blob/main/CODEOWNERS> |
+**Homepage:** <https://github.com/giantswarm/envoy-gateway-app>
 
 ## Source Code
 
@@ -59,13 +50,30 @@ To uninstall the chart:
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| certgen | object | `{"job":{"affinity":{},"annotations":{},"nodeSelector":{},"resources":{},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true,"runAsGroup":65534,"runAsNonRoot":true,"runAsUser":65534,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[],"ttlSecondsAfterFinished":30},"rbac":{"annotations":{},"labels":{}}}` | Certgen is used to generate the certificates required by EnvoyGateway. If you want to construct a custom certificate, you can generate a custom certificate through Cert-Manager before installing EnvoyGateway. Certgen will not overwrite the custom certificate. Please do not manually modify `values.yaml` to disable certgen, it may cause EnvoyGateway OIDC,OAuth2,etc. to not work as expected. |
+| certgen.job.affinity | object | `{}` |  |
+| certgen.job.annotations | object | `{}` |  |
+| certgen.job.nodeSelector | object | `{}` |  |
+| certgen.job.resources.limits.memory | string | `"500Mi"` |  |
+| certgen.job.resources.requests.cpu | string | `"50m"` |  |
+| certgen.job.resources.requests.memory | string | `"100Mi"` |  |
+| certgen.job.securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| certgen.job.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| certgen.job.securityContext.privileged | bool | `false` |  |
+| certgen.job.securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| certgen.job.securityContext.runAsGroup | int | `65534` |  |
+| certgen.job.securityContext.runAsNonRoot | bool | `true` |  |
+| certgen.job.securityContext.runAsUser | int | `65534` |  |
+| certgen.job.securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| certgen.job.tolerations | list | `[]` |  |
+| certgen.job.ttlSecondsAfterFinished | int | `30` |  |
+| certgen.rbac.annotations | object | `{}` |  |
+| certgen.rbac.labels | object | `{}` |  |
 | config.envoyGateway.gateway.controllerName | string | `"gateway.envoyproxy.io/gatewayclass-controller"` |  |
 | config.envoyGateway.logging.level.default | string | `"info"` |  |
 | config.envoyGateway.provider.type | string | `"Kubernetes"` |  |
 | createNamespace | bool | `false` |  |
-| deployment.envoyGateway.image.repository | string | `""` |  |
-| deployment.envoyGateway.image.tag | string | `""` |  |
+| deployment.envoyGateway.image.name | string | `"envoyproxy-gateway"` |  |
+| deployment.envoyGateway.image.tag | string | `"v1.2.1"` |  |
 | deployment.envoyGateway.imagePullPolicy | string | `""` |  |
 | deployment.envoyGateway.imagePullSecrets | list | `[]` |  |
 | deployment.envoyGateway.resources.limits.memory | string | `"1024Mi"` |  |
@@ -74,6 +82,7 @@ To uninstall the chart:
 | deployment.envoyGateway.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | deployment.envoyGateway.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | deployment.envoyGateway.securityContext.privileged | bool | `false` |  |
+| deployment.envoyGateway.securityContext.readOnlyRootFilesystem | bool | `true` |  |
 | deployment.envoyGateway.securityContext.runAsGroup | int | `65532` |  |
 | deployment.envoyGateway.securityContext.runAsNonRoot | bool | `true` |  |
 | deployment.envoyGateway.securityContext.runAsUser | int | `65532` |  |
@@ -99,13 +108,21 @@ To uninstall the chart:
 | deployment.ports[3].targetPort | int | `19001` |  |
 | deployment.priorityClassName | string | `nil` |  |
 | deployment.replicas | int | `1` |  |
-| global.images.envoyGateway.image | string | `nil` |  |
-| global.images.envoyGateway.pullPolicy | string | `nil` |  |
+| global.images.envoyGateway.image | string | `"docker.io/envoyproxy/gateway:v1.2.1"` |  |
+| global.images.envoyGateway.pullPolicy | string | `"IfNotPresent"` |  |
 | global.images.envoyGateway.pullSecrets | list | `[]` |  |
 | global.images.ratelimit.image | string | `"docker.io/envoyproxy/ratelimit:master"` |  |
 | global.images.ratelimit.pullPolicy | string | `"IfNotPresent"` |  |
 | global.images.ratelimit.pullSecrets | list | `[]` |  |
+| image.registry | string | `"gsoci.azurecr.io"` |  |
+| image.repository | string | `"giantswarm"` |  |
 | kubernetesClusterDomain | string | `"cluster.local"` |  |
+| name | string | `"envoy-gateway"` |  |
+| namespace | string | `"envoy-gateway-system"` |  |
 | podDisruptionBudget.minAvailable | int | `0` |  |
 | service.annotations | object | `{}` |  |
+| serviceType | string | `"managed"` |  |
+
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)
 
