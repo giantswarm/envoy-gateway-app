@@ -27,11 +27,15 @@ podDisruptionBudget:
   minAvailable: 0
   # maxUnavailable: 1
 
+image:
+  registry: gsoci.azurecr.io
+  repository: giantswarm
+
 deployment:
   envoyGateway:
     image:
-      repository: ""
-      tag: ""
+      name: envoyproxy-gateway
+      tag: 'v1.2.1'
     imagePullPolicy: ""
     imagePullSecrets: []
     resources:
@@ -49,6 +53,7 @@ deployment:
       runAsNonRoot: true
       runAsGroup: 65532
       runAsUser: 65532
+      readOnlyRootFilesystem: true
       seccompProfile:
         type: RuntimeDefault
   ports:
@@ -93,11 +98,15 @@ createNamespace: false
 
 kubernetesClusterDomain: cluster.local
 
-# -- Certgen is used to generate the certificates required by EnvoyGateway. If you want to construct a custom certificate, you can generate a custom certificate through Cert-Manager before installing EnvoyGateway. Certgen will not overwrite the custom certificate. Please do not manually modify `values.yaml` to disable certgen, it may cause EnvoyGateway OIDC,OAuth2,etc. to not work as expected.
 certgen:
   job:
     annotations: {}
-    resources: {}
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        memory: 500Mi
     affinity: {}
     tolerations: []
     nodeSelector: {}

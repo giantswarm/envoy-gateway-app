@@ -1,8 +1,17 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 56cf308..7979274 100644
+index 56cf308..b81476e 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
-@@ -22,11 +22,15 @@ podDisruptionBudget:
+@@ -18,15 +18,24 @@ global:
+       pullPolicy: IfNotPresent
+       # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
+       pullSecrets: []
++
++name: envoy-gateway
++namespace: envoy-gateway-system
++serviceType: managed
++
+ podDisruptionBudget:
    minAvailable: 0
    # maxUnavailable: 1
  
@@ -20,7 +29,7 @@ index 56cf308..7979274 100644
      imagePullPolicy: ""
      imagePullSecrets: []
      resources:
-@@ -44,6 +48,7 @@ deployment:
+@@ -44,6 +53,7 @@ deployment:
        runAsNonRoot: true
        runAsGroup: 65532
        runAsUser: 65532
@@ -28,7 +37,7 @@ index 56cf308..7979274 100644
        seccompProfile:
          type: RuntimeDefault
    ports:
-@@ -88,11 +93,15 @@ createNamespace: false
+@@ -88,11 +98,15 @@ createNamespace: false
  
  kubernetesClusterDomain: cluster.local
  

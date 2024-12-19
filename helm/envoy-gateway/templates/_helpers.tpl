@@ -40,6 +40,7 @@ helm.sh/chart: {{ include "eg.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+application.giantswarm.io/team: {{ index .Chart.Annotations "application.giantswarm.io/team" | quote }}
 {{- end }}
 
 {{/*
@@ -65,8 +66,8 @@ Create the name of the service account to use
 The name of the Envoy Gateway image.
 */}}
 {{- define "eg.image" -}}
-{{- if .Values.deployment.envoyGateway.image.repository }}
-{{- .Values.deployment.envoyGateway.image.repository }}:{{ .Values.deployment.envoyGateway.image.tag | default .Values.global.images.envoyGateway.tag | default .Chart.AppVersion }}
+{{- if .Values.image.registry }}
+{{- .Values.image.registry }}/{{- .Values.image.repository }}/{{- .Values.deployment.envoyGateway.image.name }}:{{ .Values.deployment.envoyGateway.image.tag | default .Chart.AppVersion }}
 {{- else if .Values.global.images.envoyGateway.image }}
 {{- .Values.global.images.envoyGateway.image }}
 {{- else }}
