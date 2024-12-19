@@ -7,11 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2024-12-19
+
 - changed: `app.giantswarm.io` label group was changed to `application.giantswarm.io`
-- Sync with upstream 1.0.2 helm chart
+- Sync with upstream 1.2.1 helm chart
 - Add team cabbage annotation and label
 - Add values.schema.json
+- Adapt the namespace to our taste
 - Set requests and limits for certgen Job
 - Improve security for PSS compliance
 
-[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/tree/main
+[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/giantswarm/envoy-gateway-app/releases/tag/v0.1.0
