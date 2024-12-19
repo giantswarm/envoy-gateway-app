@@ -8,12 +8,12 @@ Thank you for installing Envoy Gateway! 🎉
 
 Your release is named: {{ .Release.Name }}. 🎉
 
-Your release is in namespace: {{ .Release.Namespace }}. 🎉
+Your release is in namespace: '{{ .Values.namespace }}. 🎉
 
 To learn more about the release, try:
 
-  $ helm status {{ .Release.Name }} -n {{ .Release.Namespace }}
-  $ helm get all {{ .Release.Name }} -n {{ .Release.Namespace }}
+  $ helm status {{ .Release.Name }} -n '{{ .Values.namespace }}
+  $ helm get all {{ .Release.Name }} -n '{{ .Values.namespace }}
 
 To have a quickstart of Envoy Gateway, please refer to https://gateway.envoyproxy.io/latest/tasks/quickstart.
 

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: envoy-gateway
-  namespace: '{{ .Release.Namespace }}'
+  namespace: '{{ .Values.namespace }}'
   labels:
     control-plane: envoy-gateway
   {{- include "eg.labels" . | nindent 4 }}

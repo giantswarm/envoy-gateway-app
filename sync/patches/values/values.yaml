@@ -18,6 +18,11 @@ global:
       pullPolicy: IfNotPresent
       # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
       pullSecrets: []
+
+name: envoy-gateway
+namespace: envoy-gateway-system
+serviceType: managed
+
 podDisruptionBudget:
   minAvailable: 0
   # maxUnavailable: 1
