@@ -2,8 +2,8 @@
 
 # envoy-gateway chart
 
-Giant Swarm offers a envoy-gateway App which can be installed in workload clusters.
-Here we define the envoy-gateway chart with its templates and default configuration.
+Giant Swarm offers an envoy-gateway app that can be installed in workload clusters.
+Here, we define the envoy-gateway chart using its templates and default configuration.
 
 **What is this app?**
 
