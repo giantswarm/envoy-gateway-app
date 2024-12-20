@@ -1,67 +1,52 @@
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/giantswarm/envoy-gateway-app/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/giantswarm/envoy-gateway-app/tree/main)
 
-# envoy-gateway chart
+# Envoy Gateway chart
 
-Giant Swarm offers a envoy-gateway App which can be installed in workload clusters.
-Here we define the envoy-gateway chart with its templates and default configuration.
+Giant Swarm offers an envoy-gateway app that can be installed in workload clusters. Here, we define the envoy-gateway chart using its templates and default configuration.
 
 **What is this app?**
 
+This app is a gateway that routes traffic to services in the workload cluster. It is fully compliant with the [Gateway API](https://gateway-api.sigs.k8s.io/). It deploys an Envoy proxy configured to listen to new `Gateway` and `HTTPRoute` resources and route traffic accordingly.
+
+By default, the app has no `Gateway` or `GatewayClass` resources. We have created a [default configuration app](https://github.com/giantswarm/envoy-gateway-default-configuration) to offer you a quick start in Giant Swarm clusters.
+
 **Why did we add it?**
+
+Our security baseline is higher than usual so we need to add configuration, policies and network rules to make sure the app is secure and compliant with our standards. We extend it using `git` patches over the original app templates.
 
 **Who can use it?**
 
+It is ready to use for any platform team.
+
 ## Installing
 
-There are several ways to install this app onto a workload cluster.
+Before installing this app, you need to configure the cert-manager application in your workload cluster to work with Gateway API. That way the cert manager will listen for Gateway API resources to create certificates when those are needed. Adapt the configmap `*****-user-values` to contain the following configuration:
 
-- [Using GitOps to instantiate the App](https://docs.giantswarm.io/advanced/gitops/apps/)
-- [Using our web interface](https://docs.giantswarm.io/platform-overview/web-interface/app-platform/#installing-an-app).
-- By creating an [App resource](https://docs.giantswarm.io/use-the-api/management-api/crd/apps.application.giantswarm.io/) in the management cluster as explained in [Getting started with App Platform](https://docs.giantswarm.io/getting-started/app-platform/).
+```yaml
+apiVersion: v1
+data:
+  values: |
+    ...
+    featureGates: "ExperimentalGatewayAPISupport=true"
+kind: ConfigMap
+metadata:
+  name: <mylcutser>-cert-manager-user-values
+  namespace: org-<your-org>
+```
 
 ## Configuring
 
-### values.yaml
-
-**This is an example of a values file you could upload using our web interface.**
-
-```yaml
-# values.yaml
-
-```
-
-### Sample App CR and ConfigMap for the management cluster
-
-If you have access to the Kubernetes API on the management cluster, you could create
-the App CR and ConfigMap directly.
-
-Here is an example that would install the app to
-workload cluster `abc12`:
-
-```yaml
-# appCR.yaml
-
-```
-
-```yaml
-# user-values-configmap.yaml
-
-```
-
-See our [full reference on how to configure apps](https://docs.giantswarm.io/getting-started/app-platform/app-configuration/) for more details.
+The default app configuration is ready to deploy an instance of envoy proxy on your cluster to act as gateway. It will be deployed in the `envoy-gateway-system` namespace. You may want to read the [configuration options](https://github.com/giantswarm/gateway-api-app/tree/main/helm/gateway-api) though and accommodate them to your needs.
 
 ## Compatibility
 
 This app has been tested to work with the following workload cluster release versions:
 
-- CAPI >= v25
+- CAPI >= v29.0.0
 
 ## Limitations
 
-Some apps have restrictions on how they can be deployed.
-Not following these limitations will most likely result in a broken deployment.
-
-- The [Gateway API App](https://github.com/giantswarm/gateway-api-app) needs to be deployed beforehand.
+Some of the features of the app are not yet stable and are subject to change. The app is not yet ready for production use.
 
 ## Development
 
