@@ -20,7 +20,7 @@ It is ready to use for any platform team.
 
 ## Installing
 
-Before installing this app, you need to configure the cert-manager application in your workload cluster to work with Gateway API. That way the cert manager will listen for Gateway API resources to create certificates when those are needed. Adapt the configmap `*****-user-values` to contain the following configuration:
+Before installing this app, you need to configure the cert-manager application in your workload cluster to work with Gateway API. That way cert-manager will watch for Gateway resources and create certificates based on the Listener information hostname filed. Adapt the configmap `*****-user-values` to contain the following configuration:
 
 ```yaml
 apiVersion: v1
@@ -30,13 +30,32 @@ data:
     featureGates: "ExperimentalGatewayAPISupport=true"
 kind: ConfigMap
 metadata:
-  name: <mylcutser>-cert-manager-user-values
-  namespace: org-<your-org>
+  name: <cluster_name>-cert-manager-user-values
+  namespace: <org_namespace>
+```
+
+Then, you can install the App using the following manifest:
+
+```
+apiVersion: application.giantswarm.io/v1alpha1
+kind: App
+metadata:
+  labels:
+    giantswarm.io/cluster: <cluster_name>
+  name: <cluster_name>-envoy-gateway
+  namespace: <org_namespace>
+spec:
+  catalog: giantswarm-playground-test
+  kubeConfig:
+    inCluster: false
+  name: envoy-gateway
+  namespace: envoy-gateway-system
+  version: 0.1.0
 ```
 
 ## Configuring
 
-The default app configuration is ready to deploy an instance of envoy proxy on your cluster to act as gateway. It will be deployed in the `envoy-gateway-system` namespace. You may want to read the [configuration options](https://github.com/giantswarm/gateway-api-app/tree/main/helm/gateway-api) though and accommodate them to your needs.
+This app only provides the Envoy Gateway controller and doesn't include any GatewayClass or Gateway resource definition.
 
 ## Compatibility
 

@@ -118,7 +118,6 @@ To uninstall the chart:
 | image.repository | string | `"giantswarm"` |  |
 | kubernetesClusterDomain | string | `"cluster.local"` |  |
 | name | string | `"envoy-gateway"` |  |
-| namespace | string | `"envoy-gateway-system"` |  |
 | podDisruptionBudget.minAvailable | int | `0` |  |
 | service.annotations | object | `{}` |  |
 | serviceType | string | `"managed"` |  |

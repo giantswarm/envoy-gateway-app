@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Remove namespace from values
+
 ## [0.1.0] - 2024-12-19
 
 - changed: `app.giantswarm.io` label group was changed to `application.giantswarm.io`

@@ -20,7 +20,6 @@ global:
       pullSecrets: []
 
 name: envoy-gateway
-namespace: envoy-gateway-system
 serviceType: managed
 
 podDisruptionBudget:

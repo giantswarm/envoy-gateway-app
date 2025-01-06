@@ -19,7 +19,6 @@ find vendor/ -type f -exec sed -i 's/[[:space:]]*$//' {} \;
 ./sync/patches/image-registry/patch.sh
 ./sync/patches/pss-comply/patch.sh
 ./sync/patches/team-label/patch.sh
-./sync/patches/namespace-values/patch.sh
 ./sync/patches/values/patch.sh
 ./sync/patches/network-policies/patch.sh
 
