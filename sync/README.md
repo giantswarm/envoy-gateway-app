@@ -14,7 +14,7 @@ Scenario: Upstream released a new chart version and you want to update our chart
 - Run `./sync/sync.sh`.
 - Fix syncing errors by changing the patches in `sync/patches`.
 - In case of container image version changes:
-  - Update the `tag` fields in `sync/patches/values/values.yaml`. 
+  - Update the `tag` fields in `sync/patches/values/values.yaml`.
   - Update the `appVersion` field in `helm/kong-app/Chart.yaml`.
 - Commit your changes in directories `sync`, `diffs` and `helm`.
 
@@ -50,7 +50,7 @@ The `patch.sh` script is being called by `sync/sync.sh` and contains code to tra
 - Add values.schema.json.
 - Set resources requests and limits for certgen Job.
 
-TODO: 
+TODO:
 - Generate values.schema.json in sync.sh
 - Discuss with upstream to include as default values.
 
@@ -62,3 +62,6 @@ TODO:
 
 TODO: Push to upstream as default or make it configurable through values.
 
+### disable-gateway-api-crds
+
+Remove the bundled Gateway API CRD file. We're installing these separately as part of the [gateway-api-bundle](https://github.com/giantswarm/gateway-api-bundle)
