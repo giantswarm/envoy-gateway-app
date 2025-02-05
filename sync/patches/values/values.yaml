@@ -4,7 +4,7 @@ global:
   images:
     envoyGateway:
       # This is the full image name including the hub, repo, and tag.
-      image: docker.io/envoyproxy/gateway:v1.2.1
+      image: docker.io/envoyproxy/gateway:v1.3.0
       # Specify image pull policy if default behavior isn't desired.
       # Default behavior: latest images will be Always else IfNotPresent.
       pullPolicy: IfNotPresent
@@ -12,7 +12,7 @@ global:
       pullSecrets: []
     ratelimit:
       # This is the full image name including the hub, repo, and tag.
-      image: "docker.io/envoyproxy/ratelimit:master"
+      image: "docker.io/envoyproxy/ratelimit:60d8e81b"
       # Specify image pull policy if default behavior isn't desired.
       # Default behavior: latest images will be Always else IfNotPresent.
       pullPolicy: IfNotPresent
@@ -34,7 +34,7 @@ deployment:
   envoyGateway:
     image:
       name: envoyproxy-gateway
-      tag: 'v1.2.1'
+      tag: 'v1.3.0'
     imagePullPolicy: ""
     imagePullSecrets: []
     resources:
@@ -100,6 +100,7 @@ kubernetesClusterDomain: cluster.local
 certgen:
   job:
     annotations: {}
+    args: []
     resources:
       requests:
         cpu: 50m

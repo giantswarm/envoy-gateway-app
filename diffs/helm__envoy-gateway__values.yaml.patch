@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 56cf308..d383f2d 100644
+index b5a783a..416e088 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -18,15 +18,23 @@ global:
@@ -24,7 +24,7 @@ index 56cf308..d383f2d 100644
 -      repository: ""
 -      tag: ""
 +      name: envoyproxy-gateway
-+      tag: 'v1.2.1'
++      tag: 'v1.3.0'
      imagePullPolicy: ""
      imagePullSecrets: []
      resources:
@@ -36,7 +36,7 @@ index 56cf308..d383f2d 100644
        seccompProfile:
          type: RuntimeDefault
    ports:
-@@ -88,11 +97,15 @@ createNamespace: false
+@@ -88,12 +97,16 @@ createNamespace: false
  
  kubernetesClusterDomain: cluster.local
  
@@ -44,6 +44,7 @@ index 56cf308..d383f2d 100644
  certgen:
    job:
      annotations: {}
+     args: []
 -    resources: {}
 +    resources:
 +      requests:
