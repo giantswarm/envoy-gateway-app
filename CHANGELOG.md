@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade envoy-gateway to [v1.3.0](https://github.com/envoyproxy/gateway/releases/tag/v1.3.0).
+
 ### Removed
 
 - Remove namespace from values
