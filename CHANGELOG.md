@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-02-05
+
 ### Changed
 
 - Upgrade envoy-gateway to [v1.3.0](https://github.com/envoyproxy/gateway/releases/tag/v1.3.0).
@@ -26,5 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set requests and limits for certgen Job
 - Improve security for PSS compliance
 
-[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/giantswarm/envoy-gateway-app/releases/tag/v0.1.0
