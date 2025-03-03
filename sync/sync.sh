@@ -21,6 +21,7 @@ find vendor/ -type f -exec sed -i 's/[[:space:]]*$//' {} \;
 ./sync/patches/team-label/patch.sh
 ./sync/patches/values/patch.sh
 ./sync/patches/network-policies/patch.sh
+./sync/patches/service-monitor/patch.sh
 ./sync/patches/disable-gateway-api-crds/patch.sh
 
 HELM_DOCS="docker run --rm -u $(id -u) -v ${PWD}:/helm-docs -w /helm-docs jnorwood/helm-docs:v1.11.0"
@@ -45,9 +46,10 @@ for f in $(git --no-pager diff --no-exit-code --no-color --no-index vendor/gatew
         git --no-pager diff --no-exit-code --no-color --no-index "$base_file" "${f}" \
                 > "./diffs/${f//\//__}.patch" # ${f//\//__} replaces all "/" with "__"
 
-        ret=$?
         { set +x; } 2>/dev/null
         set -e
+
+        ret=$?
         if [ $ret -ne 0 ] && [ $ret -ne 1 ] ; then
                 exit $ret
         fi
