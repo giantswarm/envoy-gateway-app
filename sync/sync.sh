@@ -21,7 +21,7 @@ find vendor/ -type f -exec sed -i 's/[[:space:]]*$//' {} \;
 ./sync/patches/team-label/patch.sh
 ./sync/patches/values/patch.sh
 ./sync/patches/network-policies/patch.sh
-./sync/patches/service-monitor/patch.sh
+./sync/patches/pod-monitor/patch.sh
 ./sync/patches/disable-gateway-api-crds/patch.sh
 
 HELM_DOCS="docker run --rm -u $(id -u) -v ${PWD}:/helm-docs -w /helm-docs jnorwood/helm-docs:v1.11.0"

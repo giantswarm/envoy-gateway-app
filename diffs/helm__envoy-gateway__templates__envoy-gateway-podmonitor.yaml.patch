@@ -1,18 +1,18 @@
-diff --git a/helm/envoy-gateway/templates/envoy-gateway-servicemonitor.yaml b/helm/envoy-gateway/templates/envoy-gateway-servicemonitor.yaml
+diff --git a/helm/envoy-gateway/templates/envoy-gateway-podmonitor.yaml b/helm/envoy-gateway/templates/envoy-gateway-podmonitor.yaml
 new file mode 100644
-index 0000000..2bb54a9
+index 0000000..7653e03
 --- /dev/null
-+++ b/helm/envoy-gateway/templates/envoy-gateway-servicemonitor.yaml
++++ b/helm/envoy-gateway/templates/envoy-gateway-podmonitor.yaml
 @@ -0,0 +1,27 @@
 +apiVersion: monitoring.coreos.com/v1
-+kind: ServiceMonitor
++kind: PodMonitor
 +metadata:
 +  name: envoy-gateway
 +  namespace: {{ .Release.Namespace }}
 +  labels:
 +    {{- include "eg.labels" . | nindent 4 }}
 +spec:
-+  endpoints:
++  podMetricsEndpoints:
 +  - honorLabels: true
 +    interval: 60s
 +    metricRelabelings: []
@@ -29,5 +29,5 @@ index 0000000..2bb54a9
 +    - {{ .Release.Namespace }}
 +  selector:
 +    matchLabels:
-+      {{ include "eg.selectorLabels" . | nindent 4 }}
++      {{ include "eg.selectorLabels" . | nindent 6 }}
 +
