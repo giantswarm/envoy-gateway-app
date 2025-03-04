@@ -21,7 +21,4 @@ spec:
   namespaceSelector:
     matchNames:
     - {{ .Release.Namespace }}
-  selector:
-    matchLabels:
-      {{ include "eg.selectorLabels" . | nindent 6 }}
-
+  selector: {}

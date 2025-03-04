@@ -1,9 +1,9 @@
 diff --git a/helm/envoy-gateway/templates/envoy-gateway-podmonitor.yaml b/helm/envoy-gateway/templates/envoy-gateway-podmonitor.yaml
 new file mode 100644
-index 0000000..7653e03
+index 0000000..a19fe7e
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/envoy-gateway-podmonitor.yaml
-@@ -0,0 +1,27 @@
+@@ -0,0 +1,24 @@
 +apiVersion: monitoring.coreos.com/v1
 +kind: PodMonitor
 +metadata:
@@ -27,7 +27,4 @@ index 0000000..7653e03
 +  namespaceSelector:
 +    matchNames:
 +    - {{ .Release.Namespace }}
-+  selector:
-+    matchLabels:
-+      {{ include "eg.selectorLabels" . | nindent 6 }}
-+
++  selector: {}
