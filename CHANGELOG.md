@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add PodMonitor scrapping envoy-gateway controller.
+- Add PodMonitor scraping envoy-gateway controller.
 
 ## [0.2.0] - 2025-02-05
 
