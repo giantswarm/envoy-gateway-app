@@ -37,8 +37,8 @@ deployment:
   envoyGateway:
     image:
       # if both this and global.imageRegistry are specified, this has to include both registry and repository explicitly, eg docker.io/envoyproxy/gateway
-      repository: gsoci.azurecr.io/giantswarm/envoyproxy-gateway
-      tag: 'v1.4.2'
+      repository: ""
+      tag: ""
     imagePullPolicy: ""
     imagePullSecrets: []
     resources:

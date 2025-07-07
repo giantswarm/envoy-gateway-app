@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 9feeae5..baecea0 100644
+index 9feeae5..5db40ca 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,8 @@
@@ -38,17 +38,6 @@ index 9feeae5..baecea0 100644
  podDisruptionBudget:
    minAvailable: 0
    # maxUnavailable: 1
-@@ -34,8 +37,8 @@ deployment:
-   envoyGateway:
-     image:
-       # if both this and global.imageRegistry are specified, this has to include both registry and repository explicitly, eg docker.io/envoyproxy/gateway
--      repository: ""
--      tag: ""
-+      repository: gsoci.azurecr.io/giantswarm/envoyproxy-gateway
-+      tag: 'v1.4.2'
-     imagePullPolicy: ""
-     imagePullSecrets: []
-     resources:
 @@ -53,6 +56,7 @@ deployment:
        runAsNonRoot: true
        runAsGroup: 65532

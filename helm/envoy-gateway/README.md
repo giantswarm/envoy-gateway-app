@@ -71,8 +71,8 @@ To uninstall the chart:
 | certgen.rbac.labels | object | `{}` |  |
 | config.envoyGateway | object | `{"extensionApis":{},"gateway":{"controllerName":"gateway.envoyproxy.io/gatewayclass-controller"},"logging":{"level":{"default":"info"}},"provider":{"type":"Kubernetes"}}` | EnvoyGateway configuration. Visit https://gateway.envoyproxy.io/docs/api/extension_types/#envoygateway to view all options. |
 | createNamespace | bool | `false` |  |
-| deployment.envoyGateway.image.repository | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-gateway"` |  |
-| deployment.envoyGateway.image.tag | string | `"v1.4.2"` |  |
+| deployment.envoyGateway.image.repository | string | `""` |  |
+| deployment.envoyGateway.image.tag | string | `""` |  |
 | deployment.envoyGateway.imagePullPolicy | string | `""` |  |
 | deployment.envoyGateway.imagePullSecrets | list | `[]` |  |
 | deployment.envoyGateway.resources.limits.memory | string | `"1024Mi"` |  |
