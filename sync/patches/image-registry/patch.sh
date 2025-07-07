@@ -12,6 +12,7 @@ cd "${repo_dir}"
 readonly script_dir_rel=".${script_dir#"${repo_dir}"}"
 
 set -x
-git apply "${script_dir_rel}/000-image-registry.patch"
+sed -i 's/imageRegistry/image.registry/g' ./helm/envoy-gateway/templates/_helpers.tpl
+
 
 { set +x; } 2>/dev/null
