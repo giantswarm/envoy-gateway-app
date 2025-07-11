@@ -1,0 +1,5 @@
+appName: envoy-gateway
+repoName: envoy-gateway-app
+appCatalog: giantswarm
+providers:
+- capa
