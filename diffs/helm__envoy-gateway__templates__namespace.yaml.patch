@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/templates/namespace.yaml b/helm/envoy-gateway/templates/namespace.yaml
-index 92bc258..0361b22 100644
+index 92bc258..6a7477b 100644
 --- a/vendor/gateway-helm/templates/namespace.yaml
 +++ b/helm/envoy-gateway/templates/namespace.yaml
 @@ -2,5 +2,5 @@
@@ -7,6 +7,5 @@ index 92bc258..0361b22 100644
  kind: Namespace
  metadata:
 -  name: '{{ .Release.Namespace }}'
--{{ end }}
 +  name: '{{ .Release.Namespace }}' 
-+{{ end }}    
+ {{ end }}
