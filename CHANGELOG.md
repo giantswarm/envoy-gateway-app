@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update Envoy Gateway to [v1.4.3](https://gateway.envoyproxy.io/news/releases/notes/v1.4.3).
+- Sync with upstream Helm chart.
+- Refactor Image patch, now using the `globa.image.registry` value.
+
+### Removed
+
+- Drop PSS patch as now the chart is compliant.
+
 ## [0.3.0] - 2025-03-05
 
 ### Added

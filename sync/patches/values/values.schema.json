@@ -113,6 +113,9 @@
                 "envoyGateway": {
                     "type": "object",
                     "properties": {
+                        "extensionApis": {
+                            "type": "object"
+                        },
                         "gateway": {
                             "type": "object",
                             "properties": {
@@ -158,7 +161,7 @@
                         "image": {
                             "type": "object",
                             "properties": {
-                                "name": {
+                                "repository": {
                                     "type": "string"
                                 },
                                 "tag": {
@@ -299,6 +302,17 @@
         "global": {
             "type": "object",
             "properties": {
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "imagePullSecrets": {
+                    "type": "array"
+                },
                 "images": {
                     "type": "object",
                     "properties": {
@@ -334,21 +348,27 @@
                 }
             }
         },
-        "image": {
+        "hpa": {
             "type": "object",
             "properties": {
-                "registry": {
-                    "type": "string"
+                "behavior": {
+                    "type": "object"
                 },
-                "repository": {
-                    "type": "string"
+                "enabled": {
+                    "type": "boolean"
+                },
+                "maxReplicas": {
+                    "type": "integer"
+                },
+                "metrics": {
+                    "type": "array"
+                },
+                "minReplicas": {
+                    "type": "integer"
                 }
             }
         },
         "kubernetesClusterDomain": {
-            "type": "string"
-        },
-        "name": {
             "type": "string"
         },
         "podDisruptionBudget": {
@@ -364,11 +384,25 @@
             "properties": {
                 "annotations": {
                     "type": "object"
+                },
+                "trafficDistribution": {
+                    "type": "string"
                 }
             }
         },
         "serviceType": {
             "type": "string"
+        },
+        "topologyInjector": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "object"
+                },
+                "enabled": {
+                    "type": "boolean"
+                }
+            }
         }
     }
 }
