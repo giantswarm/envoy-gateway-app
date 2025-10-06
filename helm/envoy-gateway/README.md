@@ -50,25 +50,7 @@ To uninstall the chart:
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| certgen.job.affinity | object | `{}` |  |
-| certgen.job.annotations | object | `{}` |  |
-| certgen.job.args | list | `[]` |  |
-| certgen.job.nodeSelector | object | `{}` |  |
-| certgen.job.resources.limits.memory | string | `"500Mi"` |  |
-| certgen.job.resources.requests.cpu | string | `"50m"` |  |
-| certgen.job.resources.requests.memory | string | `"100Mi"` |  |
-| certgen.job.securityContext.allowPrivilegeEscalation | bool | `false` |  |
-| certgen.job.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| certgen.job.securityContext.privileged | bool | `false` |  |
-| certgen.job.securityContext.readOnlyRootFilesystem | bool | `true` |  |
-| certgen.job.securityContext.runAsGroup | int | `65532` |  |
-| certgen.job.securityContext.runAsNonRoot | bool | `true` |  |
-| certgen.job.securityContext.runAsUser | int | `65532` |  |
-| certgen.job.securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
-| certgen.job.tolerations | list | `[]` |  |
-| certgen.job.ttlSecondsAfterFinished | int | `30` |  |
-| certgen.rbac.annotations | object | `{}` |  |
-| certgen.rbac.labels | object | `{}` |  |
+| certgen | object | `{"job":{"affinity":{},"annotations":{},"args":[],"nodeSelector":{},"resources":{"limits":{"memory":"500Mi"},"requests":{"cpu":"50m","memory":"100Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true,"runAsGroup":65532,"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[],"ttlSecondsAfterFinished":30},"rbac":{"annotations":{},"labels":{}}}` | Certgen is used to generate the certificates required by EnvoyGateway. If you want to construct a custom certificate, you can generate a custom certificate through Cert-Manager before installing EnvoyGateway. Certgen will not overwrite the custom certificate. Please do not manually modify `values.yaml` to disable certgen, it may cause EnvoyGateway OIDC,OAuth2,etc. to not work as expected. |
 | config.envoyGateway | object | `{"extensionApis":{},"gateway":{"controllerName":"gateway.envoyproxy.io/gatewayclass-controller"},"logging":{"level":{"default":"info"}},"provider":{"type":"Kubernetes"}}` | EnvoyGateway configuration. Visit https://gateway.envoyproxy.io/docs/api/extension_types/#envoygateway to view all options. |
 | createNamespace | bool | `false` |  |
 | deployment.envoyGateway.image.repository | string | `""` |  |
@@ -109,10 +91,10 @@ To uninstall the chart:
 | deployment.replicas | int | `1` |  |
 | global.image | object | `{"registry":"gsoci.azurecr.io"}` | Global override for image registry |
 | global.imagePullSecrets | list | `[]` | Global override for image pull secrets |
-| global.images.envoyGateway.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.4.3"` |  |
+| global.images.envoyGateway.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.4.4"` |  |
 | global.images.envoyGateway.pullPolicy | string | `"IfNotPresent"` |  |
 | global.images.envoyGateway.pullSecrets | list | `[]` |  |
-| global.images.ratelimit.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:bb4dae24"` |  |
+| global.images.ratelimit.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:e74a664a"` |  |
 | global.images.ratelimit.pullPolicy | string | `"IfNotPresent"` |  |
 | global.images.ratelimit.pullSecrets | list | `[]` |  |
 | hpa.behavior | object | `{}` |  |

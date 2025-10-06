@@ -12,7 +12,7 @@ global:
   images:
     envoyGateway:
       # This is the full image name including the hub, repo, and tag.
-      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.4.3
+      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.4.4
       # Specify image pull policy if default behavior isn't desired.
       # Default behavior: latest images will be Always else IfNotPresent.
       pullPolicy: IfNotPresent
@@ -20,7 +20,7 @@ global:
       pullSecrets: []
     ratelimit:
       # This is the full image name including the hub, repo, and tag.
-      image: "gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:bb4dae24"
+      image: "gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:e74a664a"
       # Specify image pull policy if default behavior isn't desired.
       # Default behavior: latest images will be Always else IfNotPresent.
       pullPolicy: IfNotPresent
@@ -112,6 +112,7 @@ createNamespace: false
 
 kubernetesClusterDomain: cluster.local
 
+# -- Certgen is used to generate the certificates required by EnvoyGateway. If you want to construct a custom certificate, you can generate a custom certificate through Cert-Manager before installing EnvoyGateway. Certgen will not overwrite the custom certificate. Please do not manually modify `values.yaml` to disable certgen, it may cause EnvoyGateway OIDC,OAuth2,etc. to not work as expected.
 certgen:
   job:
     annotations: {}
