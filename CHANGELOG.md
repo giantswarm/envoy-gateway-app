@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Update Envoy Gateway to [v1.4.3](https://gateway.envoyproxy.io/news/releases/notes/v1.4.3).
+- Update Envoy Gateway to [v1.4.4](https://gateway.envoyproxy.io/news/releases/notes/v1.4.4).
 - Sync with upstream Helm chart.
 - Refactor Image patch, now using the `globa.image.registry` value.
 
