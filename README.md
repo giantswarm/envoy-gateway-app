@@ -59,9 +59,11 @@ This app only provides the Envoy Gateway controller and doesn't include any Gate
 
 ## Compatibility
 
-This app has been tested to work with the following workload cluster release versions:
+| Envoy Gateway App | Envoy Gateway | Gateway API CRDs |
+| --- | --- | --- |
+| 1.0.x | 1.4.x | v1.3.0 |
+| 0.3.x | 1.3.x | v1.2.1 |
 
-- CAPI >= v29.0.0
 
 ## Limitations
 
