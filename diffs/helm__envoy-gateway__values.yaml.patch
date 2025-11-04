@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 1b59c21..e1adbe2 100644
+index 17a7dd8..8599b1b 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,8 @@
@@ -16,12 +16,12 @@ index 1b59c21..e1adbe2 100644
    images:
      envoyGateway:
        # This is the full image name including the hub, repo, and tag.
--      image: docker.io/envoyproxy/gateway:v1.4.4
-+      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.4.4
+-      image: docker.io/envoyproxy/gateway:v1.5.4
++      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.5.4
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: latest images will be Always else IfNotPresent.
        pullPolicy: IfNotPresent
-@@ -19,13 +20,15 @@ global:
+@@ -19,19 +20,20 @@ global:
        pullSecrets: []
      ratelimit:
        # This is the full image name including the hub, repo, and tag.
@@ -38,7 +38,13 @@ index 1b59c21..e1adbe2 100644
  podDisruptionBudget:
    minAvailable: 0
    # maxUnavailable: 1
-@@ -53,6 +56,7 @@ deployment:
+ 
+ deployment:
+-  annotations: {}
+   envoyGateway:
+     image:
+       # if both this and global.imageRegistry are specified, this has to include both registry and repository explicitly, eg docker.io/envoyproxy/gateway
+@@ -54,6 +56,7 @@ deployment:
        runAsNonRoot: true
        runAsGroup: 65532
        runAsUser: 65532
@@ -46,7 +52,7 @@ index 1b59c21..e1adbe2 100644
        seccompProfile:
          type: RuntimeDefault
    ports:
-@@ -108,12 +112,16 @@ createNamespace: false
+@@ -109,7 +112,6 @@ createNamespace: false
  
  kubernetesClusterDomain: cluster.local
  
@@ -54,7 +60,10 @@ index 1b59c21..e1adbe2 100644
  certgen:
    job:
      annotations: {}
-     args: []
+@@ -117,7 +119,12 @@ certgen:
+     pod:
+       annotations: {}
+       labels: {}
 -    resources: {}
 +    resources:
 +      requests:
