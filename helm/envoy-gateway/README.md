@@ -54,6 +54,8 @@ To uninstall the chart:
 | certgen.job.annotations | object | `{}` |  |
 | certgen.job.args | list | `[]` |  |
 | certgen.job.nodeSelector | object | `{}` |  |
+| certgen.job.pod.annotations | object | `{}` |  |
+| certgen.job.pod.labels | object | `{}` |  |
 | certgen.job.resources.limits.memory | string | `"500Mi"` |  |
 | certgen.job.resources.requests.cpu | string | `"50m"` |  |
 | certgen.job.resources.requests.memory | string | `"100Mi"` |  |
@@ -109,7 +111,7 @@ To uninstall the chart:
 | deployment.replicas | int | `1` |  |
 | global.image | object | `{"registry":"gsoci.azurecr.io"}` | Global override for image registry |
 | global.imagePullSecrets | list | `[]` | Global override for image pull secrets |
-| global.images.envoyGateway.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.4.4"` |  |
+| global.images.envoyGateway.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.5.4"` |  |
 | global.images.envoyGateway.pullPolicy | string | `"IfNotPresent"` |  |
 | global.images.envoyGateway.pullSecrets | list | `[]` |  |
 | global.images.ratelimit.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:e74a664a"` |  |
