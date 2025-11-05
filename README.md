@@ -61,6 +61,7 @@ This app only provides the Envoy Gateway controller and doesn't include any Gate
 
 | Envoy Gateway App | Envoy Gateway | Gateway API CRDs |
 | --- | --- | --- |
+| 1.1.x | 1.5.x | v1.3.0 |
 | 1.0.x | 1.4.x | v1.3.0 |
 | 0.3.x | 1.3.x | v1.2.1 |
 
