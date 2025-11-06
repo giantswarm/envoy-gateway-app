@@ -1,0 +1,6 @@
+dependencies:
+- name: kubectl-apply-job
+  repository: oci://giantswarmpublic.azurecr.io/giantswarm-playground-catalog
+  version: 0.10.0
+digest: sha256:11c226d3ccefcbc7a11ad8a0264bf618d9da7af6a4ed25f23ea1241547a43030
+generated: "2025-11-06T13:58:48.613700865+01:00"
