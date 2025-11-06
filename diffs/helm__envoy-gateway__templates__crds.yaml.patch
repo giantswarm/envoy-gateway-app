@@ -1,10 +1,10 @@
 diff --git a/helm/envoy-gateway/templates/crds.yaml b/helm/envoy-gateway/templates/crds.yaml
 new file mode 100644
-index 0000000..3f81762
+index 0000000..9dc18f3
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/crds.yaml
 @@ -0,0 +1,4 @@
 +{{/* This requires giantswarm/kubectl-apply-job to be present as a Chart dependency */}}
-+{{- if .Values.ingressController.enabled -}}
++{{- if .Values.kubectlApplyJob.enabled -}}
 +{{ include "kubectlApplyJob.job" . }}
 +{{- end }}
