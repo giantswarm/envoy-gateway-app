@@ -160,4 +160,3 @@ kubectlApplyJob:
   - files/generated/gateway.envoyproxy.io_envoyproxies.yaml
   - files/generated/gateway.envoyproxy.io_httproutefilters.yaml
   - files/generated/gateway.envoyproxy.io_securitypolicies.yaml
-
