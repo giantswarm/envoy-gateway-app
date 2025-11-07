@@ -8,12 +8,6 @@ The Helm chart for Envoy Gateway
 
 * <https://github.com/envoyproxy/gateway>
 
-## Requirements
-
-| Repository | Name | Version |
-|------------|------|---------|
-| oci://giantswarmpublic.azurecr.io/giantswarm-playground-test-catalog | kubectl-apply-job | 0.11.0-27709f40c9f30209b7b88b650ec2df151e6f8a05 |
-
 ## Usage
 
 [Helm](https://helm.sh) must be installed to use the charts.
