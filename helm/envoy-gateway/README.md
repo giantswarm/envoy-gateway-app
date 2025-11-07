@@ -12,7 +12,7 @@ The Helm chart for Envoy Gateway
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file:///home/matias/gs/kubectl-apply-job/helm/kubectl-apply-job | kubectl-apply-job | 0.10.3 |
+| oci://giantswarmpublic.azurecr.io/giantswarm-playground-catalog | kubectl-apply-job | 0.11.0 |
 
 ## Usage
 
