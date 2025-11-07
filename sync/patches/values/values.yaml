@@ -148,16 +148,3 @@ certgen:
 topologyInjector:
   enabled: true
   annotations: {}
-
-kubectlApplyJob:
-  enabled: true
-  jobNameSuffix: crds
-  files:
-  - files/gateway.envoyproxy.io-backends.yaml
-  - files/gateway.envoyproxy.io-backendtrafficpolicies.yaml
-  - files/gateway.envoyproxy.io-clienttrafficpolicies.yaml
-  - files/gateway.envoyproxy.io-envoyextensionpolicies.yaml
-  - files/gateway.envoyproxy.io-envoypatchpolicies.yaml
-  - files/gateway.envoyproxy.io-envoyproxies.yaml
-  - files/gateway.envoyproxy.io-httproutefilters.yaml
-  - files/gateway.envoyproxy.io-securitypolicies.yaml
