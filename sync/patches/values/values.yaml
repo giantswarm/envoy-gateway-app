@@ -151,6 +151,7 @@ topologyInjector:
 
 kubectlApplyJob:
   enabled: true
+  jobNameSuffix: crds
   files:
   - files/gateway.envoyproxy.io-backends.yaml
   - files/gateway.envoyproxy.io-backendtrafficpolicies.yaml

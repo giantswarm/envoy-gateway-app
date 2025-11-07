@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 17a7dd8..c231a78 100644
+index 17a7dd8..e533676 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,8 @@
@@ -74,13 +74,14 @@ index 17a7dd8..c231a78 100644
      affinity: {}
      tolerations: []
      nodeSelector: {}
-@@ -141,3 +148,15 @@ certgen:
+@@ -141,3 +148,16 @@ certgen:
  topologyInjector:
    enabled: true
    annotations: {}
 +
 +kubectlApplyJob:
 +  enabled: true
++  jobNameSuffix: crds
 +  files:
 +  - files/gateway.envoyproxy.io-backends.yaml
 +  - files/gateway.envoyproxy.io-backendtrafficpolicies.yaml

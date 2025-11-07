@@ -12,7 +12,7 @@ The Helm chart for Envoy Gateway
 
 | Repository | Name | Version |
 |------------|------|---------|
-| oci://giantswarmpublic.azurecr.io/giantswarm-playground-catalog | kubectl-apply-job | 0.10.3 |
+| file:///home/matias/gs/kubectl-apply-job/helm/kubectl-apply-job | kubectl-apply-job | 0.10.3 |
 
 ## Usage
 
@@ -137,6 +137,7 @@ To uninstall the chart:
 | kubectlApplyJob.files[5] | string | `"files/gateway.envoyproxy.io-envoyproxies.yaml"` |  |
 | kubectlApplyJob.files[6] | string | `"files/gateway.envoyproxy.io-httproutefilters.yaml"` |  |
 | kubectlApplyJob.files[7] | string | `"files/gateway.envoyproxy.io-securitypolicies.yaml"` |  |
+| kubectlApplyJob.jobNameSuffix | string | `"crds"` |  |
 | kubernetesClusterDomain | string | `"cluster.local"` |  |
 | podDisruptionBudget.minAvailable | int | `0` |  |
 | service.annotations | object | `{}` |  |
