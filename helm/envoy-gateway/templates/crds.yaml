@@ -1,3 +1,4 @@
+---
 {{/* This requires giantswarm/kubectl-apply-job to be present as a Chart dependency */}}
 {{- if .Values.kubectlApplyJob.enabled -}}
 {{ include "kubectlApplyJob.job" . }}
