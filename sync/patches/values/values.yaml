@@ -152,11 +152,11 @@ topologyInjector:
 kubectlApplyJob:
   enabled: true
   files:
-  - files/generated/gateway.envoyproxy.io_backends.yaml
-  - files/generated/gateway.envoyproxy.io_backendtrafficpolicies.yaml
-  - files/generated/gateway.envoyproxy.io_clienttrafficpolicies.yaml
-  - files/generated/gateway.envoyproxy.io_envoyextensionpolicies.yaml
-  - files/generated/gateway.envoyproxy.io_envoypatchpolicies.yaml
-  - files/generated/gateway.envoyproxy.io_envoyproxies.yaml
-  - files/generated/gateway.envoyproxy.io_httproutefilters.yaml
-  - files/generated/gateway.envoyproxy.io_securitypolicies.yaml
+  - files/gateway.envoyproxy.io-backends.yaml
+  - files/gateway.envoyproxy.io-backendtrafficpolicies.yaml
+  - files/gateway.envoyproxy.io-clienttrafficpolicies.yaml
+  - files/gateway.envoyproxy.io-envoyextensionpolicies.yaml
+  - files/gateway.envoyproxy.io-envoypatchpolicies.yaml
+  - files/gateway.envoyproxy.io-envoyproxies.yaml
+  - files/gateway.envoyproxy.io-httproutefilters.yaml
+  - files/gateway.envoyproxy.io-securitypolicies.yaml
