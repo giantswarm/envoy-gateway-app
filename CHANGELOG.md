@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Apply CRDs as templates with the keep annotation.
+
 ## [1.1.0] - 2025-11-05
 
 ### Changed
