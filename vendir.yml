@@ -16,3 +16,4 @@ directories:
       path: vendor/gateway-helm
     ignorePaths:
       - Chart.yaml
+      - Chart.lock
