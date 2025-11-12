@@ -2,14 +2,14 @@ module e2e
 
 go 1.25.2
 
-toolchain go1.25.3
+toolchain go1.25.4
 
 require (
 	github.com/giantswarm/apptest-framework/v2 v2.0.2
 	github.com/giantswarm/clustertest/v2 v2.1.2
 	github.com/onsi/ginkgo/v2 v2.27.2
 	github.com/onsi/gomega v1.38.2
-	k8s.io/apimachinery v0.34.1
+	k8s.io/apimachinery v0.34.2
 )
 
 require (
