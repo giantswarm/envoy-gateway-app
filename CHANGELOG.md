@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add PodLogs resource for log collection
 
+### Changed
+
+- Update Envoy Gateway to [v1.5.6](https://gateway.envoyproxy.io/news/releases/notes/v1.5.6).
+
 ## [1.2.0] - 2025-11-11
 
 ### Changed
