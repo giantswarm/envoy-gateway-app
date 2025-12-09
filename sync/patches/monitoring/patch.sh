@@ -13,5 +13,6 @@ readonly script_dir_rel=".${script_dir#"${repo_dir}"}"
 
 set -x
 cp "${script_dir_rel}/envoy-gateway-podmonitor.yaml" ./helm/envoy-gateway/templates/envoy-gateway-podmonitor.yaml
+cp "${script_dir_rel}/envoy-gateway-podlogs.yaml" ./helm/envoy-gateway/templates/envoy-gateway-podlogs.yaml
 
 { set +x; } 2>/dev/null
