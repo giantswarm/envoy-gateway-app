@@ -1,0 +1,19 @@
+apiVersion: monitoring.grafana.com/v1alpha2
+kind: PodLogs
+metadata:
+  name: envoy-gateway
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "eg.labels" . | nindent 4 }}
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: {{ .Release.Namespace }}
+  relabelings:
+  # Configure tenant for data routing
+  - action: replace
+    replacement: giantswarm
+    targetLabel: giantswarm_observability_tenant
+  selector:
+    matchLabels:
+      {{ include "eg.selectorLabels" . | nindent 6 }}
