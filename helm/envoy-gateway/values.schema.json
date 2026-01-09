@@ -20,6 +20,17 @@
                         "nodeSelector": {
                             "type": "object"
                         },
+                        "pod": {
+                            "type": "object",
+                            "properties": {
+                                "annotations": {
+                                    "type": "object"
+                                },
+                                "labels": {
+                                    "type": "object"
+                                }
+                            }
+                        },
                         "resources": {
                             "type": "object",
                             "properties": {
@@ -155,6 +166,9 @@
         "deployment": {
             "type": "object",
             "properties": {
+                "annotations": {
+                    "type": "object"
+                },
                 "envoyGateway": {
                     "type": "object",
                     "properties": {
@@ -386,6 +400,9 @@
                     "type": "object"
                 },
                 "trafficDistribution": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
