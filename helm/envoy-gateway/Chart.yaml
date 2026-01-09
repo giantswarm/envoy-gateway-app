@@ -9,7 +9,7 @@ keywords:
   - envoy-gateway
   - eg
 annotations:
-  application.giantswarm.io/team: cabbage
+  io.giantswarm.application.team: cabbage
 name: envoy-gateway
 sources:
   - https://github.com/envoyproxy/gateway
