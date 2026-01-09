@@ -12,7 +12,7 @@ global:
   images:
     envoyGateway:
       # This is the full image name including the hub, repo, and tag.
-      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.5.6
+      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.6.1
       # Specify image pull policy if default behavior isn't desired.
       # Default behavior: latest images will be Always else IfNotPresent.
       pullPolicy: IfNotPresent
@@ -20,7 +20,7 @@ global:
       pullSecrets: []
     ratelimit:
       # This is the full image name including the hub, repo, and tag.
-      image: "gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:e74a664a"
+      image: "gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:99d85510"
       # Specify image pull policy if default behavior isn't desired.
       # Default behavior: latest images will be Always else IfNotPresent.
       pullPolicy: IfNotPresent
@@ -34,6 +34,7 @@ podDisruptionBudget:
   # maxUnavailable: 1
 
 deployment:
+  annotations: {}
   envoyGateway:
     image:
       # if both this and global.imageRegistry are specified, this has to include both registry and repository explicitly, eg docker.io/envoyproxy/gateway
@@ -88,6 +89,7 @@ service:
   # If set to PreferClose, the Envoy fleet will prioritize connecting to the Envoy Gateway pods that are topologically closest to them.
   trafficDistribution: ""
   annotations: {}
+  type: "ClusterIP"
 
 hpa:
   enabled: false
@@ -112,6 +114,7 @@ createNamespace: false
 
 kubernetesClusterDomain: cluster.local
 
+# -- Certgen is used to generate the certificates required by EnvoyGateway. If you want to construct a custom certificate, you can generate a custom certificate through Cert-Manager before installing EnvoyGateway. Certgen will not overwrite the custom certificate. Please do not manually modify `values.yaml` to disable certgen, it may cause EnvoyGateway OIDC,OAuth2,etc. to not work as expected.
 certgen:
   job:
     annotations: {}
