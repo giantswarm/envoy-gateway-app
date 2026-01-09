@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index db3b90b..e798d7b 100644
+index 2593354..e798d7b 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,8 @@
@@ -16,7 +16,7 @@ index db3b90b..e798d7b 100644
    images:
      envoyGateway:
        # This is the full image name including the hub, repo, and tag.
--      image: docker.io/envoyproxy/gateway:v1.5.6
+-      image: docker.io/envoyproxy/gateway:v1.6.1
 +      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.5.6
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: latest images will be Always else IfNotPresent.
@@ -25,7 +25,7 @@ index db3b90b..e798d7b 100644
        pullSecrets: []
      ratelimit:
        # This is the full image name including the hub, repo, and tag.
--      image: "docker.io/envoyproxy/ratelimit:e74a664a"
+-      image: "docker.io/envoyproxy/ratelimit:99d85510"
 +      image: "gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:e74a664a"
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: latest images will be Always else IfNotPresent.
@@ -52,7 +52,15 @@ index db3b90b..e798d7b 100644
        seccompProfile:
          type: RuntimeDefault
    ports:
-@@ -109,7 +112,6 @@ createNamespace: false
+@@ -85,7 +88,6 @@ service:
+   # If set to PreferClose, the Envoy fleet will prioritize connecting to the Envoy Gateway pods that are topologically closest to them.
+   trafficDistribution: ""
+   annotations: {}
+-  type: "ClusterIP"
+ 
+ hpa:
+   enabled: false
+@@ -110,7 +112,6 @@ createNamespace: false
  
  kubernetesClusterDomain: cluster.local
  
@@ -60,7 +68,7 @@ index db3b90b..e798d7b 100644
  certgen:
    job:
      annotations: {}
-@@ -117,7 +119,12 @@ certgen:
+@@ -118,7 +119,12 @@ certgen:
      pod:
        annotations: {}
        labels: {}
