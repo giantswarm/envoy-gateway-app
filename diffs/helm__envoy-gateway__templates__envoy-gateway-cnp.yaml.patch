@@ -1,9 +1,9 @@
 diff --git a/helm/envoy-gateway/templates/envoy-gateway-cnp.yaml b/helm/envoy-gateway/templates/envoy-gateway-cnp.yaml
 new file mode 100644
-index 0000000..a44b6ee
+index 0000000..16081e3
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/envoy-gateway-cnp.yaml
-@@ -0,0 +1,41 @@
+@@ -0,0 +1,44 @@
 +---
 +apiVersion: "cilium.io/v2"
 +kind: CiliumNetworkPolicy
@@ -26,6 +26,9 @@ index 0000000..a44b6ee
 +    - toEntities:
 +        - kube-apiserver
 +        - cluster
++        {{- if .Values.ciliumNetworkPolicy.controlPlaneAllowWorld }}
++        - world
++        {{- end }}
 +    - toEndpoints:
 +        - matchLabels:
 +            k8s:io.kubernetes.pod.namespace: kube-system

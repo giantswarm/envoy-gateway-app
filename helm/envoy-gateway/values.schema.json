@@ -118,6 +118,14 @@
                 }
             }
         },
+        "ciliumNetworkPolicy": {
+            "type": "object",
+            "properties": {
+                "controlPlaneAllowWorld": {
+                    "type": "boolean"
+                }
+            }
+        },
         "config": {
             "type": "object",
             "properties": {

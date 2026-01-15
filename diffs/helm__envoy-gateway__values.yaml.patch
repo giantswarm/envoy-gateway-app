@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 2593354..05decf1 100644
+index 2593354..08a9f65 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,8 @@
@@ -60,3 +60,11 @@ index 2593354..05decf1 100644
      affinity: {}
      tolerations: []
      nodeSelector: {}
+@@ -142,3 +151,7 @@ certgen:
+ topologyInjector:
+   enabled: true
+   annotations: {}
++
++ciliumNetworkPolicy:
++  # -- Allow envoy-gateway control plane pods to communicate with the outside world. This can be required in certain cases with SecurityPolicies trying to contact external providers for additional OIDC or JWT configuration.
++  controlPlaneAllowWorld: false
