@@ -20,6 +20,9 @@ spec:
     - toEntities:
         - kube-apiserver
         - cluster
+        {{- if .Values.ciliumNetworkPolicy.controlPlaneAllowWorld }}
+        - world
+        {{- end }}
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: kube-system

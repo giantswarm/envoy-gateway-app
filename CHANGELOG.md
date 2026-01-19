@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Add values switch to allow egress traffic to outside world of envoy-gateway control plane pods. This is required in certain cases where SecurityPolicies need to obtain additional configuration from OIDC or JWT providers.
+
 ## [1.4.0] - 2026-01-12
 
 ### Changed

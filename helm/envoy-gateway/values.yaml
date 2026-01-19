@@ -151,3 +151,7 @@ certgen:
 topologyInjector:
   enabled: true
   annotations: {}
+
+ciliumNetworkPolicy:
+  # -- Allow envoy-gateway control plane pods to communicate with the outside world. This can be required in certain cases with SecurityPolicies trying to contact external providers for additional OIDC or JWT configuration.
+  controlPlaneAllowWorld: false
