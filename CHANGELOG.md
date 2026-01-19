@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-01-19
+
 ### Changed
 
 - Add values switch to allow egress traffic to outside world of envoy-gateway control plane pods. This is required in certain cases where SecurityPolicies need to obtain additional configuration from OIDC or JWT providers.
@@ -79,7 +81,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set requests and limits for certgen Job
 - Improve security for PSS compliance
 
-[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.1.0...v1.2.0
