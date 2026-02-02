@@ -455,6 +455,7 @@ spec:
                     Default: Strict
                   enum:
                     - Strict
+                    - InsecureSyntax
                     - Disabled
                   type: string
                 mergeGateways:
