@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 2593354..ee13010 100644
+index 2593354..f9bba6b 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,8 @@
@@ -83,7 +83,7 @@ index 2593354..ee13010 100644
 +kyvernoPolicies:
 +  backend:
 +    # -- Enable Kyverno policies to restrict Backend resource creation
-+    enabled: false
++    enabled: true
 +    # -- Validation failure action: Enforce (block) or Audit (warn only)
 +    validationFailureAction: Enforce
 +    # -- Block access to Envoy admin port (19000)

@@ -109,7 +109,7 @@ To uninstall the chart:
 | kyvernoPolicies.backend.allowedDynamicResolverNamespaces | list | `[]` | Restrict DynamicResolver type to specific namespaces (empty = deny all) |
 | kyvernoPolicies.backend.denyAdminPort | bool | `true` | Block access to Envoy admin port (19000) |
 | kyvernoPolicies.backend.denyMetadataService | bool | `true` | Block access to cloud metadata service (169.254.169.254) |
-| kyvernoPolicies.backend.enabled | bool | `false` | Enable Kyverno policies to restrict Backend resource creation |
+| kyvernoPolicies.backend.enabled | bool | `true` | Enable Kyverno policies to restrict Backend resource creation |
 | kyvernoPolicies.backend.validationFailureAction | string | `"Enforce"` | Validation failure action: Enforce (block) or Audit (warn only) |
 | podDisruptionBudget.minAvailable | int | `0` |  |
 | service.annotations | object | `{}` |  |

@@ -170,7 +170,7 @@ backend:
 kyvernoPolicies:
   backend:
     # -- Enable Kyverno policies to restrict Backend resource creation
-    enabled: false
+    enabled: true
     # -- Validation failure action: Enforce (block) or Audit (warn only)
     validationFailureAction: Enforce
     # -- Block access to Envoy admin port (19000)
