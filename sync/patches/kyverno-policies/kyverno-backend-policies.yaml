@@ -1,0 +1,193 @@
+{{- if and .Values.backend.enabled .Values.kyvernoPolicies.backend.enabled }}
+---
+# Kyverno ClusterPolicy: Block restricted Backend endpoints
+# Prevents Backend resources from targeting localhost, loopback IPs, or metadata services
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ include "eg.fullname" . }}-block-restricted-backends
+  labels:
+    {{- include "eg.labels" . | nindent 4 }}
+  annotations:
+    policies.kyverno.io/title: Block restricted Backend endpoints
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Prevents Backend resources from targeting localhost, 127.0.0.1, ::1,
+      or cloud metadata services (169.254.169.254) which could expose
+      admin interfaces or sensitive cloud credentials.
+spec:
+  validationFailureAction: {{ .Values.kyvernoPolicies.backend.validationFailureAction }}
+  background: true
+  rules:
+    - name: deny-localhost-fqdn
+      match:
+        any:
+          - resources:
+              kinds:
+                - gateway.envoyproxy.io/v1alpha1/Backend
+      validate:
+        message: "Backend FQDN cannot target localhost"
+        foreach:
+          - list: "request.object.spec.endpoints[]"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ "{{" }} element.fqdn.hostname || '' {{ "}}" }}"
+                    operator: Equals
+                    value: "localhost"
+    - name: deny-loopback-ip
+      match:
+        any:
+          - resources:
+              kinds:
+                - gateway.envoyproxy.io/v1alpha1/Backend
+      validate:
+        message: "Backend IP cannot be a loopback address (127.0.0.1 or ::1)"
+        foreach:
+          - list: "request.object.spec.endpoints[]"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ "{{" }} element.ip.address || '' {{ "}}" }}"
+                    operator: AnyIn
+                    value:
+                      - "127.0.0.1"
+                      - "::1"
+{{- if .Values.kyvernoPolicies.backend.denyMetadataService }}
+    - name: deny-metadata-service
+      match:
+        any:
+          - resources:
+              kinds:
+                - gateway.envoyproxy.io/v1alpha1/Backend
+      validate:
+        message: "Backend cannot target cloud metadata service (169.254.169.254)"
+        foreach:
+          - list: "request.object.spec.endpoints[]"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ "{{" }} element.ip.address || '' {{ "}}" }}"
+                    operator: Equals
+                    value: "169.254.169.254"
+{{- end }}
+{{- if .Values.kyvernoPolicies.backend.denyAdminPort }}
+---
+# Kyverno ClusterPolicy: Block Envoy admin port access
+# Prevents Backend resources from targeting Envoy's admin port
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ include "eg.fullname" . }}-block-backend-admin-port
+  labels:
+    {{- include "eg.labels" . | nindent 4 }}
+  annotations:
+    policies.kyverno.io/title: Block Backend admin port access
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Prevents Backend resources from targeting Envoy's admin port (19000)
+      which could expose sensitive admin operations.
+spec:
+  validationFailureAction: {{ .Values.kyvernoPolicies.backend.validationFailureAction }}
+  background: true
+  rules:
+    - name: deny-admin-port
+      match:
+        any:
+          - resources:
+              kinds:
+                - gateway.envoyproxy.io/v1alpha1/Backend
+      validate:
+        message: "Backend cannot target Envoy admin port (19000)"
+        foreach:
+          - list: "request.object.spec.endpoints[]"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ "{{" }} element.ip.port || element.fqdn.port || element.unix.port || `0` {{ "}}" }}"
+                    operator: Equals
+                    value: 19000
+{{- end }}
+{{- if gt (len .Values.kyvernoPolicies.backend.allowedDynamicResolverNamespaces) 0 }}
+---
+# Kyverno ClusterPolicy: Restrict DynamicResolver type
+# Limits DynamicResolver Backend type to specific namespaces
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ include "eg.fullname" . }}-restrict-dynamic-resolver
+  labels:
+    {{- include "eg.labels" . | nindent 4 }}
+  annotations:
+    policies.kyverno.io/title: Restrict DynamicResolver Backend type
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      DynamicResolver type Backends can act as open proxies. This policy
+      restricts their creation to specific trusted namespaces.
+spec:
+  validationFailureAction: {{ .Values.kyvernoPolicies.backend.validationFailureAction }}
+  background: true
+  rules:
+    - name: restrict-dynamic-resolver-namespace
+      match:
+        any:
+          - resources:
+              kinds:
+                - gateway.envoyproxy.io/v1alpha1/Backend
+      preconditions:
+        all:
+          - key: "{{ "{{" }} request.object.spec.type || 'Endpoints' {{ "}}" }}"
+            operator: Equals
+            value: "DynamicResolver"
+      validate:
+        message: "DynamicResolver Backend type is only allowed in namespaces: {{ join ", " .Values.kyvernoPolicies.backend.allowedDynamicResolverNamespaces }}"
+        deny:
+          conditions:
+            all:
+              - key: "{{ "{{" }} request.namespace {{ "}}" }}"
+                operator: AnyNotIn
+                value:
+                  {{- range .Values.kyvernoPolicies.backend.allowedDynamicResolverNamespaces }}
+                  - {{ . | quote }}
+                  {{- end }}
+{{- else }}
+---
+# Kyverno ClusterPolicy: Deny DynamicResolver type
+# Blocks DynamicResolver Backend type completely (no allowed namespaces configured)
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ include "eg.fullname" . }}-deny-dynamic-resolver
+  labels:
+    {{- include "eg.labels" . | nindent 4 }}
+  annotations:
+    policies.kyverno.io/title: Deny DynamicResolver Backend type
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      DynamicResolver type Backends can act as open proxies. This policy
+      blocks their creation entirely. Configure allowedDynamicResolverNamespaces
+      to allow in specific namespaces.
+spec:
+  validationFailureAction: {{ .Values.kyvernoPolicies.backend.validationFailureAction }}
+  background: true
+  rules:
+    - name: deny-dynamic-resolver
+      match:
+        any:
+          - resources:
+              kinds:
+                - gateway.envoyproxy.io/v1alpha1/Backend
+      validate:
+        message: "DynamicResolver Backend type is not allowed. Configure kyvernoPolicies.backend.allowedDynamicResolverNamespaces to enable."
+        deny:
+          conditions:
+            all:
+              - key: "{{ "{{" }} request.object.spec.type || 'Endpoints' {{ "}}" }}"
+                operator: Equals
+                value: "DynamicResolver"
+{{- end }}
+{{- end }}

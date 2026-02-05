@@ -50,6 +50,7 @@ To uninstall the chart:
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| backend.enabled | bool | `false` | Enable Backend extension API (disabled by default for security) |
 | certgen | object | `{"job":{"affinity":{},"annotations":{},"args":[],"nodeSelector":{},"pod":{"annotations":{},"labels":{}},"resources":{"limits":{"memory":"500Mi"},"requests":{"cpu":"50m","memory":"100Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true,"runAsGroup":65532,"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[],"ttlSecondsAfterFinished":30},"rbac":{"annotations":{},"labels":{}}}` | Certgen is used to generate the certificates required by EnvoyGateway. If you want to construct a custom certificate, you can generate a custom certificate through Cert-Manager before installing EnvoyGateway. Certgen will not overwrite the custom certificate. Please do not manually modify `values.yaml` to disable certgen, it may cause EnvoyGateway OIDC,OAuth2,etc. to not work as expected. |
 | ciliumNetworkPolicy.controlPlaneAllowWorld | bool | `false` | Allow envoy-gateway control plane pods to communicate with the outside world. This can be required in certain cases with SecurityPolicies trying to contact external providers for additional OIDC or JWT configuration. |
 | config.envoyGateway | object | `{"extensionApis":{},"gateway":{"controllerName":"gateway.envoyproxy.io/gatewayclass-controller"},"logging":{"level":{"default":"info"}},"provider":{"type":"Kubernetes"}}` | EnvoyGateway configuration. Visit https://gateway.envoyproxy.io/docs/api/extension_types/#envoygateway to view all options. |
@@ -105,6 +106,11 @@ To uninstall the chart:
 | hpa.metrics | list | `[]` |  |
 | hpa.minReplicas | int | `1` |  |
 | kubernetesClusterDomain | string | `"cluster.local"` |  |
+| kyvernoPolicies.backend.allowedDynamicResolverNamespaces | list | `[]` | Restrict DynamicResolver type to specific namespaces (empty = deny all) |
+| kyvernoPolicies.backend.denyAdminPort | bool | `true` | Block access to Envoy admin port (19000) |
+| kyvernoPolicies.backend.denyMetadataService | bool | `true` | Block access to cloud metadata service (169.254.169.254) |
+| kyvernoPolicies.backend.enabled | bool | `false` | Enable Kyverno policies to restrict Backend resource creation |
+| kyvernoPolicies.backend.validationFailureAction | string | `"Enforce"` | Validation failure action: Enforce (block) or Audit (warn only) |
 | podDisruptionBudget.minAvailable | int | `0` |  |
 | service.annotations | object | `{}` |  |
 | service.trafficDistribution | string | `""` |  |

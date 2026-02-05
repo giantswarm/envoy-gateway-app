@@ -1,9 +1,9 @@
 diff --git a/helm/envoy-gateway/values.schema.json b/helm/envoy-gateway/values.schema.json
 new file mode 100644
-index 0000000..fca5450
+index 0000000..262ee0a
 --- /dev/null
 +++ b/helm/envoy-gateway/values.schema.json
-@@ -0,0 +1,433 @@
+@@ -0,0 +1,469 @@
 +{
 +    "$schema": "http://json-schema.org/schema#",
 +    "type": "object",
@@ -432,6 +432,42 @@ index 0000000..fca5450
 +                },
 +                "enabled": {
 +                    "type": "boolean"
++                }
++            }
++        },
++        "backend": {
++            "type": "object",
++            "properties": {
++                "enabled": {
++                    "type": "boolean"
++                }
++            }
++        },
++        "kyvernoPolicies": {
++            "type": "object",
++            "properties": {
++                "backend": {
++                    "type": "object",
++                    "properties": {
++                        "enabled": {
++                            "type": "boolean"
++                        },
++                        "validationFailureAction": {
++                            "type": "string"
++                        },
++                        "denyAdminPort": {
++                            "type": "boolean"
++                        },
++                        "denyMetadataService": {
++                            "type": "boolean"
++                        },
++                        "allowedDynamicResolverNamespaces": {
++                            "type": "array",
++                            "items": {
++                                "type": "string"
++                            }
++                        }
++                    }
 +                }
 +            }
 +        }
