@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add optional Kyverno policies for restricting usage of Backend resources with problematic targets like localhost, cloud metadata endpoints, envoy admin ports or dynamic resolver usage.
   See `values.yaml` file for more information.
 
+### Changed
+
+- Update Envoy Gateway to [v1.6.3](https://gateway.envoyproxy.io/news/releases/notes/v1.6.3).
+
 ## [1.4.1] - 2026-01-19
 
 ### Changed
