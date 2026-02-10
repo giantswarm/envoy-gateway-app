@@ -44,6 +44,18 @@ The `patch.sh` script is being called by `sync/sync.sh` and contains code to tra
 
 - Include team label in `eg.labels` template function.
 
+### backend
+
+- Add convenience `backend.enabled` value for enabling Backend extension API.
+- Merge with existing `extensionApis` configuration.
+- See: https://gateway.envoyproxy.io/docs/tasks/traffic/backend/
+
+### kyverno-policies
+
+- Optional Kyverno policies for securing Backend API (disabled by default).
+- Prevents localhost targeting, metadata service access, and admin port exposure.
+- Requires Kyverno to be installed separately.
+
 ### values
 
 - Add GS values

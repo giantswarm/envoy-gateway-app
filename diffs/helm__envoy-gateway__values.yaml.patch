@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 7d86dea..63e0e46 100644
+index 7d86dea..579ced3 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,8 @@
@@ -60,7 +60,7 @@ index 7d86dea..63e0e46 100644
      affinity: {}
      tolerations: []
      nodeSelector: {}
-@@ -142,3 +151,7 @@ certgen:
+@@ -142,3 +151,31 @@ certgen:
  topologyInjector:
    enabled: true
    annotations: {}
@@ -68,3 +68,27 @@ index 7d86dea..63e0e46 100644
 +ciliumNetworkPolicy:
 +  # -- Allow envoy-gateway control plane pods to communicate with the outside world. This can be required in certain cases with SecurityPolicies trying to contact external providers for additional OIDC or JWT configuration.
 +  controlPlaneAllowWorld: false
++
++# Backend API Configuration
++# WARNING: Enables routing to arbitrary endpoints including localhost.
++# This feature has significant security implications. Consider enabling
++# kyvernoPolicies.backend when using in production.
++# See: https://gateway.envoyproxy.io/docs/tasks/traffic/backend/
++backend:
++  # -- Enable Backend extension API (disabled by default for security)
++  enabled: false
++
++# Kyverno policies for securing Envoy Gateway extension APIs
++# Requires Kyverno (https://kyverno.io) to be installed in the cluster
++kyvernoPolicies:
++  backend:
++    # -- Enable Kyverno policies to restrict Backend resource creation
++    enabled: true
++    # -- Validation failure action: Enforce (block) or Audit (warn only)
++    validationFailureAction: Enforce
++    # -- Block access to Envoy admin port (19000)
++    denyAdminPort: true
++    # -- Block access to cloud metadata service (169.254.169.254)
++    denyMetadataService: true
++    # -- Restrict DynamicResolver type to specific namespaces (empty = deny all)
++    allowedDynamicResolverNamespaces: []

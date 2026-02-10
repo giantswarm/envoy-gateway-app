@@ -177,9 +177,15 @@ provider:
       {{- end }}
     shutdownManager:
       image: {{ include "eg.image" . }}
-{{- with .Values.config.envoyGateway.extensionApis }}
+{{- $extensionApis := .Values.config.envoyGateway.extensionApis | default dict -}}
+{{- if .Values.backend.enabled -}}
+{{-   $extensionApis = merge (dict "enableBackend" true) $extensionApis -}}
+{{- end -}}
+{{- with $extensionApis }}
+{{- if gt (len .) 0 }}
 extensionApis:
   {{- toYaml . | nindent 2 }}
+{{- end }}
 {{- end }}
 {{- if not .Values.topologyInjector.enabled }}
 proxyTopologyInjector:

@@ -428,6 +428,42 @@
                     "type": "boolean"
                 }
             }
+        },
+        "backend": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "kyvernoPolicies": {
+            "type": "object",
+            "properties": {
+                "backend": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "validationFailureAction": {
+                            "type": "string"
+                        },
+                        "denyAdminPort": {
+                            "type": "boolean"
+                        },
+                        "denyMetadataService": {
+                            "type": "boolean"
+                        },
+                        "allowedDynamicResolverNamespaces": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

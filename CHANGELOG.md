@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add convenience values switch for enabling [Envoy Gateway Backend extension](https://gateway.envoyproxy.io/docs/tasks/traffic/backend/). Disabled by default.
+- Add optional Kyverno policies for restricting usage of Backend resources with problematic targets like localhost, cloud metadata endpoints, envoy admin ports or dynamic resolver usage.
+  See `values.yaml` file for more information.
+
 ### Changed
 
 - Update Envoy Gateway to [v1.6.3](https://gateway.envoyproxy.io/news/releases/notes/v1.6.3).
