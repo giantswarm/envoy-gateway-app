@@ -11,7 +11,6 @@ keywords:
 annotations:
   io.giantswarm.application.team: cabbage
   io.giantswarm.application.audience: "all"
-  io.giantswarm.application.managed: "false"
 name: envoy-gateway
 sources:
   - https://github.com/envoyproxy/gateway
