@@ -2,8 +2,8 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - helmChart:
-      appVersion: v1.6.3
-      version: v1.6.3
+      appVersion: v1.7.0
+      version: v1.7.0
     path: gateway-helm
   path: vendor
 - contents:
