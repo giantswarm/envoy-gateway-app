@@ -1,9 +1,9 @@
 diff --git a/helm/envoy-gateway/templates/crds/gateway.envoyproxy.io_envoypatchpolicies.yaml b/helm/envoy-gateway/templates/crds/gateway.envoyproxy.io_envoypatchpolicies.yaml
 new file mode 100644
-index 0000000..d66b99d
+index 0000000..974a1b7
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/crds/gateway.envoyproxy.io_envoypatchpolicies.yaml
-@@ -0,0 +1,506 @@
+@@ -0,0 +1,509 @@
 +---
 +apiVersion: apiextensions.k8s.io/v1
 +kind: CustomResourceDefinition
@@ -26,8 +26,11 @@ index 0000000..d66b99d
 +  scope: Namespaced
 +  versions:
 +    - additionalPrinterColumns:
-+        - jsonPath: .status.conditions[?(@.type=="Programmed")].reason
-+          name: Status
++        - jsonPath: .status.ancestors[0].conditions[?(@.type=="Accepted")].status
++          name: Accepted
++          type: string
++        - jsonPath: .status.ancestors[0].conditions[?(@.type=="Programmed")].status
++          name: Programmed
 +          type: string
 +        - jsonPath: .metadata.creationTimestamp
 +          name: Age

@@ -1,6 +1,6 @@
 diff --git a/helm/envoy-gateway/templates/crds/gateway.envoyproxy.io_backends.yaml b/helm/envoy-gateway/templates/crds/gateway.envoyproxy.io_backends.yaml
 new file mode 100644
-index 0000000..a828e8b
+index 0000000..ad7a0a4
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/crds/gateway.envoyproxy.io_backends.yaml
 @@ -0,0 +1,455 @@
@@ -145,7 +145,7 @@ index 0000000..a828e8b
 +                        rule: (has(self.fqdn) || has(self.ip) || has(self.unix))
 +                      - message: only one of fqdn, ip or unix can be specified
 +                        rule: ((has(self.fqdn) && !(has(self.ip) || has(self.unix))) || (has(self.ip) && !(has(self.fqdn) || has(self.unix))) || (has(self.unix) && !(has(self.ip) || has(self.fqdn))))
-+                  maxItems: 64
++                  maxItems: 256
 +                  minItems: 1
 +                  type: array
 +                  x-kubernetes-validations:
