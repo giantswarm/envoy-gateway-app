@@ -10,6 +10,7 @@ keywords:
   - eg
 annotations:
   io.giantswarm.application.team: cabbage
+  io.giantswarm.application.audience: "all"
 name: envoy-gateway
 sources:
   - https://github.com/envoyproxy/gateway
