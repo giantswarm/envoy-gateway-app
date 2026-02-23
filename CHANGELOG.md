@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-02-23
+
 ## [1.6.0] - 2026-02-19
 
 ### Changed
@@ -100,6 +102,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve security for PSS compliance
 
 [Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.6.0...v1.6.0
 [1.6.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.4.0...v1.4.1
