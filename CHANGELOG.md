@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-03-16
+
+### Changed
+
+- Update Envoy Gateway to [v1.7.1](https://gateway.envoyproxy.io/news/releases/notes/v1.7.1).
+
 ## [1.6.0] - 2026-02-23
 
 ### Changed
