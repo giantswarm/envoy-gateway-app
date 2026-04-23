@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download vendir
-        uses: giantswarm/install-binary-action@952007edaee6637d91216e7001f79aff11e93228 # v4.0.1
+        uses: giantswarm/install-binary-action@e2730babbc89f02ef1559b042d33cbe24f5c3547 # v4.0.2
         with:
           binary: "vendir"
           version: "0.45.1"
