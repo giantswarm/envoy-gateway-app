@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update Envoy Gateway to [v1.7.2](https://gateway.envoyproxy.io/news/releases/notes/v1.7.2).
+- Grant infra-manager `get/list/watch` on Secrets when `GatewayNamespace` deploy mode is used with explicit watch namespaces.
+
 ## [1.6.1] - 2026-04-01
 
 ### Changed
