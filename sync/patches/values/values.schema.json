@@ -197,6 +197,9 @@
                         "imagePullSecrets": {
                             "type": "array"
                         },
+                        "extraEnv": {
+                            "type": "array"
+                        },
                         "resources": {
                             "type": "object",
                             "properties": {
@@ -293,6 +296,12 @@
                         },
                         "topologySpreadConstraints": {
                             "type": "array"
+                        },
+                        "extraVolumeMounts": {
+                            "type": "array"
+                        },
+                        "extraVolumes": {
+                            "type": "array"
                         }
                     }
                 },
@@ -365,10 +374,30 @@
                                     "type": "array"
                                 }
                             }
+                        },
+                        "envoyProxy": {
+                            "type": "object",
+                            "properties": {
+                                "image": {
+                                    "type": "string"
+                                },
+                                "pullPolicy": {
+                                    "type": "string"
+                                },
+                                "pullSecrets": {
+                                    "type": "array"
+                                }
+                            }
                         }
                     }
                 }
             }
+        },
+        "commonLabels": {
+            "type": "object"
+        },
+        "namespaceOverride": {
+            "type": "string"
         },
         "hpa": {
             "type": "object",
