@@ -53,9 +53,11 @@ To uninstall the chart:
 | backend.enabled | bool | `false` | Enable Backend extension API (disabled by default for security) |
 | certgen | object | `{"job":{"affinity":{},"annotations":{},"args":[],"nodeSelector":{},"pod":{"annotations":{},"labels":{}},"resources":{"limits":{"memory":"500Mi"},"requests":{"cpu":"50m","memory":"100Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true,"runAsGroup":65532,"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[],"ttlSecondsAfterFinished":30},"rbac":{"annotations":{},"labels":{}}}` | Certgen is used to generate the certificates required by EnvoyGateway. If you want to construct a custom certificate, you can generate a custom certificate through Cert-Manager before installing EnvoyGateway. Certgen will not overwrite the custom certificate. Please do not manually modify `values.yaml` to disable certgen, it may cause EnvoyGateway OIDC,OAuth2,etc. to not work as expected. |
 | ciliumNetworkPolicy.controlPlaneAllowWorld | bool | `false` | Allow envoy-gateway control plane pods to communicate with the outside world. This can be required in certain cases with SecurityPolicies trying to contact external providers for additional OIDC or JWT configuration. |
+| commonLabels | object | `{}` | Labels to apply to all resources |
 | config.envoyGateway | object | `{"extensionApis":{},"gateway":{"controllerName":"gateway.envoyproxy.io/gatewayclass-controller"},"logging":{"level":{"default":"info"}},"provider":{"type":"Kubernetes"}}` | EnvoyGateway configuration. Visit https://gateway.envoyproxy.io/docs/api/extension_types/#envoygateway to view all options. |
 | createNamespace | bool | `false` |  |
 | deployment.annotations | object | `{}` |  |
+| deployment.envoyGateway.extraEnv | list | `[]` | Additional environment variables for the envoy-gateway container. |
 | deployment.envoyGateway.image.repository | string | `""` |  |
 | deployment.envoyGateway.image.tag | string | `""` |  |
 | deployment.envoyGateway.imagePullPolicy | string | `""` |  |
@@ -74,6 +76,8 @@ To uninstall the chart:
 | deployment.pod.affinity | object | `{}` |  |
 | deployment.pod.annotations."prometheus.io/port" | string | `"19001"` |  |
 | deployment.pod.annotations."prometheus.io/scrape" | string | `"true"` |  |
+| deployment.pod.extraVolumeMounts | list | `[]` |  |
+| deployment.pod.extraVolumes | list | `[]` |  |
 | deployment.pod.labels | object | `{}` |  |
 | deployment.pod.nodeSelector | object | `{}` |  |
 | deployment.pod.tolerations | list | `[]` |  |
@@ -94,10 +98,13 @@ To uninstall the chart:
 | deployment.replicas | int | `1` |  |
 | global.image | object | `{"registry":"gsoci.azurecr.io"}` | Global override for image registry |
 | global.imagePullSecrets | list | `[]` | Global override for image pull secrets |
-| global.images.envoyGateway.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.7.2"` |  |
+| global.images.envoyGateway.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.8.0"` |  |
 | global.images.envoyGateway.pullPolicy | string | `"IfNotPresent"` |  |
 | global.images.envoyGateway.pullSecrets | list | `[]` |  |
-| global.images.ratelimit.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:05c08d03"` |  |
+| global.images.envoyProxy.image | string | `"gsoci.azurecr.io/giantswarm/envoy:distroless-v1.38.0"` |  |
+| global.images.envoyProxy.pullPolicy | string | `"IfNotPresent"` |  |
+| global.images.envoyProxy.pullSecrets | list | `[]` |  |
+| global.images.ratelimit.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:ff287602"` |  |
 | global.images.ratelimit.pullPolicy | string | `"IfNotPresent"` |  |
 | global.images.ratelimit.pullSecrets | list | `[]` |  |
 | hpa.behavior | object | `{}` |  |
@@ -111,6 +118,7 @@ To uninstall the chart:
 | kyvernoPolicies.backend.denyMetadataService | bool | `true` | Block access to cloud metadata service (169.254.169.254) |
 | kyvernoPolicies.backend.enabled | bool | `true` | Enable Kyverno policies to restrict Backend resource creation |
 | kyvernoPolicies.backend.validationFailureAction | string | `"Enforce"` | Validation failure action: Enforce (block) or Audit (warn only) |
+| namespaceOverride | string | `""` | Override the namespace for resources deployed by the chart. Defaults to the release namespace. |
 | podDisruptionBudget.minAvailable | int | `0` |  |
 | service.annotations | object | `{}` |  |
 | service.trafficDistribution | string | `""` |  |

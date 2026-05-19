@@ -1,10 +1,10 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 766a015..852d156 100644
+index 0338c74..2f45ddd 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,8 @@
  global:
-   # If set, these take highest precedence and change both envoyGateway and ratelimit's container registry and pull secrets.
+   # If set, these take highest precedence and change envoyGateway, envoyProxy, and ratelimit's container registry and pull secrets.
    # -- Global override for image registry
 -  imageRegistry: ""
 +  image:
@@ -16,29 +16,42 @@ index 766a015..852d156 100644
    images:
      envoyGateway:
        # This is the full image name including the hub, repo, and tag.
--      image: docker.io/envoyproxy/gateway:v1.7.2
-+      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.7.2
+-      image: docker.io/envoyproxy/gateway:v1.8.0
++      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.8.0
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: latest images will be Always else IfNotPresent.
        pullPolicy: IfNotPresent
-@@ -19,13 +20,15 @@ global:
+@@ -19,7 +20,7 @@ global:
        pullSecrets: []
      ratelimit:
        # This is the full image name including the hub, repo, and tag.
--      image: "docker.io/envoyproxy/ratelimit:05c08d03"
-+      image: "gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:05c08d03"
+-      image: "docker.io/envoyproxy/ratelimit:ff287602"
++      image: "gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:ff287602"
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: latest images will be Always else IfNotPresent.
        pullPolicy: IfNotPresent
+@@ -28,16 +29,18 @@ global:
+     envoyProxy:
+       # This is the full image name including the hub, repo, and tag for the Envoy Proxy data plane.
+       # If not specified, uses the default image built into envoy-gateway.
+-      image: ""
++      image: "gsoci.azurecr.io/giantswarm/envoy:distroless-v1.38.0"
+       # Specify image pull policy if default behavior isn't desired.
+       # Default behavior: IfNotPresent.
+-      pullPolicy: ""
++      pullPolicy: IfNotPresent
        # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
        pullSecrets: []
+ 
+ # -- Labels to apply to all resources
+ commonLabels: {}
  
 +serviceType: managed
 +
  podDisruptionBudget:
    minAvailable: 0
    # maxUnavailable: 1
-@@ -54,6 +57,7 @@ deployment:
+@@ -68,6 +71,7 @@ deployment:
        runAsNonRoot: true
        runAsGroup: 65532
        runAsUser: 65532
@@ -46,7 +59,7 @@ index 766a015..852d156 100644
        seccompProfile:
          type: RuntimeDefault
    ports:
-@@ -121,7 +125,12 @@ certgen:
+@@ -149,7 +153,12 @@ certgen:
      pod:
        annotations: {}
        labels: {}
@@ -60,7 +73,7 @@ index 766a015..852d156 100644
      affinity: {}
      tolerations: []
      nodeSelector: {}
-@@ -145,3 +154,31 @@ certgen:
+@@ -173,3 +182,31 @@ certgen:
  topologyInjector:
    enabled: true
    annotations: {}

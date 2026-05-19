@@ -12,12 +12,10 @@ cd "${repo_dir}"
 readonly script_dir_rel=".${script_dir#"${repo_dir}"}"
 
 set -x
-rm -rf ./helm/envoy-gateway/crds/gatewayapi-crds.yaml
-mv ./helm/envoy-gateway/crds/generated ./helm/envoy-gateway/templates/crds
+mv ./helm/envoy-gateway/charts/crds/crds/generated ./helm/envoy-gateway/templates/crds
+rm -rf ./helm/envoy-gateway/charts/crds
 
 templates_path="./helm/envoy-gateway/templates/crds"
-
-set -x
 
 cd "${templates_path}"
 
@@ -28,7 +26,3 @@ for f in *.yaml ; do
 
   { set +x; } 2>/dev/null
 done
-
-set -x
-
-{ set +x; } 2>/dev/null

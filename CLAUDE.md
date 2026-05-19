@@ -22,7 +22,7 @@ This is a Giant Swarm Helm chart wrapper for [Envoy Gateway](https://gateway.env
 3. Edit `vendir.yml` to update the chart version
 4. Run `./sync/sync.sh` — this fetches upstream and applies all patches in `sync/patches/`
 5. Fix any patch conflicts
-6. Compare `sync/patches/values/values.yaml` against `vendor/gateway-helm/values.yaml` to identify new or removed upstream fields that should be reflected in our patch. Also update the `global.images.envoyGateway.image` tag to the new version.
+6. Compare `sync/patches/values/values.yaml` against `vendor/gateway-helm/values.yaml` to identify new or removed upstream fields that should be reflected in our patch. Also update the `global.images.envoyGateway.image` tag to the new version. If changed, also update `sync/patches/values/values.schema.json`.
 7. Re-run `./sync/sync.sh` if the values patch was updated
 8. Update `CHANGELOG.md`: add a changelog entry under `## [Unreleased]` only — do **not** create a new versioned section or update the comparison links. Do **not** bump the version in `Chart.yaml` either. Both are automated by CI.
 9. Commit changes in `vendir.yml`, `vendir.lock.yml`, `sync/patches/`, `helm/`, `diffs/`, and `CHANGELOG.md`
