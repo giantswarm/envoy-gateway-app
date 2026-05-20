@@ -1,6 +1,6 @@
 diff --git a/helm/envoy-gateway/templates/crds/gateway.envoyproxy.io_envoypatchpolicies.yaml b/helm/envoy-gateway/templates/crds/gateway.envoyproxy.io_envoypatchpolicies.yaml
 new file mode 100644
-index 0000000..974a1b7
+index 0000000..3b31b1c
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/crds/gateway.envoyproxy.io_envoypatchpolicies.yaml
 @@ -0,0 +1,509 @@
@@ -9,7 +9,7 @@ index 0000000..974a1b7
 +kind: CustomResourceDefinition
 +metadata:
 +  annotations:
-+    controller-gen.kubebuilder.io/version: v0.18.0
++    controller-gen.kubebuilder.io/version: v0.20.1
 +    helm.sh/resource-policy: keep
 +  name: envoypatchpolicies.gateway.envoyproxy.io
 +spec:

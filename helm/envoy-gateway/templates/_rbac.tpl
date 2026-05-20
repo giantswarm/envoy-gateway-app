@@ -9,8 +9,6 @@ All namespaced resources for Envoy Gateway RBAC.
 - {{ include "eg.rbac.namespaced.gateway.envoyproxy.status" . | nindent 2 | trim }}
 - {{ include "eg.rbac.namespaced.gateway.networking" . | nindent 2 | trim }}
 - {{ include "eg.rbac.namespaced.gateway.networking.status" . | nindent 2 | trim }}
-- {{ include "eg.rbac.namespaced.gateway.networking.experimental" . | nindent 2 | trim }}
-- {{ include "eg.rbac.namespaced.gateway.networking.experimental.status" . | nindent 2 | trim }}
 {{- if .Values.topologyInjector.enabled }}
 - {{ include "eg.rbac.namespaced.topologyinjector" . | nindent 2 | trim }}
 {{- end }}
@@ -117,6 +115,7 @@ apiGroups:
 - gateway.networking.k8s.io
 resources:
 - gateways
+- listenersets
 - grpcroutes
 - httproutes
 - referencegrants
@@ -135,6 +134,7 @@ apiGroups:
 - gateway.networking.k8s.io
 resources:
 - gateways/status
+- listenersets/status
 - grpcroutes/status
 - httproutes/status
 - tcproutes/status
@@ -146,23 +146,9 @@ verbs:
 {{- end }}
 
 {{- define "eg.rbac.namespaced.gateway.networking.experimental" -}}
-apiGroups:
-- gateway.networking.x-k8s.io
-resources:
-- xlistenersets
-verbs:
-- get
-- list
-- watch
 {{- end }}
 
 {{- define "eg.rbac.namespaced.gateway.networking.experimental.status" -}}
-apiGroups:
-- gateway.networking.x-k8s.io
-resources:
-- xlistenersets/status
-verbs:
-- update
 {{- end }}
 
 {{/*
@@ -229,6 +215,7 @@ verbs:
   - delete
   - deletecollection
   - patch
+  - watch
 - apiGroups:
   - apps
   resources:
@@ -237,9 +224,11 @@ verbs:
   verbs:
   - create
   - get
+  - list
   - delete
   - deletecollection
   - patch
+  - watch
 - apiGroups:
   - autoscaling
   - policy
@@ -253,6 +242,7 @@ verbs:
   - delete
   - deletecollection
   - patch
+  - watch
 - apiGroups:
   - certificates.k8s.io
   resources:
