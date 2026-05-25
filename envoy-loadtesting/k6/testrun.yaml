@@ -1,0 +1,122 @@
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: envoy-gateway-load-test
+  namespace: K6_NS_PLACEHOLDER
+spec:
+  parallelism: 4
+  # Allows to have logs in the runner pods.
+  quiet: "false"
+  # k6-operator will clean up the generated resources after the test is completed.
+  cleanup: 'post'
+  script:
+    configMap:
+      name: envoy-load-testing-scenario
+      file: test-scenario.js
+  separate: false
+  arguments: -o experimental-prometheus-rw --tag testid=TESTID_PLACEHOLDER
+  initializer:
+    image: K6_IMAGE_PLACEHOLDER
+    containerSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      readOnlyRootFilesystem: false
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      fsGroup: 1000
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+      seccompProfile:
+        type: RuntimeDefault
+  starter:
+    containerSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      readOnlyRootFilesystem: false
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      fsGroup: 1000
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+      seccompProfile:
+        type: RuntimeDefault
+  runner:
+    image: K6_IMAGE_PLACEHOLDER
+    envFrom:
+      # K6_PROMETHEUS_RW_USERNAME and K6_PROMETHEUS_RW_PASSWORD.
+      # Created by deploy.sh from the alloy-metrics secret in kube-system.
+      - secretRef:
+          name: k6-prometheus-rw-credentials
+    env:
+      # Infrastructure — composed from shared WC + BASE_DOMAIN
+      - name: ENDPOINTS
+        value: ENDPOINTS_PLACEHOLDER
+      - name: BASE_DOMAIN
+        value: CLUSTER.DOMAIN_PLACEHOLDER
+      - name: PROXY_CONTROLLER
+        value: PROXY_CONTROLLER_PLACEHOLDER
+      # Prometheus Remote Write credentials & config
+      - name: K6_PROMETHEUS_RW_SERVER_URL
+        value: PROMETHEUS_RW_URL_PLACEHOLDER
+      - name: K6_PROMETHEUS_RW_HTTP_HEADERS
+        value: PROMETHEUS_RW_HTTP_HEADERS_PLACEHOLDER
+      - name: K6_PROMETHEUS_RW_PUSH_INTERVAL
+        value: PROMETHEUS_RW_PUSH_INTERVAL_PLACEHOLDER
+      # Scenario timing & load shape
+      - name: SCENARIO_DURATION_SECONDS
+        value: SCENARIO_DURATION_SECONDS_PLACEHOLDER
+      - name: WAIT_BETWEEN_SCENARIOS
+        value: WAIT_BETWEEN_SCENARIOS_PLACEHOLDER
+      - name: PEAK_HTTP_RPS
+        value: PEAK_HTTP_RPS_PLACEHOLDER
+      - name: RAMP_STEP_HTTP_RPS
+        value: RAMP_STEP_HTTP_RPS_PLACEHOLDER
+      - name: RAMP_STEP_DURATION_SECONDS
+        value: RAMP_STEP_DURATION_SECONDS_PLACEHOLDER
+      - name: PRE_ALLOCATED_VUS
+        value: PRE_ALLOCATED_VUS_PLACEHOLDER
+      - name: MAX_VUS
+        value: MAX_VUS_PLACEHOLDER
+      - name: GRACEFUL_STOP
+        value: GRACEFUL_STOP_PLACEHOLDER
+      # SLO thresholds (giantswarm/giantswarm#35147)
+      - name: SLO_P95_LATENCY_MS
+        value: SLO_P95_LATENCY_MS_PLACEHOLDER
+      - name: SLO_P99_LATENCY_MS
+        value: SLO_P99_LATENCY_MS_PLACEHOLDER
+      - name: SLO_ERROR_RATE
+        value: SLO_ERROR_RATE_PLACEHOLDER
+      - name: SLO_CHECKS_RATE
+        value: SLO_CHECKS_RATE_PLACEHOLDER
+    containerSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      readOnlyRootFilesystem: false
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      fsGroup: 1000
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+      seccompProfile:
+        type: RuntimeDefault
