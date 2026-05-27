@@ -18,6 +18,6 @@ type: application
 version: 1.7.0
 dependencies:
   - name: kubectl-apply-job
-    version: "0.11.0"
+    version: "0.11.1"
     repository: oci://giantswarmpublic.azurecr.io/giantswarm-playground-catalog
     condition: kubectlApplyJob.enabled
