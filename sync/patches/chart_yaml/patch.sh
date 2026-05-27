@@ -13,4 +13,6 @@ APP_VERSION=$(yq e '.directories[] | select(.path == "vendor").contents[] | sele
 
 yq -i e ".appVersion |= \"${APP_VERSION#v}\"" ./helm/envoy-gateway/Chart.yaml
 
+helm dependency update ./helm/envoy-gateway
+
 { set +x; } 2>/dev/null

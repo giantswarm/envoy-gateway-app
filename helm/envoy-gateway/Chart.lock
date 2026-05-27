@@ -1,6 +1,6 @@
 dependencies:
-- name: crds
-  repository: ""
-  version: 0.0.0
-digest: sha256:aeada3fbffa2565a325406ad014001fd2685f7c0c9cfc1167da4f10c75a1bd65
-generated: "2026-02-17T14:34:30.962808-07:00"
+- name: kubectl-apply-job
+  repository: oci://giantswarmpublic.azurecr.io/giantswarm-playground-catalog
+  version: 0.11.0
+digest: sha256:66fef523866aa248c55a7098967c89922fe9ff46e05e963ca2ed6b28f921d5c9
+generated: "2026-05-27T11:42:19.715201761+02:00"
