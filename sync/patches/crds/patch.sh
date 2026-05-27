@@ -15,7 +15,8 @@ set -x
 rm -f ./helm/envoy-gateway/charts/crds/crds/gatewayapi-crds.yaml
 mkdir -p ./crds
 cp ./helm/envoy-gateway/charts/crds/crds/generated/*.yaml ./crds/
-rm -rf ./helm/envoy-gateway/charts/crds
+rm -rf ./helm/envoy-gateway/charts
+rm -rf ./helm/envoy-gateway/Chart.lock
 
 mkdir -p ./helm/envoy-gateway/templates/crds
 cp "${script_dir_rel}/crds-serviceaccount.yaml" ./helm/envoy-gateway/templates/crds/serviceaccount.yaml
