@@ -1,0 +1,68 @@
+diff --git a/helm/envoy-gateway/templates/crds-job.yaml b/helm/envoy-gateway/templates/crds-job.yaml
+new file mode 100644
+index 0000000..24a7019
+--- /dev/null
++++ b/helm/envoy-gateway/templates/crds-job.yaml
+@@ -0,0 +1,62 @@
++apiVersion: batch/v1
++kind: Job
++metadata:
++  name: {{ .Chart.Name }}-crd-installer
++  namespace: {{ include "eg.namespace" . }}
++  annotations:
++    "helm.sh/hook": "pre-install,pre-upgrade"
++    "helm.sh/hook-weight": "-1"
++    "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded,hook-failed"
++  labels:
++    {{- include "eg.labels" . | nindent 4 }}
++spec:
++  backoffLimit: 10
++  ttlSecondsAfterFinished: 3600
++  template:
++    metadata:
++      labels:
++        {{- include "eg.labels" . | nindent 8 }}
++    spec:
++      serviceAccountName: {{ .Chart.Name }}-crd-installer
++      securityContext:
++        runAsNonRoot: true
++        runAsUser: 1000
++        runAsGroup: 1000
++        seccompProfile:
++          type: RuntimeDefault
++      tolerations:
++      - key: node-role.kubernetes.io/master
++        operator: Exists
++        effect: NoSchedule
++      - key: node-role.kubernetes.io/control-plane
++        operator: Exists
++        effect: NoSchedule
++      containers:
++      - name: crd-installer
++        image: {{ .Values.crds.image.registry }}/{{ .Values.crds.image.repository }}:{{ .Values.crds.image.tag }}
++        imagePullPolicy: IfNotPresent
++        command:
++        - sh
++        - -c
++        - |
++          set -o errexit ; set -o xtrace ; set -o nounset
++          kubectl apply --server-side=true --field-manager='kubectl-client-side-apply' --force-conflicts -f /crds/ 2>&1
++        resources:
++          requests:
++            cpu: 100m
++            memory: 256Mi
++          limits:
++            cpu: 500m
++            memory: 512Mi
++        securityContext:
++          readOnlyRootFilesystem: true
++          runAsNonRoot: true
++          allowPrivilegeEscalation: false
++          capabilities:
++            drop:
++            - ALL
++          runAsUser: 1000
++          runAsGroup: 1000
++          seccompProfile:
++            type: RuntimeDefault
++      restartPolicy: Never

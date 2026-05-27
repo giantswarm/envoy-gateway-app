@@ -13,9 +13,12 @@ readonly script_dir_rel=".${script_dir#"${repo_dir}"}"
 
 set -x
 rm -f ./helm/envoy-gateway/charts/crds/crds/gatewayapi-crds.yaml
-mkdir -p ./helm/envoy-gateway/files
-mv ./helm/envoy-gateway/charts/crds/crds/generated ./helm/envoy-gateway/files/generated
+mkdir -p ./crds
+cp ./helm/envoy-gateway/charts/crds/crds/generated/*.yaml ./crds/
 rm -rf ./helm/envoy-gateway/charts/crds
-cp "${script_dir_rel}/crds.yaml" ./helm/envoy-gateway/templates/crds.yaml
+
+cp "${script_dir_rel}/crds-serviceaccount.yaml" ./helm/envoy-gateway/templates/crds-serviceaccount.yaml
+cp "${script_dir_rel}/crds-rbac.yaml" ./helm/envoy-gateway/templates/crds-rbac.yaml
+cp "${script_dir_rel}/crds-job.yaml" ./helm/envoy-gateway/templates/crds-job.yaml
 
 { set +x; } 2>/dev/null

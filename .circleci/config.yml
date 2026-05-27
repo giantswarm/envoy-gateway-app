@@ -2,9 +2,49 @@ version: 2.1
 orbs:
   architect: giantswarm/architect@8.3.0
 
+jobs:
+  build-crd-image:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+    - checkout
+    - run:
+        name: Build CRD installer image
+        command: |
+          docker build -t "docker.io/giantswarm/envoy-gateway-crds:${CIRCLE_SHA1}" .
+    - run:
+        name: Save image to workspace
+        command: |
+          mkdir -p /tmp/workspace
+          docker save "docker.io/giantswarm/envoy-gateway-crds:${CIRCLE_SHA1}" \
+            -o /tmp/workspace/envoy-gateway-crds.tar
+    - persist_to_workspace:
+        root: /tmp/workspace
+        paths:
+        - envoy-gateway-crds.tar
+
 workflows:
   package-and-push-chart-on-tag:
     jobs:
+    - build-crd-image:
+        filters:
+          tags:
+            only: /^v.*/
+
+    - architect/push-to-registries:
+        context: architect
+        name: push-crd-image-to-registries
+        image: giantswarm/envoy-gateway-crds
+        requires:
+        - build-crd-image
+        filters:
+          tags:
+            only: /^v.*/
+          branches:
+            ignore:
+            - main
+            - master
+
     - architect/push-to-app-catalog:
         context: architect
         executor: app-build-suite
@@ -12,7 +52,8 @@ workflows:
         app_catalog: giantswarm-catalog
         app_catalog_test: giantswarm-test-catalog
         chart: envoy-gateway
-          # Trigger job on git tag.
+        requires:
+        - push-crd-image-to-registries
         filters:
           tags:
             only: /^v.*/
