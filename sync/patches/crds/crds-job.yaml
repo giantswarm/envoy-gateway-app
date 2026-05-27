@@ -33,7 +33,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: crd-installer
-        image: {{ .Values.crds.image.registry }}/{{ .Values.crds.image.repository }}:{{ .Values.crds.image.tag }}
+        image: {{ .Values.crds.image.registry }}/{{ .Values.crds.image.repository }}:{{ .Chart.Version | splitList "+" | first }}
         imagePullPolicy: IfNotPresent
         command:
         - sh

@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 0338c74..0af1634 100644
+index 0338c74..4b09ccd 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,8 @@
@@ -73,7 +73,7 @@ index 0338c74..0af1634 100644
      affinity: {}
      tolerations: []
      nodeSelector: {}
-@@ -173,3 +182,43 @@ certgen:
+@@ -173,3 +182,36 @@ certgen:
  topologyInjector:
    enabled: true
    annotations: {}
@@ -106,14 +106,7 @@ index 0338c74..0af1634 100644
 +    # -- Restrict DynamicResolver type to specific namespaces (empty = deny all)
 +    allowedDynamicResolverNamespaces: []
 +
-+kubectlApplyJob:
-+  enabled: true
-+  files:
-+  - files/generated/gateway.envoyproxy.io_backends.yaml
-+  - files/generated/gateway.envoyproxy.io_backendtrafficpolicies.yaml
-+  - files/generated/gateway.envoyproxy.io_clienttrafficpolicies.yaml
-+  - files/generated/gateway.envoyproxy.io_envoyextensionpolicies.yaml
-+  - files/generated/gateway.envoyproxy.io_envoypatchpolicies.yaml
-+  - files/generated/gateway.envoyproxy.io_envoyproxies.yaml
-+  - files/generated/gateway.envoyproxy.io_httproutefilters.yaml
-+  - files/generated/gateway.envoyproxy.io_securitypolicies.yaml
++crds:
++  image:
++    registry: gsoci.azurecr.io
++    repository: giantswarm/envoy-gateway-crds

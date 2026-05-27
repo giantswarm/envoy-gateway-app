@@ -215,4 +215,3 @@ crds:
   image:
     registry: gsoci.azurecr.io
     repository: giantswarm/envoy-gateway-crds
-    tag: v1.8.0

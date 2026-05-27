@@ -17,8 +17,9 @@ mkdir -p ./crds
 cp ./helm/envoy-gateway/charts/crds/crds/generated/*.yaml ./crds/
 rm -rf ./helm/envoy-gateway/charts/crds
 
-cp "${script_dir_rel}/crds-serviceaccount.yaml" ./helm/envoy-gateway/templates/crds-serviceaccount.yaml
-cp "${script_dir_rel}/crds-rbac.yaml" ./helm/envoy-gateway/templates/crds-rbac.yaml
-cp "${script_dir_rel}/crds-job.yaml" ./helm/envoy-gateway/templates/crds-job.yaml
+mkdir -p ./helm/envoy-gateway/templates/crds
+cp "${script_dir_rel}/crds-serviceaccount.yaml" ./helm/envoy-gateway/templates/crds/serviceaccount.yaml
+cp "${script_dir_rel}/crds-rbac.yaml" ./helm/envoy-gateway/templates/crds/rbac.yaml
+cp "${script_dir_rel}/crds-job.yaml" ./helm/envoy-gateway/templates/crds/job.yaml
 
 { set +x; } 2>/dev/null

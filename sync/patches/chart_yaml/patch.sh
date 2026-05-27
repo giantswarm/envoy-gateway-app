@@ -12,6 +12,5 @@ set -x
 APP_VERSION=$(yq e '.directories[] | select(.path == "vendor").contents[] | select(.path == "gateway-helm").helmChart.version' vendir.yml)
 
 yq -i e ".appVersion |= \"${APP_VERSION#v}\"" ./helm/envoy-gateway/Chart.yaml
-yq -i e ".crds.image.tag |= \"v${APP_VERSION#v}\"" ./helm/envoy-gateway/values.yaml
 
 { set +x; } 2>/dev/null
