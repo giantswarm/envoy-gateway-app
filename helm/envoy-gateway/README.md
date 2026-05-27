@@ -8,6 +8,12 @@ The Helm chart for Envoy Gateway
 
 * <https://github.com/envoyproxy/gateway>
 
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| oci://giantswarmpublic.azurecr.io/giantswarm-playground-catalog | kubectl-apply-job | 0.11.0 |
+
 ## Usage
 
 [Helm](https://helm.sh) must be installed to use the charts.
@@ -112,6 +118,15 @@ To uninstall the chart:
 | hpa.maxReplicas | int | `1` |  |
 | hpa.metrics | list | `[]` |  |
 | hpa.minReplicas | int | `1` |  |
+| kubectlApplyJob.enabled | bool | `true` |  |
+| kubectlApplyJob.files[0] | string | `"files/generated/gateway.envoyproxy.io_backends.yaml"` |  |
+| kubectlApplyJob.files[1] | string | `"files/generated/gateway.envoyproxy.io_backendtrafficpolicies.yaml"` |  |
+| kubectlApplyJob.files[2] | string | `"files/generated/gateway.envoyproxy.io_clienttrafficpolicies.yaml"` |  |
+| kubectlApplyJob.files[3] | string | `"files/generated/gateway.envoyproxy.io_envoyextensionpolicies.yaml"` |  |
+| kubectlApplyJob.files[4] | string | `"files/generated/gateway.envoyproxy.io_envoypatchpolicies.yaml"` |  |
+| kubectlApplyJob.files[5] | string | `"files/generated/gateway.envoyproxy.io_envoyproxies.yaml"` |  |
+| kubectlApplyJob.files[6] | string | `"files/generated/gateway.envoyproxy.io_httproutefilters.yaml"` |  |
+| kubectlApplyJob.files[7] | string | `"files/generated/gateway.envoyproxy.io_securitypolicies.yaml"` |  |
 | kubernetesClusterDomain | string | `"cluster.local"` |  |
 | kyvernoPolicies.backend.allowedDynamicResolverNamespaces | list | `[]` | Restrict DynamicResolver type to specific namespaces (empty = deny all) |
 | kyvernoPolicies.backend.denyAdminPort | bool | `true` | Block access to Envoy admin port (19000) |

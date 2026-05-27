@@ -12,17 +12,10 @@ cd "${repo_dir}"
 readonly script_dir_rel=".${script_dir#"${repo_dir}"}"
 
 set -x
-mv ./helm/envoy-gateway/charts/crds/crds/generated ./helm/envoy-gateway/templates/crds
+rm -f ./helm/envoy-gateway/charts/crds/crds/gatewayapi-crds.yaml
+mkdir -p ./helm/envoy-gateway/files
+mv ./helm/envoy-gateway/charts/crds/crds/generated ./helm/envoy-gateway/files/generated
 rm -rf ./helm/envoy-gateway/charts/crds
-
-templates_path="./helm/envoy-gateway/templates/crds"
-
-cd "${templates_path}"
+cp "${script_dir_rel}/crds.yaml" ./helm/envoy-gateway/templates/crds.yaml
 
 { set +x; } 2>/dev/null
-for f in *.yaml ; do
-  set -x
-  yq -i '.metadata.annotations += {"helm.sh/resource-policy":"keep"}' "$f"
-
-  { set +x; } 2>/dev/null
-done
