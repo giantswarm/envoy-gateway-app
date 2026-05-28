@@ -1,2 +1,2 @@
-FROM gsoci.azurecr.io/giantswarm/docker-kubectl:1.33.4
+FROM gsoci.azurecr.io/giantswarm/docker-kubectl:1.36.1
 COPY crds/ /crds/
