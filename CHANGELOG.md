@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.1] - 2026-05-28
+
 ### Changed
 
 - Envoy Gateway CRDs are no longer installed as Helm-managed resources. Instead, a dedicated Docker image (`gsoci.azurecr.io/giantswarm/envoy-gateway-crds`) is built and a pre-install/pre-upgrade hook Job applies the CRDs via `kubectl apply --server-side`. This avoids CRD ownership conflicts and allows safe upgrades.
@@ -122,7 +124,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set requests and limits for certgen Job
 - Improve security for PSS compliance
 
-[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.7.1...HEAD
+[1.7.1]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.6.2...v1.7.0
 [1.6.2]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.6.0...v1.6.1
