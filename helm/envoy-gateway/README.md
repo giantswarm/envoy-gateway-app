@@ -55,6 +55,8 @@ To uninstall the chart:
 | ciliumNetworkPolicy.controlPlaneAllowWorld | bool | `false` | Allow envoy-gateway control plane pods to communicate with the outside world. This can be required in certain cases with SecurityPolicies trying to contact external providers for additional OIDC or JWT configuration. |
 | commonLabels | object | `{}` | Labels to apply to all resources |
 | config.envoyGateway | object | `{"extensionApis":{},"gateway":{"controllerName":"gateway.envoyproxy.io/gatewayclass-controller"},"logging":{"level":{"default":"info"}},"provider":{"type":"Kubernetes"}}` | EnvoyGateway configuration. Visit https://gateway.envoyproxy.io/docs/api/extension_types/#envoygateway to view all options. |
+| crds.image.registry | string | `"gsoci.azurecr.io"` |  |
+| crds.image.repository | string | `"giantswarm/envoy-gateway-crds"` |  |
 | createNamespace | bool | `false` |  |
 | deployment.annotations | object | `{}` |  |
 | deployment.envoyGateway.extraEnv | list | `[]` | Additional environment variables for the envoy-gateway container. |

@@ -5,6 +5,18 @@ orbs:
 workflows:
   package-and-push-chart-on-tag:
     jobs:
+    - architect/push-to-registries:
+        context: architect
+        name: push-crd-image-to-registries
+        image: giantswarm/envoy-gateway-crds
+        filters:
+          tags:
+            only: /^v.*/
+          branches:
+            ignore:
+            - main
+            - master
+
     - architect/push-to-app-catalog:
         context: architect
         executor: app-build-suite
@@ -12,7 +24,8 @@ workflows:
         app_catalog: giantswarm-catalog
         app_catalog_test: giantswarm-test-catalog
         chart: envoy-gateway
-          # Trigger job on git tag.
+        requires:
+        - push-crd-image-to-registries
         filters:
           tags:
             only: /^v.*/

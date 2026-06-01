@@ -210,3 +210,8 @@ kyvernoPolicies:
     denyMetadataService: true
     # -- Restrict DynamicResolver type to specific namespaces (empty = deny all)
     allowedDynamicResolverNamespaces: []
+
+crds:
+  image:
+    registry: gsoci.azurecr.io
+    repository: giantswarm/envoy-gateway-crds
