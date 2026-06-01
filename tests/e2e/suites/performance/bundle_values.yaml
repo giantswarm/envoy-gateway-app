@@ -1,0 +1,44 @@
+apps:
+  envoyGateway:
+    userConfig:
+      configMap:
+        values: |
+          config:
+            envoyGateway:
+              gatewayAPI:
+                enabled:
+                  - XListenerSet
+  gatewayApiConfig:
+    enabled: true
+    userConfig:
+      configMap:
+        values: |
+          gateways:
+            default:
+              envoyProxy:
+                enabled: true
+              allowedListeners:
+                enabled: true
+                namespaces:
+                  from: All
+              listeners:
+                http:
+                  httpsRedirectEnabled: true
+                  allowedRoutes:
+                    namespaces:
+                      from: All
+                https:
+                  subdomains:
+                    - onlineboutique
+                  certificate:
+                    issuer:
+                      kind: ClusterIssuer
+                      name: letsencrypt-giantswarm
+  gatewayApiCrds:
+    enabled: true
+    userConfig:
+      configMap:
+        values: |
+          install:
+            xlistenersets: "experimental"
+            gateways: "experimental"

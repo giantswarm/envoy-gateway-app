@@ -37,55 +37,6 @@ global:
 enableServiceMutatorWebhook: false
 `
 
-const gatewayApiBundleValues = `
-apps:
-  envoyGateway:
-    enabled: true
-    userConfig:
-      configMap:
-        values: |
-          config:
-            envoyGateway:
-              gatewayAPI:
-                enabled:
-                  - XListenerSet
-  gatewayApiConfig:
-    enabled: true
-    userConfig:
-      configMap:
-        values: |
-          gateways:
-            default:
-              envoyProxy:
-                enabled: true
-              allowedListeners:
-                enabled: true
-                namespaces:
-                  from: All
-              listeners:
-                http:
-                  httpsRedirectEnabled: true
-                  allowedRoutes:
-                    namespaces:
-                      from: All
-                https:
-                  subdomains:
-                    - onlineboutique
-                  certificate:
-                    issuer:
-                      kind: ClusterIssuer
-                      name: letsencrypt-giantswarm
-  gatewayApiCrds:
-    enabled: true
-    userConfig:
-      configMap:
-        values: |
-          install:
-            xlistenersets: "experimental"
-            gateways: "experimental"
-clusterID: %s
-`
-
 const kongAppValues = `
 ingressController:
   enabled: true
@@ -157,14 +108,16 @@ controller:
 `
 
 // dependencyVersions pins the version of each dependency app to match the
-// manual load-testing pipeline (envoy-loadtesting/wc-deployment/additional-apps.yaml).
-// Keep in sync with that file so the e2e suite exercises the same versions the
-// benchmark uses.
+// manual load-testing pipeline (envoy-loadtesting/wc-deployment/additional-apps.yaml
+// and envoy-loadtesting/wc-deployment/loadtesting-app.yaml).
+// Keep in sync with those files so the e2e suite exercises the same versions the
+// benchmark uses. gateway-api-bundle is installed by apptest-framework via
+// InAppBundle and not listed here.
 var dependencyVersions = map[string]string{
 	"aws-lb-controller-bundle": "5.1.0",
 	"ingress-nginx":            "4.2.5",
-	"gateway-api-bundle":       "1.15.0",
 	"kong-app":                 "5.2.2",
+	"microservices-demo-app":   "0.1.0",
 }
 
 func deployDependency(depName, depValues string, installNs ...string) *application.Application {

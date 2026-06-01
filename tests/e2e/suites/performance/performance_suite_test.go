@@ -227,14 +227,14 @@ shippingService:
     targetCPUUtilizationPercentage: 80
 `
 
-// buildAppValues returns the values overlay applied to the
-// microservices-demo-app HelmRelease. Mirrors
+// buildMicroservicesDemoAppValues returns the values overlay applied to the
+// microservices-demo-app dependency. Mirrors
 // envoy-loadtesting/wc-deployment/values/microservices-demo.yaml; the
 // PUBLIC_ENDPOINTS / HPA_MIN_REPLICAS / HPA_MAX_REPLICAS knobs are read via
 // envOrDefault so config.env (loaded by loadConfigEnv) supplies the same
 // defaults as the manual pipeline. Only the chosen ingress controller branch
 // is enabled.
-func buildAppValues(baseDomain string) string {
+func buildMicroservicesDemoAppValues(baseDomain string) string {
 	ingressEnabled := "false"
 	kongEnabled := "false"
 	switch proxyController {
@@ -256,25 +256,24 @@ func buildAppValues(baseDomain string) string {
 	})
 }
 
-func TestBasic(t *testing.T) {
+func TestPerformance(t *testing.T) {
 	suite.New().
-		WithInstallNamespace("loadtesting").
+		// envoy-gateway is the SUT; the framework installs it via the
+		// gateway-api-bundle so the gateway-api CRDs and the default
+		// Gateway/HTTPRoute config come up at the same time. Bundle-level
+		// values (XListenerSet, listeners, TLS issuer) live in
+		// bundle_values.yaml.
+		InAppBundle("gateway-api-bundle").
+		WithInstallNamespace("envoy-gateway-system").
 		WithIsUpgrade(isUpgrade).
 		WithValuesFile("./values.yaml").
+		WithBundleValuesFile("./bundle_values.yaml").
 		AfterClusterReady(func() {
 			var (
 				awsLBApp        *application.Application
 				ingressNginxApp *application.Application
-				gatewayAPIApp   *application.Application
 				kongApp         *application.Application
 			)
-
-			It("should configure app values", FlakeAttempts(3), func() {
-				baseDomain := getWorkloadClusterBaseDomain()
-				state.SetApplication(
-					state.GetApplication().MustWithValues(buildAppValues(baseDomain), nil),
-				)
-			})
 
 			It("should create the loadtesting namespace", FlakeAttempts(3), func() {
 				createWorkloadClusterNamespace("loadtesting")
@@ -296,27 +295,6 @@ func TestBasic(t *testing.T) {
 				waitForDependency(awsLBApp)
 			})
 
-			It("should install gateway-api-bundle", FlakeAttempts(3), func() {
-				clusterName := state.GetCluster().Name
-				gatewayAPIApp = deployDependency("gateway-api-bundle", fmt.Sprintf(gatewayApiBundleValues, clusterName))
-				waitForDependency(gatewayAPIApp)
-			})
-
-			It("should have gateway api CRDs registered", FlakeAttempts(3), func() {
-				for _, crd := range []string{
-					"gateways.gateway.networking.k8s.io",
-					"httproutes.gateway.networking.k8s.io",
-					"xlistenersets.gateway.networking.x-k8s.io",
-				} {
-					Eventually(func() (bool, error) {
-						return crdExists(crd)
-					}).
-						WithTimeout(5 * time.Minute).
-						WithPolling(10 * time.Second).
-						Should(BeTrue())
-				}
-			})
-
 			if proxyController == proxyControllerNginx {
 				It("should wait for ingress-nginx to be ready", FlakeAttempts(3), func() {
 					waitForDependency(ingressNginxApp)
@@ -329,39 +307,7 @@ func TestBasic(t *testing.T) {
 					kongApp = deployDependency("kong-app", fmt.Sprintf(kongAppValues, baseDomain), "kong")
 					waitForDependency(kongApp)
 				})
-			}
 
-			It("should have ready dependency deployments on the workload cluster", FlakeAttempts(3), func() {
-				namespaces := []string{"aws-load-balancer-controller", "envoy-gateway-system", "default"}
-				if proxyController == proxyControllerKong {
-					namespaces = append(namespaces, "kong")
-				}
-				for _, ns := range namespaces {
-					Eventually(func() (bool, error) {
-						return deploymentReadyInNamespace(ns)
-					}).
-						WithTimeout(10 * time.Minute).
-						WithPolling(5 * time.Second).
-						Should(BeTrue())
-				}
-			})
-
-			It("should have ready LoadBalancer services on the workload cluster", FlakeAttempts(3), func() {
-				namespaces := []string{"default", "envoy-gateway-system"}
-				if proxyController == proxyControllerKong {
-					namespaces = append(namespaces, "kong")
-				}
-				for _, ns := range namespaces {
-					Eventually(func() (bool, error) {
-						return loadBalancerServiceReadyInNamespace(ns)
-					}).
-						WithTimeout(10 * time.Minute).
-						WithPolling(5 * time.Second).
-						Should(BeTrue())
-				}
-			})
-
-			if proxyController == proxyControllerKong {
 				It("should configure kong prometheus plugin", FlakeAttempts(3), func() {
 					By("Waiting for KongClusterPlugin CRD to be registered")
 					Eventually(func() (bool, error) {
@@ -383,16 +329,26 @@ func TestBasic(t *testing.T) {
 		}).
 		Tests(func() {
 			var (
-				nginxUrl string
-				envoyUrl string
-				kongUrl  string
+				microservicesDemoApp *application.Application
+				nginxUrl             string
+				envoyUrl             string
+				kongUrl              string
 			)
 			BeforeEach(func() {
 				nginxUrl = fmt.Sprintf("https://nginx-onlineboutique-0.loadtesting.%s", getWorkloadClusterBaseDomain())
 				envoyUrl = fmt.Sprintf("https://onlineboutique.loadtesting-0.%s", getWorkloadClusterBaseDomain())
 				kongUrl = fmt.Sprintf("https://kong-onlineboutique-0.loadtesting.%s", getWorkloadClusterBaseDomain())
 			})
-			It("should have deployed the test app", func() {
+
+			It("should have deployed envoy-gateway via the gateway-api-bundle", func() {
+				bundleApp := state.GetBundleApplication()
+				Expect(bundleApp).NotTo(BeNil())
+
+				Eventually(wait.IsAppDeployed(state.GetContext(), state.GetFramework().MC(), bundleApp.InstallName, bundleApp.GetNamespace())).
+					WithTimeout(15 * time.Minute).
+					WithPolling(5 * time.Second).
+					Should(BeTrue())
+
 				Eventually(func() (bool, error) {
 					done, err := wait.IsAppDeployed(state.GetContext(), state.GetFramework().MC(), state.GetApplication().InstallName, state.GetApplication().Organization.GetNamespace())()
 					if err != nil {
@@ -402,13 +358,64 @@ func TestBasic(t *testing.T) {
 						}
 						return false, err
 					}
-
 					return done, nil
 				}).
-					WithTimeout(5 * time.Minute).
+					WithTimeout(15 * time.Minute).
 					WithPolling(5 * time.Second).
 					Should(BeTrue())
 			})
+
+			It("should have gateway api CRDs registered", func() {
+				for _, crd := range []string{
+					"gateways.gateway.networking.k8s.io",
+					"httproutes.gateway.networking.k8s.io",
+					"xlistenersets.gateway.networking.x-k8s.io",
+				} {
+					Eventually(func() (bool, error) {
+						return crdExists(crd)
+					}).
+						WithTimeout(5 * time.Minute).
+						WithPolling(10 * time.Second).
+						Should(BeTrue())
+				}
+			})
+
+			It("should have ready dependency deployments on the workload cluster", func() {
+				namespaces := []string{"aws-load-balancer-controller", "envoy-gateway-system"}
+				if proxyController == proxyControllerKong {
+					namespaces = append(namespaces, "kong")
+				}
+				for _, ns := range namespaces {
+					Eventually(func() (bool, error) {
+						return deploymentReadyInNamespace(ns)
+					}).
+						WithTimeout(10 * time.Minute).
+						WithPolling(5 * time.Second).
+						Should(BeTrue())
+				}
+			})
+
+			It("should install and wait for microservices-demo-app", func() {
+				baseDomain := getWorkloadClusterBaseDomain()
+				microservicesDemoApp = deployDependency("microservices-demo-app", buildMicroservicesDemoAppValues(baseDomain), "loadtesting")
+				waitForDependency(microservicesDemoApp)
+			})
+
+			It("should have ready LoadBalancer services on the workload cluster", func() {
+				namespaces := []string{"loadtesting", "envoy-gateway-system"}
+				if proxyController == proxyControllerKong {
+					namespaces = append(namespaces, "kong")
+				}
+				for _, ns := range namespaces {
+					Eventually(func() (bool, error) {
+						return loadBalancerServiceReadyInNamespace(ns)
+					}).
+						WithTimeout(10 * time.Minute).
+						WithPolling(5 * time.Second).
+						Should(BeTrue())
+				}
+			})
+
 			It("should have ready certificates on the workload cluster", func() {
 				expected := []types.NamespacedName{
 					{Namespace: "loadtesting-0", Name: "gateway-0-https"},
@@ -509,5 +516,5 @@ func TestBasic(t *testing.T) {
 			configMapName := fmt.Sprintf("e2e-load-test-scenario-%s", state.GetCluster().Name)
 			cleanupK6Resources(testRunName, configMapName, k6Namespace)
 		}).
-		Run(t, "Basic Test")
+		Run(t, "Performance Test")
 }
