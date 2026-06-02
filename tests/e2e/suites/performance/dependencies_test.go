@@ -114,10 +114,10 @@ controller:
 // benchmark uses. gateway-api-bundle is installed by apptest-framework via
 // InAppBundle and not listed here.
 var dependencyVersions = map[string]string{
-	"aws-lb-controller-bundle": "5.1.0",
-	"ingress-nginx":            "4.2.5",
+	"aws-lb-controller-bundle": "5.2.0",
+	"ingress-nginx":            "4.3.3",
 	"kong-app":                 "5.2.2",
-	"microservices-demo-app":   "0.1.0",
+	"microservices-demo-app":   "0.8.0",
 }
 
 func deployDependency(depName, depValues string, installNs ...string) *application.Application {

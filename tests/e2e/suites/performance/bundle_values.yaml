@@ -1,13 +1,4 @@
 apps:
-  envoyGateway:
-    userConfig:
-      configMap:
-        values: |
-          config:
-            envoyGateway:
-              gatewayAPI:
-                enabled:
-                  - XListenerSet
   gatewayApiConfig:
     enabled: true
     userConfig:
@@ -34,11 +25,3 @@ apps:
                     issuer:
                       kind: ClusterIssuer
                       name: letsencrypt-giantswarm
-  gatewayApiCrds:
-    enabled: true
-    userConfig:
-      configMap:
-        values: |
-          install:
-            xlistenersets: "experimental"
-            gateways: "experimental"
