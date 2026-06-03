@@ -107,11 +107,7 @@ controller:
     update-status: "true"
 `
 
-// dependencyVersions pins the version of each dependency app to match the
-// manual load-testing pipeline (envoy-loadtesting/wc-deployment/additional-apps.yaml
-// and envoy-loadtesting/wc-deployment/loadtesting-app.yaml).
-// Keep in sync with those files so the e2e suite exercises the same versions the
-// benchmark uses. gateway-api-bundle is installed by apptest-framework via
+// gateway-api-bundle is installed by apptest-framework via
 // InAppBundle and not listed here.
 var dependencyVersions = map[string]string{
 	"aws-lb-controller-bundle": "5.2.0",

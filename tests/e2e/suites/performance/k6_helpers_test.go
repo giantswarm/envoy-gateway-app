@@ -31,7 +31,7 @@ const defaultK6KubeconfigPath = "/etc/k6-kubeconfig"
 // prometheusCredentialsSecret is the secret that the k6 runner reads via
 // envFrom to authenticate against the Prometheus remote-write endpoint. It is
 // populated by mirrorPrometheusCredentials from kube-system/alloy-metrics on
-// the management cluster — matching what envoy-loadtesting/deploy.sh does.
+// the management cluster
 const prometheusCredentialsSecret = "k6-prometheus-rw-credentials"
 
 // prometheusOffEnvVar disables the Prometheus remote-write integration on the
@@ -95,9 +95,9 @@ func buildScenarioConfigMap(name, namespace string) *corev1.ConfigMap {
 	_, thisFile, _, ok := runtime.Caller(0)
 	Expect(ok).To(BeTrue(), "failed to resolve test file path")
 
-	// Read the canonical scenario script from the load-testing pipeline
-	// Go file: tests/e2e/suites/basic/k6_helpers_test.go → ../../../../envoy-loadtesting/k6/test-scenario.js
-	scenarioPath := filepath.Join(filepath.Dir(thisFile), "..", "..", "..", "..", "envoy-loadtesting", "k6", "test-scenario.js")
+	// Read the canonical scenario script from the suite-local
+	// test_data/test-scenario.js, relative to this Go file.
+	scenarioPath := filepath.Join(filepath.Dir(thisFile), "test_data", "test-scenario.js")
 	content, err := os.ReadFile(scenarioPath)
 	Expect(err).NotTo(HaveOccurred(), "failed to read test-scenario.js at %s", scenarioPath)
 

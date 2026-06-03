@@ -26,10 +26,10 @@ var infraConfigKeys = map[string]bool{
 	"K6_CONTEXT":  true,
 }
 
-// loadConfigEnv seeds the process environment from
-// envoy-loadtesting/config.env on first call, so the e2e suite shares
-// app-tuning defaults (PUBLIC_ENDPOINTS, HPA_*, k6 knobs) with the manual
-// load-testing pipeline. Infrastructure-identity keys (see infraConfigKeys)
+// loadConfigEnv seeds the process environment from the suite-local
+// config.env on first call, so the e2e suite shares app-tuning defaults
+// (PUBLIC_ENDPOINTS, HPA_*, k6 knobs) with the manual load-testing
+// pipeline. Infrastructure-identity keys (see infraConfigKeys)
 // are deliberately skipped — those are specific to the manual pipeline's
 // cluster and must be discovered at runtime for the ephemeral e2e cluster.
 // Real env vars already set by the Tekton pipeline (or a local override)
@@ -44,7 +44,7 @@ func loadConfigEnv() {
 		if !ok {
 			return
 		}
-		path := filepath.Join(filepath.Dir(thisFile), "..", "..", "..", "..", "envoy-loadtesting", "config.env")
+		path := filepath.Join(filepath.Dir(thisFile), "config.env")
 		f, err := os.Open(path)
 		if err != nil {
 			return

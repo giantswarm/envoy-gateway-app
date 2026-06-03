@@ -27,9 +27,7 @@ const (
 	proxyControllerKong  = "kong"
 
 	// proxyControllerEnvVar selects which ingress controller is deployed
-	// alongside Envoy Gateway. Mirrors PROXY_CONTROLLER in
-	// envoy-loadtesting/config.env so the e2e suite and the manual
-	// load-testing pipeline exercise the same single-controller setup.
+	// alongside Envoy Gateway.
 	proxyControllerEnvVar = "PROXY_CONTROLLER"
 )
 
