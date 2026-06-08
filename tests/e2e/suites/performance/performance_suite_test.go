@@ -400,15 +400,18 @@ func TestPerformance(t *testing.T) {
 			})
 
 			It("should have ready LoadBalancer services on the workload cluster", func() {
-				namespaces := []string{"loadtesting", "envoy-gateway-system"}
-				if proxyController == proxyControllerKong {
+				namespaces := []string{"envoy-gateway-system"}
+				switch proxyController {
+				case proxyControllerNginx:
+					namespaces = append(namespaces, "default")
+				case proxyControllerKong:
 					namespaces = append(namespaces, "kong")
 				}
 				for _, ns := range namespaces {
 					Eventually(func() (bool, error) {
 						return loadBalancerServiceReadyInNamespace(ns)
 					}).
-						WithTimeout(20 * time.Minute).
+						WithTimeout(10 * time.Minute).
 						WithPolling(10 * time.Second).
 						Should(BeTrue())
 				}
