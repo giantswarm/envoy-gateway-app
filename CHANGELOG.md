@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Import load testing framework from microservices-demo app.
 
+## [1.7.2] - 2026-06-08
+
 ### Changed
 
 - Update Envoy Gateway to [v1.8.1](https://gateway.envoyproxy.io/news/releases/notes/v1.8.1) (data plane Envoy bumped to v1.38.1).
@@ -132,7 +134,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set requests and limits for certgen Job
 - Improve security for PSS compliance
 
-[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.7.1...HEAD
+[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.7.2...HEAD
+[1.7.2]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.6.2...v1.7.0
 [1.6.2]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.6.1...v1.6.2
