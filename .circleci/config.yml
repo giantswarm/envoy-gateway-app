@@ -16,6 +16,8 @@ workflows:
             ignore:
             - main
             - master
+        registries-data: |-
+          public gsoci.azurecr.io ACR_GSOCI_USERNAME ACR_GSOCI_PASSWORD true
 
     - architect/push-to-app-catalog:
         context: architect
