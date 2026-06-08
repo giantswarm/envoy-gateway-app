@@ -259,7 +259,7 @@ func TestPerformance(t *testing.T) {
 		// envoy-gateway is the SUT; the framework installs it via the
 		// gateway-api-bundle so the gateway-api CRDs and the default
 		// Gateway/HTTPRoute config come up at the same time. Bundle-level
-		// values (XListenerSet, listeners, TLS issuer) live in
+		// values (ListenerSet, listeners, TLS issuer) live in
 		// bundle_values.yaml.
 		InAppBundle("gateway-api-bundle").
 		WithInstallNamespace("envoy-gateway-system").
@@ -367,7 +367,7 @@ func TestPerformance(t *testing.T) {
 				for _, crd := range []string{
 					"gateways.gateway.networking.k8s.io",
 					"httproutes.gateway.networking.k8s.io",
-					"xlistenersets.gateway.networking.x-k8s.io",
+					"listenersets.gateway.networking.k8s.io",
 				} {
 					Eventually(func() (bool, error) {
 						return crdExists(crd)
