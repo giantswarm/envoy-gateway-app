@@ -37,7 +37,7 @@ spec:
           protocol: TCP
   ingress:
     - ports:
-        {{- range .Values.deployment.envoyGateway.ports }}
+        {{- range .Values.deployment.ports }}
         - port: {{ .port }}
           protocol: TCP
         {{- end }}

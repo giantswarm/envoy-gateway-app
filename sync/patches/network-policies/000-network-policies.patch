@@ -143,8 +143,8 @@ index 0000000..a44b6ee
 +        - cluster
 +      toPorts:
 +        - ports:
-+            {{- range .Values.deployment.envoyGateway.ports }}
-+            - port: {{ printf "\"%d\"" .port }}
++            {{- range .Values.deployment.ports }}
++            - port: {{ .port | int | toString | quote }}
 +              protocol: TCP
 +            {{- end }}
 diff --git a/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml b/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml
@@ -192,7 +192,7 @@ index 0000000..9d9049d
 +          protocol: TCP
 +  ingress:
 +    - ports:
-+        {{- range .Values.deployment.envoyGateway.ports }}
++        {{- range .Values.deployment.ports }}
 +        - port: {{ .port }}
 +          protocol: TCP
 +        {{- end }}

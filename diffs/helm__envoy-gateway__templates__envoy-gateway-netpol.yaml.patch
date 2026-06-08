@@ -1,6 +1,6 @@
 diff --git a/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml b/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml
 new file mode 100644
-index 0000000..9d9049d
+index 0000000..c3d2d58
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/envoy-gateway-netpol.yaml
 @@ -0,0 +1,45 @@
@@ -43,7 +43,7 @@ index 0000000..9d9049d
 +          protocol: TCP
 +  ingress:
 +    - ports:
-+        {{- range .Values.deployment.envoyGateway.ports }}
++        {{- range .Values.deployment.ports }}
 +        - port: {{ .port }}
 +          protocol: TCP
 +        {{- end }}
