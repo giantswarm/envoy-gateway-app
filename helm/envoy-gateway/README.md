@@ -100,10 +100,10 @@ To uninstall the chart:
 | deployment.replicas | int | `1` |  |
 | global.image | object | `{"registry":"gsoci.azurecr.io"}` | Global override for image registry |
 | global.imagePullSecrets | list | `[]` | Global override for image pull secrets |
-| global.images.envoyGateway.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.8.0"` |  |
+| global.images.envoyGateway.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.8.1"` |  |
 | global.images.envoyGateway.pullPolicy | string | `"IfNotPresent"` |  |
 | global.images.envoyGateway.pullSecrets | list | `[]` |  |
-| global.images.envoyProxy.image | string | `"gsoci.azurecr.io/giantswarm/envoy:distroless-v1.38.0"` |  |
+| global.images.envoyProxy.image | string | `"gsoci.azurecr.io/giantswarm/envoy:distroless-v1.38.1"` |  |
 | global.images.envoyProxy.pullPolicy | string | `"IfNotPresent"` |  |
 | global.images.envoyProxy.pullSecrets | list | `[]` |  |
 | global.images.ratelimit.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:ff287602"` |  |

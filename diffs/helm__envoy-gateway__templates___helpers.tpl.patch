@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/templates/_helpers.tpl b/helm/envoy-gateway/templates/_helpers.tpl
-index db56f73..be25684 100644
+index 3f10daa..ccbebd6 100644
 --- a/vendor/gateway-helm/templates/_helpers.tpl
 +++ b/helm/envoy-gateway/templates/_helpers.tpl
 @@ -47,6 +47,7 @@ helm.sh/chart: {{ include "eg.chart" . }}
