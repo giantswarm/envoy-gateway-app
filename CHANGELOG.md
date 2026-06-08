@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Import load testing framework from microservices-demo app.
+
 ## [1.7.2] - 2026-06-08
 
 ### Changed
