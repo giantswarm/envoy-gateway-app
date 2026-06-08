@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 0338c74..4b09ccd 100644
+index af43749..f4b691d 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,8 @@
@@ -16,8 +16,8 @@ index 0338c74..4b09ccd 100644
    images:
      envoyGateway:
        # This is the full image name including the hub, repo, and tag.
--      image: docker.io/envoyproxy/gateway:v1.8.0
-+      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.8.0
+-      image: docker.io/envoyproxy/gateway:v1.8.1
++      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.8.1
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: latest images will be Always else IfNotPresent.
        pullPolicy: IfNotPresent
@@ -35,7 +35,7 @@ index 0338c74..4b09ccd 100644
        # This is the full image name including the hub, repo, and tag for the Envoy Proxy data plane.
        # If not specified, uses the default image built into envoy-gateway.
 -      image: ""
-+      image: "gsoci.azurecr.io/giantswarm/envoy:distroless-v1.38.0"
++      image: "gsoci.azurecr.io/giantswarm/envoy:distroless-v1.38.1"
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: IfNotPresent.
 -      pullPolicy: ""
