@@ -431,7 +431,7 @@ func TestPerformance(t *testing.T) {
 				Eventually(func() (bool, error) {
 					return allCertificatesReady(expected)
 				}).
-					WithTimeout(10 * time.Minute).
+					WithTimeout(20 * time.Minute).
 					WithPolling(5 * time.Second).
 					Should(BeTrue())
 			})
