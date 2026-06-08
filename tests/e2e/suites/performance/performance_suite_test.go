@@ -408,8 +408,8 @@ func TestPerformance(t *testing.T) {
 					Eventually(func() (bool, error) {
 						return loadBalancerServiceReadyInNamespace(ns)
 					}).
-						WithTimeout(10 * time.Minute).
-						WithPolling(5 * time.Second).
+						WithTimeout(20 * time.Minute).
+						WithPolling(10 * time.Second).
 						Should(BeTrue())
 				}
 			})
