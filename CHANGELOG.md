@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Import load testing framework from microservices-demo app.
 
+### Changed
+
+- Update Envoy Gateway to [v1.8.1](https://gateway.envoyproxy.io/news/releases/notes/v1.8.1) (data plane Envoy bumped to v1.38.1).
+
 ## [1.7.1] - 2026-05-28
 
 ### Changed
