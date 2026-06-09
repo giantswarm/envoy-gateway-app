@@ -38,7 +38,7 @@ spec:
         - cluster
       toPorts:
         - ports:
-            {{- range .Values.deployment.envoyGateway.ports }}
-            - port: {{ printf "\"%d\"" .port }}
+            {{- range .Values.deployment.ports }}
+            - port: {{ .port | int | toString | quote }}
               protocol: TCP
             {{- end }}
