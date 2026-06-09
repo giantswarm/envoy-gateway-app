@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  architect: giantswarm/architect@9.1.0
+  architect: giantswarm/architect@9.3.0
 
 workflows:
   package-and-push-chart-on-tag:
@@ -37,6 +37,7 @@ workflows:
         app_catalog: giantswarm-catalog
         app_catalog_test: giantswarm-test-catalog
         chart: envoy-gateway
+        override_app_version: false
         requires:
         - push-crd-image-to-registries
         filters:
