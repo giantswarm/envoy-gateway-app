@@ -9,6 +9,7 @@ workflows:
         context: architect
         name: push-crd-image-to-registries
         image: giantswarm/envoy-gateway-crds
+        split-china-push: true
         filters:
           tags:
             only: /^v.*/
@@ -16,6 +17,18 @@ workflows:
             ignore:
             - main
             - master
+
+    - architect/sync-china-registry:
+        context: architect
+        name: sync-china-registry
+        image: giantswarm/envoy-gateway-crds
+        requires:
+        - push-crd-image-to-registries
+        filters:
+          tags:
+            only: /^v.*/
+          branches:
+            ignore: /^.*$/
 
     - architect/push-to-app-catalog:
         context: architect
