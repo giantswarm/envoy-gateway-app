@@ -150,8 +150,8 @@ func enforceEnvoyBasicAuth() {
 				"targetRefs": []any{
 					map[string]any{
 						"group": "gateway.networking.k8s.io",
-						"kind":  "Gateway",
-						"name":  gateway,
+						"kind":  "HTTPRoute",
+						"name":  fmt.Sprintf("frontend-%d", i),
 					},
 				},
 				"basicAuth": map[string]any{
