@@ -6,6 +6,12 @@ apps:
         values: |
           gateways:
             default:
+              backendTrafficPolicy:
+                circuitBreaker:
+                  maxConnections: 8192
+                  maxPendingRequests: 8192
+                  maxParallelRequests: 8192
+                  maxParallelRetries: 1024
               envoyProxy:
                 enabled: true
               allowedListeners:
