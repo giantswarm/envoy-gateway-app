@@ -1,0 +1,33 @@
+apps:
+  gatewayApiConfig:
+    enabled: true
+    userConfig:
+      configMap:
+        values: |
+          gateways:
+            default:
+              backendTrafficPolicy:
+                circuitBreaker:
+                  maxConnections: 8192
+                  maxPendingRequests: 8192
+                  maxParallelRequests: 8192
+                  maxParallelRetries: 1024
+              envoyProxy:
+                enabled: true
+              allowedListeners:
+                enabled: true
+                namespaces:
+                  from: All
+              listeners:
+                http:
+                  httpsRedirectEnabled: true
+                  allowedRoutes:
+                    namespaces:
+                      from: All
+                https:
+                  subdomains:
+                    - onlineboutique
+                  certificate:
+                    issuer:
+                      kind: ClusterIssuer
+                      name: letsencrypt-giantswarm
