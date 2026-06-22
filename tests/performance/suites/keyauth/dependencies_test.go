@@ -103,7 +103,7 @@ extraObjects:
 var dependencyVersions = map[string]string{
 	"aws-lb-controller-bundle": "5.2.0",
 	"kong-app":                 "5.2.2",
-	"microservices-demo-app":   "0.8.0",
+	"microservices-demo-app":   "0.8.1",
 }
 
 func deployDependency(depName, depValues string, installNs ...string) *application.Application {
