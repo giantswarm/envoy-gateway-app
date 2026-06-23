@@ -30,6 +30,9 @@ const (
 // stands in for the source file's ${WC}.${BASE_DOMAIN} (the test framework
 // already hands us the concatenated FQDN as baseDomain).
 const microservicesDemoAppValuesTmpl = `
+images:
+  tag: v0.10.5
+
 ingress:
   enabled: ${INGRESS_NGINX_ENABLED}
   number: ${PUBLIC_ENDPOINTS}
