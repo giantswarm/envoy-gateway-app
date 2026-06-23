@@ -59,6 +59,13 @@ const (
 	kongCredentialName = "boutique-key-auth-cred"
 	kongConsumerName   = "boutique-consumer"
 	kongPluginName     = "boutique-key-auth"
+
+	// kongIngressClass must match kong-app's ingressController.ingressClass
+	// (set to "none" in kongAppValues for Gateway-API-only operation). KIC gates
+	// standalone Kong CRDs like KongConsumer on kubernetes.io/ingress.class: a
+	// mismatch leaves the consumer "Waiting for controller", so its credential is
+	// never loaded into Kong and every key — valid or not — is rejected with 401.
+	kongIngressClass = "none"
 )
 
 // httpRouteGVK is the Gateway API HTTPRoute kind, used to fetch and annotate
@@ -188,7 +195,7 @@ func enforceKongKeyAuth() {
 			"name":      kongConsumerName,
 			"namespace": kongNamespace,
 			"annotations": map[string]any{
-				"kubernetes.io/ingress.class": "kong",
+				"kubernetes.io/ingress.class": kongIngressClass,
 			},
 		},
 		"username":    kongConsumerName,

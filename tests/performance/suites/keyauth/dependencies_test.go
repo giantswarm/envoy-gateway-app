@@ -65,7 +65,7 @@ extraObjects:
     metadata:
       name: prometheus
       annotations:
-        kubernetes.io/ingress.class: kong
+        kubernetes.io/ingress.class: none
       labels:
         global: "true"
     plugin: prometheus
