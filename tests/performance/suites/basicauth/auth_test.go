@@ -58,6 +58,10 @@ const (
 	kongCredentialName = "boutique-basic-auth-cred"
 	kongConsumerName   = "boutique-consumer"
 	kongPluginName     = "boutique-basic-auth"
+
+	// kongIngressClass must match kong-app's ingressController.ingressClass
+	// (set to "none" in kongAppValues for Gateway-API-only operation).
+	kongIngressClass = "none"
 )
 
 func basicAuthUser() string     { return envOrDefault("BASIC_AUTH_USER", "testuser") }
@@ -252,7 +256,7 @@ func enforceKongBasicAuth() {
 			"name":      kongConsumerName,
 			"namespace": kongNamespace,
 			"annotations": map[string]any{
-				"kubernetes.io/ingress.class": "kong",
+				"kubernetes.io/ingress.class": kongIngressClass,
 			},
 		},
 		"username":    kongConsumerName,

@@ -65,7 +65,7 @@ extraObjects:
     metadata:
       name: prometheus
       annotations:
-        kubernetes.io/ingress.class: kong
+        kubernetes.io/ingress.class: none
       labels:
         global: "true"
     plugin: prometheus
@@ -113,7 +113,7 @@ var dependencyVersions = map[string]string{
 	"aws-lb-controller-bundle": "5.2.0",
 	"ingress-nginx":            "4.3.3",
 	"kong-app":                 "5.2.2",
-	"microservices-demo-app":   "0.8.0",
+	"microservices-demo-app":   "0.8.1",
 }
 
 func deployDependency(depName, depValues string, installNs ...string) *application.Application {
