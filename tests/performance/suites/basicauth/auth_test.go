@@ -44,16 +44,24 @@ const (
 	// nginx Ingress.
 	nginxAuthSecret = "boutique-basic-auth"
 
-	// Host prefixes the chart assigns to the boutique Ingresses (from
-	// ingress.host / kong.host in buildMicroservicesDemoAppValues). The Ingress
-	// objects are named frontend-{nginx,kong}-{i}, so matching on the rule host
+	// nginxHostPrefix is the host the chart assigns to the boutique nginx
+	// Ingresses (from ingress.host in buildMicroservicesDemoAppValues). The
+	// Ingress objects are named frontend-nginx-{i}, so matching on the rule host
 	// — which we control — is the stable way to find them.
 	nginxHostPrefix = "nginx-onlineboutique"
-	kongHostPrefix  = "kong-onlineboutique"
 
-	// Kong basic-auth wiring: a basic-auth KongPlugin is attached to each
-	// boutique kong Ingress via the konghq.com/plugins annotation, and a
-	// consumer + credential secret holds the single valid identity.
+	// Kong runs as a Gateway API implementation (its own GatewayClass), exactly
+	// like Envoy — not via Ingress. The chart's kong path is a single HTTPRoute
+	// "kong-{frontend.name}" in the loadtesting namespace. (The chart also
+	// renders frontend-kong-{i} Ingresses, but kong-app runs Gateway-API-only
+	// with ingressClass: none and the kong DNSEndpoint only publishes the single
+	// HTTPRoute host, so those Ingresses are neither routable nor reconciled.)
+	kongRouteNamespace = "loadtesting"
+	kongRouteName      = "kong-frontend"
+
+	// Kong basic-auth wiring: a basic-auth KongPlugin is attached to the boutique
+	// kong HTTPRoute via the konghq.com/plugins annotation, and a consumer +
+	// credential secret holds the single valid identity.
 	kongNamespace      = "kong"
 	kongCredentialName = "boutique-basic-auth-cred"
 	kongConsumerName   = "boutique-consumer"
@@ -63,6 +71,10 @@ const (
 	// (set to "none" in kongAppValues for Gateway-API-only operation).
 	kongIngressClass = "none"
 )
+
+// httpRouteGVK is the Gateway API HTTPRoute kind, used to fetch and annotate
+// the chart-created kong HTTPRoute.
+var httpRouteGVK = schema.GroupVersionKind{Group: "gateway.networking.k8s.io", Version: "v1", Kind: "HTTPRoute"}
 
 func basicAuthUser() string     { return envOrDefault("BASIC_AUTH_USER", "testuser") }
 func basicAuthPassword() string { return envOrDefault("BASIC_AUTH_PASSWORD", "testpassword") }
@@ -226,15 +238,12 @@ func enforceNginxBasicAuth() {
 	}
 }
 
-// enforceKongBasicAuth attaches a basic-auth KongPlugin to each boutique kong
-// Ingress (the routes the scenario hits) via the konghq.com/plugins annotation,
-// plus the consumer and credential that make exactly one identity valid. A
-// route-scoped plugin is used rather than a global KongClusterPlugin so
-// enforcement is unambiguous regardless of how kong proxies the route.
+// enforceKongBasicAuth attaches a basic-auth KongPlugin to the boutique kong
+// HTTPRoute (the Gateway API route the scenario hits) via the konghq.com/plugins
+// annotation, plus the consumer and credential that make exactly one identity
+// valid. Kong runs as a Gateway API implementation here, so enforcement targets
+// the HTTPRoute, mirroring how the Envoy side targets its HTTPRoutes.
 func enforceKongBasicAuth() {
-	wc := wcClient()
-	ctx := state.GetContext()
-
 	By("Creating the Kong basic-auth credential Secret")
 	applySecret(kongNamespace, &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
@@ -265,38 +274,52 @@ func enforceKongBasicAuth() {
 	consumer.SetGroupVersionKind(schema.GroupVersionKind{Group: "configuration.konghq.com", Version: "v1", Kind: "KongConsumer"})
 	applyUnstructured(consumer)
 
-	ingresses := boutiqueIngresses(kongHostPrefix)
-	Expect(ingresses).NotTo(BeEmpty(), "found no kong boutique ingresses (host %q) to protect with basic auth", kongHostPrefix)
+	By(fmt.Sprintf("Applying the basic-auth KongPlugin in %s", kongRouteNamespace))
+	// The KongPlugin must live in the same namespace as the HTTPRoute that
+	// references it via konghq.com/plugins.
+	plugin := &unstructured.Unstructured{Object: map[string]any{
+		"apiVersion": "configuration.konghq.com/v1",
+		"kind":       "KongPlugin",
+		"metadata": map[string]any{
+			"name":      kongPluginName,
+			"namespace": kongRouteNamespace,
+		},
+		"plugin": "basic-auth",
+		"config": map[string]any{"hide_credentials": true},
+	}}
+	plugin.SetGroupVersionKind(schema.GroupVersionKind{Group: "configuration.konghq.com", Version: "v1", Kind: "KongPlugin"})
+	applyUnstructured(plugin)
 
-	pluginCreated := map[string]bool{}
-	for _, ing := range ingresses {
-		// The konghq.com/plugins annotation references a KongPlugin in the
-		// Ingress's own namespace, so create one per namespace.
-		if !pluginCreated[ing.Namespace] {
-			By(fmt.Sprintf("Applying the basic-auth KongPlugin in %s", ing.Namespace))
-			plugin := &unstructured.Unstructured{Object: map[string]any{
-				"apiVersion": "configuration.konghq.com/v1",
-				"kind":       "KongPlugin",
-				"metadata": map[string]any{
-					"name":      kongPluginName,
-					"namespace": ing.Namespace,
-				},
-				"plugin": "basic-auth",
-				"config": map[string]any{"hide_credentials": true},
-			}}
-			plugin.SetGroupVersionKind(schema.GroupVersionKind{Group: "configuration.konghq.com", Version: "v1", Kind: "KongPlugin"})
-			applyUnstructured(plugin)
-			pluginCreated[ing.Namespace] = true
-		}
+	By(fmt.Sprintf("Annotating the kong HTTPRoute %s/%s with the basic-auth plugin", kongRouteNamespace, kongRouteName))
+	annotateKongRoute()
+}
 
-		if ing.Annotations == nil {
-			ing.Annotations = map[string]string{}
+// annotateKongRoute adds the konghq.com/plugins annotation to the chart-created
+// kong HTTPRoute, re-fetching on each attempt so a concurrent reconcile (KIC /
+// external-dns) can't lose the update to a resourceVersion conflict.
+func annotateKongRoute() {
+	wc := wcClient()
+	ctx := state.GetContext()
+
+	Eventually(func() error {
+		route := &unstructured.Unstructured{}
+		route.SetGroupVersionKind(httpRouteGVK)
+		if err := wc.Get(ctx, cr.ObjectKey{Name: kongRouteName, Namespace: kongRouteNamespace}, route); err != nil {
+			return err
 		}
-		ing.Annotations["konghq.com/plugins"] = kongPluginName
-		err := wc.Update(ctx, ing)
-		Expect(err).NotTo(HaveOccurred(), "failed to annotate kong ingress %s/%s", ing.Namespace, ing.Name)
-		logger.Log("Attached basic-auth KongPlugin to kong ingress %s/%s", ing.Namespace, ing.Name)
-	}
+		annotations := route.GetAnnotations()
+		if annotations == nil {
+			annotations = map[string]string{}
+		}
+		annotations["konghq.com/plugins"] = kongPluginName
+		route.SetAnnotations(annotations)
+		return wc.Update(ctx, route)
+	}).
+		WithTimeout(5*time.Minute).
+		WithPolling(10*time.Second).
+		Should(Succeed(), "failed to annotate kong HTTPRoute %s/%s with the basic-auth plugin", kongRouteNamespace, kongRouteName)
+
+	logger.Log("Attached basic-auth KongPlugin to kong HTTPRoute %s/%s", kongRouteNamespace, kongRouteName)
 }
 
 // expectEndpointRequiresAuth verifies the gateway enforces basic auth: an

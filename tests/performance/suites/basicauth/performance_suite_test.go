@@ -338,7 +338,9 @@ func TestPerformance(t *testing.T) {
 			BeforeEach(func() {
 				nginxUrl = fmt.Sprintf("https://nginx-onlineboutique-0.loadtesting.%s", getWorkloadClusterBaseDomain())
 				envoyUrl = fmt.Sprintf("https://onlineboutique.loadtesting-0.%s", getWorkloadClusterBaseDomain())
-				kongUrl = fmt.Sprintf("https://kong-onlineboutique-0.loadtesting.%s", getWorkloadClusterBaseDomain())
+				// Kong runs as a Gateway API implementation: the chart exposes a
+				// single HTTPRoute host (no per-endpoint fan-out like Envoy/nginx).
+				kongUrl = fmt.Sprintf("https://kong-onlineboutique.loadtesting.%s", getWorkloadClusterBaseDomain())
 			})
 
 			It("should have deployed envoy-gateway via the gateway-api-bundle", func() {

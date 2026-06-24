@@ -61,9 +61,11 @@ function pickNginxBaseUrl() {
   return `https://nginx-onlineboutique-${n}.loadtesting.${BASE_DOMAIN}`;
 }
 
-function pickKongBaseUrl() {
-  const n = Math.floor(Math.random() * ENDPOINTS);
-  return `https://kong-onlineboutique-${n}.loadtesting.${BASE_DOMAIN}`;
+function kongBaseUrl() {
+  // Kong runs as a Gateway API implementation here: the chart exposes a single
+  // HTTPRoute host (kong-onlineboutique.loadtesting.<base>), with no per-endpoint
+  // fan-out like the Envoy/nginx sides, so all kong traffic targets that host.
+  return `https://kong-onlineboutique.loadtesting.${BASE_DOMAIN}`;
 }
 
 function buildScenarioConfig() {
@@ -195,5 +197,5 @@ export function nginxScenario() {
 }
 
 export function kongScenario() {
-  basicAuthFlow(pickKongBaseUrl(), false);
+  basicAuthFlow(kongBaseUrl(), false);
 }
