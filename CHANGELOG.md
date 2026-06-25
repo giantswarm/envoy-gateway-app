@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `circuitBreaker` config field in bundle values for envoy performance test suites to better sustain high request load.
 
+### Fixed
+
+- Fix kong performance tests in `basic` and `basicauth` suites.
+
 ## [1.7.3] - 2026-06-09
 
 ### Added
