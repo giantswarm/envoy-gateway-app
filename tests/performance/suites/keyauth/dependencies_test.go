@@ -14,6 +14,8 @@ import (
 	"github.com/giantswarm/clustertest/v5/pkg/logger"
 	"github.com/giantswarm/clustertest/v5/pkg/wait"
 
+	"performance/internal/deps"
+
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -96,16 +98,9 @@ extraObjects:
         namespace: kong
 `
 
-// gateway-api-bundle is installed by apptest-framework via
-// InAppBundle and not listed here. This suite compares Envoy against Kong only
-// (API key auth is not natively supported by ingress-nginx), so ingress-nginx
-// is intentionally absent.
-var dependencyVersions = map[string]string{
-	"aws-lb-controller-bundle": "5.2.0",
-	"kong-app":                 "5.2.2",
-	"microservices-demo-app":   "0.8.1",
-}
-
+// This suite compares Envoy against Kong only (API key auth is not natively
+// supported by ingress-nginx), so it never deploys ingress-nginx — the shared
+// deps.Versions map still lists it, but this suite simply never looks it up.
 func deployDependency(depName, depValues string, installNs ...string) *application.Application {
 	By(fmt.Sprintf("deploying %s", depName))
 
@@ -120,9 +115,9 @@ func deployDependency(depName, depValues string, installNs ...string) *applicati
 		installNamespace = installNs[0]
 	}
 
-	version, ok := dependencyVersions[depName]
+	version, ok := deps.Versions[depName]
 	if !ok {
-		Fail(fmt.Sprintf("no version pin defined for dependency %q — add it to dependencyVersions", depName))
+		Fail(fmt.Sprintf("no version pin defined for dependency %q — add it to performance/internal/deps", depName))
 	}
 
 	clusterName := state.GetCluster().Name
