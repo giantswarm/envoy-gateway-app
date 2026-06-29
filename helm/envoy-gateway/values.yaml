@@ -112,7 +112,7 @@ deployment:
         whenUnsatisfiable: ScheduleAnyway
         labelSelector:
           matchLabels:
-            app.kubernetes.io/name: envoy-gateway 
+            app.kubernetes.io/name: envoy-gateway
     tolerations: []
     nodeSelector: {}
     # Additional volumeMounts on the deployment definition.
