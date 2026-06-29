@@ -58,7 +58,7 @@ func publicEndpoints() int {
 }
 
 func httpbinImage() string {
-	return envOrDefault("HTTPBIN_IMAGE", "gsoci.azurecr.io/giantswarm/go-httpbin:2.18.3")
+	return envOrDefault("HTTPBIN_IMAGE", "gsoci.azurecr.io/giantswarm/go-httpbin:2.23.1")
 }
 
 func boolPtr(b bool) *bool    { return &b }
