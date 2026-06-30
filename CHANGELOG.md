@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Set `giantswarm-critical` priorityClass on the Envoy Gateway control plane pods.
 - Add `circuitBreaker` config field in bundle values for envoy performance test suites to better sustain high request load.
 - Move apps' versions in dependencies_test files from each performance test suite into a single file used in each of those.
 
