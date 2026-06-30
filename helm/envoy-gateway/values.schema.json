@@ -323,7 +323,7 @@
                     }
                 },
                 "priorityClassName": {
-                    "type": "null"
+                    "type": ["string", "null"]
                 },
                 "replicas": {
                     "type": "integer"
