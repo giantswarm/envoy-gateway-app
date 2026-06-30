@@ -1,4 +1,4 @@
-package basic
+package mobilelatency
 
 import (
 	"fmt"
@@ -466,6 +466,50 @@ func TestPerformance(t *testing.T) {
 						}
 					})
 					expectEndpointServesTraffic(kongUrl)
+				})
+			}
+			// The boutique frontend can't synthesize per-request latency, so the
+			// mobile-latency bands are served by go-httpbin's /delay endpoint,
+			// overlaid on the /delay path of the existing boutique hostnames
+			// (reusing their DNS + TLS). Deploy it, route it, and verify it
+			// before load testing.
+			It("should deploy go-httpbin", FlakeAttempts(3), func() {
+				deployHttpbin()
+			})
+			It("should route /delay to go-httpbin", FlakeAttempts(3), func() {
+				routeHttpbinThroughGateways()
+			})
+			It("should serve /delay from go-httpbin via envoy gateway on every endpoint", func() {
+				DeferCleanup(func() {
+					if CurrentSpecReport().Failed() {
+						AbortSuite("go-httpbin not reachable via envoy gateway, aborting remaining tests")
+					}
+				})
+				// k6 fans across all loadtesting-{i} endpoints, so verify each
+				// one's /delay route — not just loadtesting-0 — before load testing.
+				baseDomain := getWorkloadClusterBaseDomain()
+				for i := 0; i < publicEndpoints(); i++ {
+					expectDelayServesTraffic(fmt.Sprintf("https://onlineboutique.loadtesting-%d.%s", i, baseDomain))
+				}
+			})
+			if proxyController == proxyControllerNginx {
+				It("should serve /delay from go-httpbin via ingress-nginx", func() {
+					DeferCleanup(func() {
+						if CurrentSpecReport().Failed() {
+							AbortSuite("go-httpbin not reachable via ingress-nginx, aborting remaining tests")
+						}
+					})
+					expectDelayServesTraffic(nginxUrl)
+				})
+			}
+			if proxyController == proxyControllerKong {
+				It("should serve /delay from go-httpbin via kong", func() {
+					DeferCleanup(func() {
+						if CurrentSpecReport().Failed() {
+							AbortSuite("go-httpbin not reachable via kong, aborting remaining tests")
+						}
+					})
+					expectDelayServesTraffic(kongUrl)
 				})
 			}
 			It("should run k6 load tests successfully", func() {

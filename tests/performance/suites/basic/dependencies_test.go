@@ -14,6 +14,8 @@ import (
 	"github.com/giantswarm/clustertest/v5/pkg/logger"
 	"github.com/giantswarm/clustertest/v5/pkg/wait"
 
+	"performance/internal/deps"
+
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -65,7 +67,7 @@ extraObjects:
     metadata:
       name: prometheus
       annotations:
-        kubernetes.io/ingress.class: kong
+        kubernetes.io/ingress.class: none
       labels:
         global: "true"
     plugin: prometheus
@@ -107,15 +109,6 @@ controller:
     update-status: "true"
 `
 
-// gateway-api-bundle is installed by apptest-framework via
-// InAppBundle and not listed here.
-var dependencyVersions = map[string]string{
-	"aws-lb-controller-bundle": "5.2.0",
-	"ingress-nginx":            "4.3.3",
-	"kong-app":                 "5.2.2",
-	"microservices-demo-app":   "0.8.0",
-}
-
 func deployDependency(depName, depValues string, installNs ...string) *application.Application {
 	By(fmt.Sprintf("deploying %s", depName))
 
@@ -130,9 +123,9 @@ func deployDependency(depName, depValues string, installNs ...string) *applicati
 		installNamespace = installNs[0]
 	}
 
-	version, ok := dependencyVersions[depName]
+	version, ok := deps.Versions[depName]
 	if !ok {
-		Fail(fmt.Sprintf("no version pin defined for dependency %q — add it to dependencyVersions", depName))
+		Fail(fmt.Sprintf("no version pin defined for dependency %q — add it to performance/internal/deps", depName))
 	}
 
 	clusterName := state.GetCluster().Name

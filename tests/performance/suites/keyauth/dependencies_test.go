@@ -1,4 +1,4 @@
-package basicauth
+package keyauth
 
 import (
 	"fmt"
@@ -98,17 +98,9 @@ extraObjects:
         namespace: kong
 `
 
-const ingressNginxValues = `
-controller:
-  ingressClassResource:
-    enabled: true
-  service:
-    externalDNS:
-      enabled: true
-  extraArgs:
-    update-status: "true"
-`
-
+// This suite compares Envoy against Kong only (API key auth is not natively
+// supported by ingress-nginx), so it never deploys ingress-nginx — the shared
+// deps.Versions map still lists it, but this suite simply never looks it up.
 func deployDependency(depName, depValues string, installNs ...string) *application.Application {
 	By(fmt.Sprintf("deploying %s", depName))
 

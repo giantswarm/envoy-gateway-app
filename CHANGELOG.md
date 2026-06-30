@@ -10,10 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add `basicauth` performance test suite.
+- Add `keyauth` performance test suite.
+- Add `mobilelatency` performance test suite.
 
 ### Changed
 
 - Add `circuitBreaker` config field in bundle values for envoy performance test suites to better sustain high request load.
+- Move apps' versions in dependencies_test files from each performance test suite into a single file used in each of those.
+
+### Fixed
+
+- Fix kong performance tests in `basic` and `basicauth` suites.
 
 ## [1.7.3] - 2026-06-09
 
