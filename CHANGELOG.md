@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Add `circuitBreaker` config field in bundle values for envoy performance test suites to better sustain high request load.
+- Configure Envoy Gateway to be HA by default.
 - Move apps' versions in dependencies_test files from each performance test suite into a single file used in each of those.
 
 ### Fixed
