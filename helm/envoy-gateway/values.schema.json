@@ -377,7 +377,7 @@
                     }
                 },
                 "priorityClassName": {
-                    "type": ["string", "null"]
+                    "type": "string"
                 },
                 "replicas": {
                     "type": "integer"
@@ -530,6 +530,9 @@
             "properties": {
                 "minAvailable": {
                     "type": "integer"
+                },
+                "unhealthyPodEvictionPolicy": {
+                    "type": "string"
                 }
             }
         },

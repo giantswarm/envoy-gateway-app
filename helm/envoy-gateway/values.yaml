@@ -44,6 +44,7 @@ serviceType: managed
 podDisruptionBudget:
   minAvailable: 1
   # maxUnavailable: 1
+  unhealthyPodEvictionPolicy: AlwaysAllow
 
 deployment:
   annotations: {}
