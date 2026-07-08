@@ -83,7 +83,10 @@ To uninstall the chart:
 | deployment.pod.labels | object | `{}` |  |
 | deployment.pod.nodeSelector | object | `{}` |  |
 | deployment.pod.tolerations | list | `[]` |  |
-| deployment.pod.topologySpreadConstraints | list | `[]` |  |
+| deployment.pod.topologySpreadConstraints[0].labelSelector.matchLabels."app.kubernetes.io/name" | string | `"envoy-gateway"` |  |
+| deployment.pod.topologySpreadConstraints[0].maxSkew | int | `1` |  |
+| deployment.pod.topologySpreadConstraints[0].topologyKey | string | `"kubernetes.io/hostname"` |  |
+| deployment.pod.topologySpreadConstraints[0].whenUnsatisfiable | string | `"ScheduleAnyway"` |  |
 | deployment.ports[0].name | string | `"grpc"` |  |
 | deployment.ports[0].port | int | `18000` |  |
 | deployment.ports[0].targetPort | int | `18000` |  |
@@ -97,7 +100,7 @@ To uninstall the chart:
 | deployment.ports[3].port | int | `19001` |  |
 | deployment.ports[3].targetPort | int | `19001` |  |
 | deployment.priorityClassName | string | `"giantswarm-critical"` |  |
-| deployment.replicas | int | `1` |  |
+| deployment.replicas | int | `2` |  |
 | global.image | object | `{"registry":"gsoci.azurecr.io"}` | Global override for image registry |
 | global.imagePullSecrets | list | `[]` | Global override for image pull secrets |
 | global.images.envoyGateway.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.8.1"` |  |
@@ -110,10 +113,13 @@ To uninstall the chart:
 | global.images.ratelimit.pullPolicy | string | `"IfNotPresent"` |  |
 | global.images.ratelimit.pullSecrets | list | `[]` |  |
 | hpa.behavior | object | `{}` |  |
-| hpa.enabled | bool | `false` |  |
-| hpa.maxReplicas | int | `1` |  |
-| hpa.metrics | list | `[]` |  |
-| hpa.minReplicas | int | `1` |  |
+| hpa.enabled | bool | `true` |  |
+| hpa.maxReplicas | int | `5` |  |
+| hpa.metrics[0].resource.name | string | `"cpu"` |  |
+| hpa.metrics[0].resource.target.averageUtilization | int | `80` |  |
+| hpa.metrics[0].resource.target.type | string | `"Utilization"` |  |
+| hpa.metrics[0].type | string | `"Resource"` |  |
+| hpa.minReplicas | int | `2` |  |
 | kubernetesClusterDomain | string | `"cluster.local"` |  |
 | kyvernoPolicies.backend.allowedDynamicResolverNamespaces | list | `[]` | Restrict DynamicResolver type to specific namespaces (empty = deny all) |
 | kyvernoPolicies.backend.denyAdminPort | bool | `true` | Block access to Envoy admin port (19000) |
@@ -121,7 +127,8 @@ To uninstall the chart:
 | kyvernoPolicies.backend.enabled | bool | `true` | Enable Kyverno policies to restrict Backend resource creation |
 | kyvernoPolicies.backend.validationFailureAction | string | `"Enforce"` | Validation failure action: Enforce (block) or Audit (warn only) |
 | namespaceOverride | string | `""` | Override the namespace for resources deployed by the chart. Defaults to the release namespace. |
-| podDisruptionBudget.minAvailable | int | `0` |  |
+| podDisruptionBudget.minAvailable | int | `1` |  |
+| podDisruptionBudget.unhealthyPodEvictionPolicy | string | `"AlwaysAllow"` |  |
 | service.annotations | object | `{}` |  |
 | service.trafficDistribution | string | `""` |  |
 | service.type | string | `"ClusterIP"` | Service type. Can be set to LoadBalancer with specific IP, e.g.: type: LoadBalancer loadBalancerIP: 10.236.90.20 |

@@ -42,8 +42,9 @@ commonLabels: {}
 serviceType: managed
 
 podDisruptionBudget:
-  minAvailable: 0
+  minAvailable: 1
   # maxUnavailable: 1
+  unhealthyPodEvictionPolicy: AlwaysAllow
 
 deployment:
   annotations: {}
@@ -88,14 +89,20 @@ deployment:
       port: 19001
       targetPort: 19001
   priorityClassName: giantswarm-critical
-  replicas: 1
+  replicas: 2
   pod:
     affinity: {}
     annotations:
       prometheus.io/scrape: 'true'
       prometheus.io/port: '19001'
     labels: {}
-    topologySpreadConstraints: []
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: envoy-gateway
     tolerations: []
     nodeSelector: {}
     # Additional volumeMounts on the deployment definition.
@@ -119,10 +126,16 @@ service:
   type: "ClusterIP"
 
 hpa:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 1
-  metrics: []
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
   behavior: {}
 
 config:

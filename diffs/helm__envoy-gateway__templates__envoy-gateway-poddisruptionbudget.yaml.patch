@@ -1,0 +1,14 @@
+diff --git a/vendor/gateway-helm/templates/envoy-gateway-poddisruptionbudget.yaml b/helm/envoy-gateway/templates/envoy-gateway-poddisruptionbudget.yaml
+index b0f60f4..0c6b1b9 100644
+--- a/vendor/gateway-helm/templates/envoy-gateway-poddisruptionbudget.yaml
++++ b/helm/envoy-gateway/templates/envoy-gateway-poddisruptionbudget.yaml
+@@ -11,6 +11,9 @@ spec:
+   {{- if .Values.podDisruptionBudget.maxUnavailable }}
+   maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
+   {{- end }}
++  {{- if .Values.podDisruptionBudget.unhealthyPodEvictionPolicy }}
++  unhealthyPodEvictionPolicy: {{ .Values.podDisruptionBudget.unhealthyPodEvictionPolicy }}
++  {{- end }}
+   selector:
+     matchLabels:
+       control-plane: envoy-gateway
