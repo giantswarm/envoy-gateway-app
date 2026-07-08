@@ -295,50 +295,6 @@
                         }
                     }
                 },
-                "hpa": {
-                    "type": "object",
-                    "properties": {
-                        "enabled": {
-                            "type": "boolean"
-                        },
-                        "maxReplicas": {
-                            "type": "integer"
-                        },
-                        "metrics": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "resource": {
-                                        "type": "object",
-                                        "properties": {
-                                            "name": {
-                                                "type": "string"
-                                            },
-                                            "target": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "averageUtilization": {
-                                                        "type": "integer"
-                                                    },
-                                                    "type": {
-                                                        "type": "string"
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "type": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
-                        },
-                        "minReplicas": {
-                            "type": "integer"
-                        }
-                    }
-                },
                 "pod": {
                     "type": "object",
                     "properties": {
@@ -504,7 +460,34 @@
                     "type": "integer"
                 },
                 "metrics": {
-                    "type": "array"
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "resource": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "target": {
+                                        "type": "object",
+                                        "properties": {
+                                            "averageUtilization": {
+                                                "type": "integer"
+                                            },
+                                            "type": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    }
                 },
                 "minReplicas": {
                     "type": "integer"

@@ -89,17 +89,6 @@ deployment:
       targetPort: 19001
   priorityClassName: null
   replicas: 2
-  hpa:
-    enabled: true
-    minReplicas: 2
-    maxReplicas: 5
-    metrics:
-      - type: Resource
-        resource:
-          name: cpu
-          target:
-            type: Utilization
-            averageUtilization: 80
   pod:
     affinity: {}
     annotations:
@@ -136,10 +125,16 @@ service:
   type: "ClusterIP"
 
 hpa:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 1
-  metrics: []
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
   behavior: {}
 
 config:
