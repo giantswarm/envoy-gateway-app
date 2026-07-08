@@ -96,7 +96,7 @@ To uninstall the chart:
 | deployment.ports[3].name | string | `"metrics"` |  |
 | deployment.ports[3].port | int | `19001` |  |
 | deployment.ports[3].targetPort | int | `19001` |  |
-| deployment.priorityClassName | string | `nil` |  |
+| deployment.priorityClassName | string | `"giantswarm-critical"` |  |
 | deployment.replicas | int | `1` |  |
 | global.image | object | `{"registry":"gsoci.azurecr.io"}` | Global override for image registry |
 | global.imagePullSecrets | list | `[]` | Global override for image pull secrets |
