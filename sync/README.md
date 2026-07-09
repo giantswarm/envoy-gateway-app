@@ -34,6 +34,14 @@ The `patch.sh` script is being called by `sync/sync.sh` and contains code to tra
 
 # Patches
 
+### values
+
+- Make Envoy Gateway HA by default.
+
+### pod-disruption-budget
+
+- Add `unhealthyPodEvictionPolicy` field in PodDisruptionBudget resource teamplate.
+
 ### image-registry
 
 - Adapt image templating to use the `image.registry` value.

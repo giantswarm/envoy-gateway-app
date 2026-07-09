@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index af43749..c660390 100644
+index af43749..aa8b89f 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,8 @@
@@ -30,7 +30,7 @@ index af43749..c660390 100644
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: latest images will be Always else IfNotPresent.
        pullPolicy: IfNotPresent
-@@ -28,16 +29,18 @@ global:
+@@ -28,19 +29,22 @@ global:
      envoyProxy:
        # This is the full image name including the hub, repo, and tag for the Envoy Proxy data plane.
        # If not specified, uses the default image built into envoy-gateway.
@@ -49,9 +49,14 @@ index af43749..c660390 100644
 +serviceType: managed
 +
  podDisruptionBudget:
-   minAvailable: 0
+-  minAvailable: 0
++  minAvailable: 1
    # maxUnavailable: 1
-@@ -68,6 +71,7 @@ deployment:
++  unhealthyPodEvictionPolicy: AlwaysAllow
+ 
+ deployment:
+   annotations: {}
+@@ -68,6 +72,7 @@ deployment:
        runAsNonRoot: true
        runAsGroup: 65532
        runAsUser: 65532
@@ -59,16 +64,53 @@ index af43749..c660390 100644
        seccompProfile:
          type: RuntimeDefault
    ports:
-@@ -83,7 +87,7 @@ deployment:
+@@ -83,15 +88,21 @@ deployment:
      - name: metrics
        port: 19001
        targetPort: 19001
 -  priorityClassName: null
+-  replicas: 1
 +  priorityClassName: giantswarm-critical
-   replicas: 1
++  replicas: 2
    pod:
      affinity: {}
-@@ -149,7 +153,12 @@ certgen:
+     annotations:
+       prometheus.io/scrape: 'true'
+       prometheus.io/port: '19001'
+     labels: {}
+-    topologySpreadConstraints: []
++    topologySpreadConstraints:
++      - maxSkew: 1
++        topologyKey: kubernetes.io/hostname
++        whenUnsatisfiable: ScheduleAnyway
++        labelSelector:
++          matchLabels:
++            app.kubernetes.io/name: envoy-gateway
+     tolerations: []
+     nodeSelector: {}
+     # Additional volumeMounts on the deployment definition.
+@@ -115,10 +126,16 @@ service:
+   type: "ClusterIP"
+ 
+ hpa:
+-  enabled: false
+-  minReplicas: 1
+-  maxReplicas: 1
+-  metrics: []
++  enabled: true
++  minReplicas: 2
++  maxReplicas: 5
++  metrics:
++    - type: Resource
++      resource:
++        name: cpu
++        target:
++          type: Utilization
++          averageUtilization: 80
+   behavior: {}
+ 
+ config:
+@@ -149,7 +166,12 @@ certgen:
      pod:
        annotations: {}
        labels: {}
@@ -82,7 +124,7 @@ index af43749..c660390 100644
      affinity: {}
      tolerations: []
      nodeSelector: {}
-@@ -173,3 +182,36 @@ certgen:
+@@ -173,3 +195,36 @@ certgen:
  topologyInjector:
    enabled: true
    annotations: {}
