@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 6189f1e..5e747b6 100644
+index 6189f1e..5c479b1 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,8 @@
@@ -26,7 +26,7 @@ index 6189f1e..5e747b6 100644
      ratelimit:
        # This is the full image name including the hub, repo, and tag.
 -      image: "docker.io/envoyproxy/ratelimit:1e50889b"
-+      image: "gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:ff287602"
++      image: "gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:1e50889b"
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: latest images will be Always else IfNotPresent.
        pullPolicy: IfNotPresent
