@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index af43749..aa8b89f 100644
+index 6189f1e..5e747b6 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,8 @@
@@ -16,8 +16,8 @@ index af43749..aa8b89f 100644
    images:
      envoyGateway:
        # This is the full image name including the hub, repo, and tag.
--      image: docker.io/envoyproxy/gateway:v1.8.1
-+      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.8.1
+-      image: docker.io/envoyproxy/gateway:v1.8.2
++      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.8.2
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: latest images will be Always else IfNotPresent.
        pullPolicy: IfNotPresent
@@ -25,17 +25,17 @@ index af43749..aa8b89f 100644
        pullSecrets: []
      ratelimit:
        # This is the full image name including the hub, repo, and tag.
--      image: "docker.io/envoyproxy/ratelimit:ff287602"
+-      image: "docker.io/envoyproxy/ratelimit:1e50889b"
 +      image: "gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:ff287602"
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: latest images will be Always else IfNotPresent.
        pullPolicy: IfNotPresent
-@@ -28,19 +29,22 @@ global:
+@@ -28,24 +29,22 @@ global:
      envoyProxy:
        # This is the full image name including the hub, repo, and tag for the Envoy Proxy data plane.
        # If not specified, uses the default image built into envoy-gateway.
 -      image: ""
-+      image: "gsoci.azurecr.io/giantswarm/envoy:distroless-v1.38.1"
++      image: "gsoci.azurecr.io/giantswarm/envoy:distroless-v1.38.3"
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: IfNotPresent.
 -      pullPolicy: ""
@@ -43,6 +43,11 @@ index af43749..aa8b89f 100644
        # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
        pullSecrets: []
  
+-# Values for CRDs dependency
+-crds:
+-  # -- Install Envoy Gateway CRDs, Gateway API CRDs, and Gateway API safe upgrade policy resources. Set to false when these resources are managed separately.
+-  enabled: true
+-
  # -- Labels to apply to all resources
  commonLabels: {}
  
@@ -56,7 +61,7 @@ index af43749..aa8b89f 100644
  
  deployment:
    annotations: {}
-@@ -68,6 +72,7 @@ deployment:
+@@ -73,6 +72,7 @@ deployment:
        runAsNonRoot: true
        runAsGroup: 65532
        runAsUser: 65532
@@ -64,7 +69,7 @@ index af43749..aa8b89f 100644
        seccompProfile:
          type: RuntimeDefault
    ports:
-@@ -83,15 +88,21 @@ deployment:
+@@ -88,15 +88,21 @@ deployment:
      - name: metrics
        port: 19001
        targetPort: 19001
@@ -89,7 +94,7 @@ index af43749..aa8b89f 100644
      tolerations: []
      nodeSelector: {}
      # Additional volumeMounts on the deployment definition.
-@@ -115,10 +126,16 @@ service:
+@@ -120,10 +126,16 @@ service:
    type: "ClusterIP"
  
  hpa:
@@ -110,7 +115,7 @@ index af43749..aa8b89f 100644
    behavior: {}
  
  config:
-@@ -149,7 +166,12 @@ certgen:
+@@ -154,7 +166,12 @@ certgen:
      pod:
        annotations: {}
        labels: {}
@@ -124,7 +129,7 @@ index af43749..aa8b89f 100644
      affinity: {}
      tolerations: []
      nodeSelector: {}
-@@ -173,3 +195,36 @@ certgen:
+@@ -178,3 +195,36 @@ certgen:
  topologyInjector:
    enabled: true
    annotations: {}
