@@ -1,0 +1,127 @@
+# PromQL manifest for the Envoy Gateway performance report.
+#
+# This is the SOURCE OF TRUTH for what the report measures. It is mirrored from
+# the three Grafana dashboards (in the giantswarm/dashboards repo):
+#   * charts/networking/dashboards/Shared Org/k6-tests-results.json
+#   * charts/networking/dashboards/Shared Org/Envoy Gateway/envoy-vs-nginx-loadtesting.json
+#   * charts/networking/dashboards/Shared Org/Envoy Gateway/envoy-vs-kong-loadtesting.json
+#
+# Placeholders substituted by fetch_metrics.py:
+#   {cluster_id}  -> the workload cluster_id ($workload_cluster in the dashboards)
+#   {testid}      -> the k6 testid  ($testid in the k6 dashboard), e.g. e2e-load-test-<cluster>
+#   {rate}        -> rate window (default 5m, matching the dashboards)
+#
+# When the dashboards change, re-run:  python3 fetch_metrics.py --dump-dashboard-queries
+# (see README.md) and reconcile this file. Keep expressions byte-identical to the
+# dashboards so the report and Grafana never disagree.
+
+rate_interval: "5m"
+
+# --- k6 client-side metrics, per scenario -----------------------------------
+# Queried per scenario over that scenario's own window. {scenario} is one of
+# envoy_simulation / nginx_simulation / kong_simulation.
+# k6 values are already summary quantiles (p95/p99) in milliseconds.
+k6:
+  http_req_duration_p99:
+    title: "HTTP req duration p99"
+    unit: ms
+    expr: 'avg(k6_http_req_duration_p99{testid="{testid}", scenario="{scenario}"})'
+  http_req_duration_p95:
+    title: "HTTP req duration p95"
+    unit: ms
+    expr: 'avg(k6_http_req_duration_p95{testid="{testid}", scenario="{scenario}"})'
+  http_reqs_rate:
+    title: "HTTP request rate"
+    unit: req/s
+    expr: 'sum(irate(k6_http_reqs_total{testid="{testid}", scenario="{scenario}"}[{rate}]))'
+  http_req_failed_rate:
+    title: "HTTP failure rate"
+    unit: ratio
+    expr: 'avg(k6_http_req_failed_rate{testid="{testid}", scenario="{scenario}"})'
+  checks_rate:
+    title: "Checks success rate"
+    unit: ratio
+    expr: 'avg(k6_checks_rate{testid="{testid}", scenario="{scenario}"})'
+  iterations:
+    title: "Iterations completed"
+    unit: count
+    expr: 'sum(k6_iterations_total{testid="{testid}", scenario="{scenario}"})'
+  dropped_iterations:
+    title: "Dropped iterations"
+    unit: count
+    expr: 'sum(k6_dropped_iterations_total{testid="{testid}", scenario="{scenario}"})'
+
+# --- Server-side comparison metrics -----------------------------------------
+# Each metric has an `envoy` block and one block per competitor (nginx / kong).
+# fetch_metrics.py picks the envoy block + the detected competitor's block, runs
+# each over the matching scenario window, and pairs them in the report.
+# `kind: percentile` means the sub-keys (p50/p90/p99) are separate series.
+comparison:
+
+  downstream_latency:
+    title: "Downstream latency"
+    unit: ms
+    kind: percentile
+    envoy:
+      p50: 'histogram_quantile(0.5, sum by(le) (rate(envoy_http_downstream_rq_time_bucket{cluster_id="{cluster_id}"}[{rate}])))'
+      p90: 'histogram_quantile(0.9, sum by(le) (rate(envoy_http_downstream_rq_time_bucket{cluster_id="{cluster_id}"}[{rate}])))'
+      p99: 'histogram_quantile(0.99, sum by(le) (rate(envoy_http_downstream_rq_time_bucket{cluster_id="{cluster_id}"}[{rate}])))'
+    nginx:
+      p50: 'histogram_quantile(0.5, sum by(le) (rate(nginx_ingress_controller_request_duration_seconds_bucket{cluster_id="{cluster_id}"}[{rate}]))) * 1000'
+      p90: 'histogram_quantile(0.9, sum by(le) (rate(nginx_ingress_controller_request_duration_seconds_bucket{cluster_id="{cluster_id}"}[{rate}]))) * 1000'
+      p99: 'histogram_quantile(0.99, sum by(le) (rate(nginx_ingress_controller_request_duration_seconds_bucket{cluster_id="{cluster_id}"}[{rate}]))) * 1000'
+    kong:
+      p50: 'histogram_quantile(0.5, sum by(le) (rate(kong_kong_latency_ms_bucket{cluster_id="{cluster_id}"}[{rate}])))'
+      p90: 'histogram_quantile(0.9, sum by(le) (rate(kong_kong_latency_ms_bucket{cluster_id="{cluster_id}"}[{rate}])))'
+      p99: 'histogram_quantile(0.99, sum by(le) (rate(kong_kong_latency_ms_bucket{cluster_id="{cluster_id}"}[{rate}])))'
+
+  downstream_rps:
+    title: "Downstream RPS"
+    unit: req/s
+    kind: single
+    lower_is_better: false
+    envoy: 'sum(rate(envoy_http_downstream_rq_total{cluster_id="{cluster_id}"}[{rate}]))'
+    nginx: 'sum(rate(nginx_ingress_controller_requests{cluster_id="{cluster_id}",controller_namespace="kube-system"}[{rate}]))'
+    kong: 'sum(rate(kong_kong_latency_ms_count{cluster_id="{cluster_id}"}[{rate}]))'
+
+  success_rate:
+    title: "Downstream success rate"
+    unit: "%"
+    kind: single
+    lower_is_better: false
+    envoy: 'sum(rate(envoy_http_downstream_rq_xx{cluster_id="{cluster_id}", envoy_response_code_class!~"4|5"}[{rate}])) by (cluster_id) / sum(rate(envoy_http_downstream_rq_xx{cluster_id="{cluster_id}"}[{rate}])) by (cluster_id) * 100'
+    nginx: 'sum(rate(nginx_ingress_controller_requests{cluster_id="{cluster_id}", status!~"[4-5].*"}[{rate}])) by (cluster_id) / sum(rate(nginx_ingress_controller_requests{cluster_id="{cluster_id}"}[{rate}])) by (cluster_id) * 100'
+    kong: 'sum(rate(kong_kong_latency_ms_count{cluster_id="{cluster_id}", code!~"[45].."}[{rate}])) by (cluster_id) / sum(rate(kong_kong_latency_ms_count{cluster_id="{cluster_id}"}[{rate}])) by (cluster_id) * 100'
+
+  upstream_latency:
+    title: "Upstream latency"
+    unit: ms
+    kind: percentile
+    envoy:
+      p50: 'histogram_quantile(0.5, sum(rate(envoy_cluster_upstream_rq_time_bucket{cluster_id="{cluster_id}", namespace="envoy-gateway-system"}[{rate}])) by (le, namespace))'
+      p90: 'histogram_quantile(0.9, sum(rate(envoy_cluster_upstream_rq_time_bucket{cluster_id="{cluster_id}", namespace="envoy-gateway-system"}[{rate}])) by (le, namespace))'
+      p99: 'histogram_quantile(0.99, sum(rate(envoy_cluster_upstream_rq_time_bucket{cluster_id="{cluster_id}", namespace="envoy-gateway-system"}[{rate}])) by (le, namespace))'
+    kong:
+      p50: 'histogram_quantile(0.5, sum(rate(kong_upstream_latency_ms_bucket{cluster_id="{cluster_id}", namespace="kong"}[{rate}])) by (le, namespace))'
+      p90: 'histogram_quantile(0.9, sum(rate(kong_upstream_latency_ms_bucket{cluster_id="{cluster_id}", namespace="kong"}[{rate}])) by (le, namespace))'
+      p99: 'histogram_quantile(0.99, sum(rate(kong_upstream_latency_ms_bucket{cluster_id="{cluster_id}", namespace="kong"}[{rate}])) by (le, namespace))'
+    # nginx: upstream latency exposed only as a request count (no histogram) on
+    # the nginx dashboard, so there is no comparable percentile series. Omitted.
+
+  cpu_usage:
+    title: "CPU usage"
+    unit: cores
+    kind: single
+    lower_is_better: true
+    envoy: 'sum(max by (cluster_id, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{cluster_id="{cluster_id}", namespace="envoy-gateway-system"}) * on(cluster_id, namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster_id="{cluster_id}", namespace="envoy-gateway-system", workload_type="deployment"}) by (cluster_id)'
+    nginx: 'sum(max by (cluster_id, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{cluster_id="{cluster_id}", namespace="kube-system"}) * on(cluster_id, namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster_id="{cluster_id}", namespace="kube-system", workload="ingress-nginx-controller", workload_type="deployment"}) by (workload)'
+    kong: 'sum(max by (cluster_id, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{cluster_id="{cluster_id}", namespace="kong"}) * on(cluster_id, namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster_id="{cluster_id}", namespace="kong", workload="kong-app-kong-app", workload_type="deployment"}) by (workload)'
+
+  memory_usage:
+    title: "Memory usage"
+    unit: bytes
+    kind: single
+    lower_is_better: true
+    envoy: 'sum(max by (cluster_id, namespace, pod, container)(container_memory_working_set_bytes{cluster_id="{cluster_id}", namespace="envoy-gateway-system", container!="", image!=""}) * on(cluster_id, namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster_id="{cluster_id}", namespace="envoy-gateway-system", workload_type="deployment"}) by (cluster_id)'
+    nginx: 'sum(max by (cluster_id, namespace, pod, container)(container_memory_working_set_bytes{cluster_id="{cluster_id}", namespace="kube-system", container!="", image!=""}) * on(cluster_id, namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster_id="{cluster_id}", namespace="kube-system", workload="ingress-nginx-controller", workload_type="deployment"}) by (workload)'
+    kong: 'sum(max by (cluster_id, namespace, pod, container)(container_memory_working_set_bytes{cluster_id="{cluster_id}", namespace="kong", container!="", image!=""}) * on(cluster_id, namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster_id="{cluster_id}", namespace="kong", workload="kong-app-kong-app", workload_type="deployment"}) by (workload)'
