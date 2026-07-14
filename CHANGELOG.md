@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `circuitBreaker` config field in bundle values for envoy performance test suites to better sustain high request load.
 - Configure Envoy Gateway to be HA by default.
 - Move apps' versions in dependencies_test files from each performance test suite into a single file used in each of those.
+- Update Envoy Gateway to [v1.8.2](https://gateway.envoyproxy.io/news/releases/notes/v1.8.2) (data plane Envoy bumped to v1.38.3).
 
 ### Fixed
 
