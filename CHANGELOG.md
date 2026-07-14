@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add `perf-report` repo-specific claude skill.
+
 ## [1.8.0] - 2026-07-14
 
 ### Added
@@ -14,7 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `basicauth` performance test suite.
 - Add `keyauth` performance test suite.
 - Add `mobilelatency` performance test suite.
-- Add `perf-report` repo-specific claude skill.
 
 ### Changed
 
