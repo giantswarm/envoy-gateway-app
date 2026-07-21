@@ -95,6 +95,11 @@ deployment:
     annotations:
       prometheus.io/scrape: 'true'
       prometheus.io/port: '19001'
+      # Prevent Karpenter from voluntarily disrupting (consolidating) the control-plane
+      # pods. A control-plane reschedule forces the Envoy proxies to reconnect and can
+      # leave them wedged with stale/absent TLS secrets over delta xDS until they are
+      # restarted (see https://github.com/envoyproxy/gateway/issues/9519).
+      karpenter.sh/do-not-disrupt: 'true'
     labels: {}
     topologySpreadConstraints:
       - maxSkew: 1

@@ -304,6 +304,9 @@
                         "annotations": {
                             "type": "object",
                             "properties": {
+                                "karpenter.sh/do-not-disrupt": {
+                                    "type": "string"
+                                },
                                 "prometheus.io/port": {
                                     "type": "string"
                                 },
