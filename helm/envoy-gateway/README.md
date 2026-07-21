@@ -76,6 +76,7 @@ To uninstall the chart:
 | deployment.envoyGateway.securityContext.runAsUser | int | `65532` |  |
 | deployment.envoyGateway.securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | deployment.pod.affinity | object | `{}` |  |
+| deployment.pod.annotations."karpenter.sh/do-not-disrupt" | string | `"true"` |  |
 | deployment.pod.annotations."prometheus.io/port" | string | `"19001"` |  |
 | deployment.pod.annotations."prometheus.io/scrape" | string | `"true"` |  |
 | deployment.pod.extraVolumeMounts | list | `[]` |  |

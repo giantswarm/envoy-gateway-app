@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update cert-manager config in the cluster values for all performance test suites.
+
 ### Added
 
-- Add `perf-report` repo-specific claude skill.
+- Set `karpenter.sh/do-not-disrupt: "true"` on the Envoy Gateway control-plane pods, so Karpenter does not voluntarily consolidate them. A control-plane reschedule forces the Envoy proxies to reconnect and can leave them wedged with stale/absent TLS secrets over delta xDS until restarted (see [envoyproxy/gateway#9519](https://github.com/envoyproxy/gateway/issues/9519)).
+- Add `perf-report` repo-specific claude skill to automatically generate performance test report as html files.
 
 ## [1.8.0] - 2026-07-14
 

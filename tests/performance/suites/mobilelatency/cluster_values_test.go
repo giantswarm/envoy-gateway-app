@@ -19,10 +19,11 @@ const baseClusterValues = `global:
   apps:
     certManager:
       values:
-        config:
-          apiVersion: controller.config.cert-manager.io/v1alpha1
-          enableGatewayAPI: true
-          kind: ControllerConfiguration
+        cert-manager:
+          config:
+            apiVersion: controller.config.cert-manager.io/v1alpha1
+            enableGatewayAPI: true
+            kind: ControllerConfiguration
   connectivity:
     certManager:
       useDnsChallenges: true
