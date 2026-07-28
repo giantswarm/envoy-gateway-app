@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Update Envoy Gateway to [v1.8.2](https://gateway.envoyproxy.io/news/releases/notes/v1.8.3).
 - Update cert-manager config in the cluster values for all performance test suites.
 
 ### Added
