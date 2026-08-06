@@ -18,8 +18,6 @@ metadata:
   creationTimestamp: null
   name: {{ include "eg.fullname" $ }}-envoy-gateway-role
   namespace: {{ $ns | quote }}
-  labels:
-  {{- include "eg.labels" $ | nindent 4 }}
 rules:
 {{ include "eg.rbac.namespaced" $ }}
 ---
@@ -28,8 +26,6 @@ kind: RoleBinding
 metadata:
   name: {{ include "eg.fullname" $ }}-envoy-gateway-rolebinding
   namespace: {{ $ns | quote }}
-  labels:
-  {{- include "eg.labels" $ | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -45,8 +41,6 @@ kind: ClusterRole
 metadata:
   creationTimestamp: null
   name: {{ include "eg.fullname" . }}-envoy-gateway-role
-  labels:
-  {{- include "eg.labels" . | nindent 4 }}
 rules:
 {{ include "eg.rbac.cluster" . }}
 ---
@@ -54,8 +48,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: {{ include "eg.fullname" . }}-envoy-gateway-rolebinding
-  labels:
-  {{- include "eg.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -71,8 +63,6 @@ kind: ClusterRole
 metadata:
   creationTimestamp: null
   name: {{ include "eg.fullname" . }}-envoy-gateway-role
-  labels:
-  {{- include "eg.labels" . | nindent 4 }}
 rules:
 {{ include "eg.rbac.cluster" . }}
 {{ include "eg.rbac.namespaced" . }}
@@ -81,8 +71,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: {{ include "eg.fullname" . }}-envoy-gateway-rolebinding
-  labels:
-  {{- include "eg.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

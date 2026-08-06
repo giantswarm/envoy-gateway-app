@@ -117,45 +117,33 @@ spec:
                     items:
                       description: |-
                         ExtractFrom is where to fetch the key from the coming request.
-                        Only one of headers, params or cookies must be specified.
+                        Only one of header, param or cookie is supposed to be specified.
                       properties:
                         cookies:
                           description: |-
                             Cookies is the names of the cookie to fetch the key from.
                             If multiple cookies are specified, envoy will look for the api key in the order of the list.
-                            This field is optional, but only one of headers, params or cookies must be specified.
+                            This field is optional, but only one of headers, params or cookies is supposed to be specified.
                           items:
-                            minLength: 1
                             type: string
-                          minItems: 1
                           type: array
                         headers:
                           description: |-
                             Headers is the names of the header to fetch the key from.
                             If multiple headers are specified, envoy will look for the api key in the order of the list.
-                            This field is optional, but only one of headers, params or cookies must be specified.
+                            This field is optional, but only one of headers, params or cookies is supposed to be specified.
                           items:
-                            minLength: 1
                             type: string
-                          minItems: 1
                           type: array
                         params:
                           description: |-
                             Params is the names of the query parameter to fetch the key from.
                             If multiple params are specified, envoy will look for the api key in the order of the list.
-                            This field is optional, but only one of headers, params or cookies must be specified.
+                            This field is optional, but only one of headers, params or cookies is supposed to be specified.
                           items:
-                            minLength: 1
                             type: string
-                          minItems: 1
                           type: array
                       type: object
-                      x-kubernetes-validations:
-                      - message: exactly one of headers, params, or cookies must be
-                          specified
-                        rule: '(has(self.headers) ? 1 : 0) + (has(self.params) ? 1
-                          : 0) + (has(self.cookies) ? 1 : 0) == 1'
-                    minItems: 1
                     type: array
                   forwardClientIDHeader:
                     description: |-
@@ -1205,9 +1193,8 @@ spec:
                                         type: array
                                       hostname:
                                         description: |-
-                                          Hostname defines the HTTP Host header used for active HTTP health checks.
-                                          Host selection uses this order: this field, the associated Backend endpoint
-                                          hostname if available, then the effective Route hostname.
+                                          Hostname defines the HTTP host that will be requested during health checking.
+                                          Default: HTTPRoute or GRPCRoute hostname.
                                         maxLength: 253
                                         minLength: 1
                                         pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -2609,9 +2596,8 @@ spec:
                                         type: array
                                       hostname:
                                         description: |-
-                                          Hostname defines the HTTP Host header used for active HTTP health checks.
-                                          Host selection uses this order: this field, the associated Backend endpoint
-                                          hostname if available, then the effective Route hostname.
+                                          Hostname defines the HTTP host that will be requested during health checking.
+                                          Default: HTTPRoute or GRPCRoute hostname.
                                         maxLength: 253
                                         minLength: 1
                                         pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -4292,9 +4278,8 @@ spec:
                                               type: array
                                             hostname:
                                               description: |-
-                                                Hostname defines the HTTP Host header used for active HTTP health checks.
-                                                Host selection uses this order: this field, the associated Backend endpoint
-                                                hostname if available, then the effective Route hostname.
+                                                Hostname defines the HTTP host that will be requested during health checking.
+                                                Default: HTTPRoute or GRPCRoute hostname.
                                               maxLength: 253
                                               minLength: 1
                                               pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -6007,9 +5992,8 @@ spec:
                                         type: array
                                       hostname:
                                         description: |-
-                                          Hostname defines the HTTP Host header used for active HTTP health checks.
-                                          Host selection uses this order: this field, the associated Backend endpoint
-                                          hostname if available, then the effective Route hostname.
+                                          Hostname defines the HTTP host that will be requested during health checking.
+                                          Default: HTTPRoute or GRPCRoute hostname.
                                         maxLength: 253
                                         minLength: 1
                                         pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -7157,10 +7141,6 @@ spec:
 
                         When specified, the effective set of namespaces is always constrained to the
                         namespaces watched by Envoy Gateway.
-
-                        Selecting targets across namespaces requires a ReferenceGrant in the target
-                        namespace that allows this policy kind to reference the selected target kind.
-                        Cross-namespace targets without a matching ReferenceGrant are ignored.
                       properties:
                         from:
                           default: Same
