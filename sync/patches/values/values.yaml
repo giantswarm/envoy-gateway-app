@@ -2,8 +2,7 @@
 global:
   # If set, these take highest precedence and change envoyGateway, envoyProxy, and ratelimit's container registry and pull secrets.
   # -- Global override for image registry
-  image:
-    registry: "gsoci.azurecr.io"
+  imageRegistry: "gsoci.azurecr.io"
   # -- Global override for image pull secrets
   imagePullSecrets: []
 

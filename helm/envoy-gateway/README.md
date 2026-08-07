@@ -125,8 +125,8 @@ To uninstall the chart:
 | deployment.ports[3].targetPort | int | `19001` |  |
 | deployment.priorityClassName | string | `"giantswarm-critical"` |  |
 | deployment.replicas | int | `2` |  |
-| global.image | object | `{"registry":"gsoci.azurecr.io"}` | Global override for image registry |
 | global.imagePullSecrets | list | `[]` | Global override for image pull secrets |
+| global.imageRegistry | string | `"gsoci.azurecr.io"` | Global override for image registry |
 | global.images.envoyGateway.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.9.0"` | Full image for the Envoy Gateway control plane Deployment installed by this chart. |
 | global.images.envoyGateway.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the Envoy Gateway control plane Deployment. Default behavior: latest images will be Always else IfNotPresent. |
 | global.images.envoyGateway.pullSecrets | list | `[]` | Pull secrets for the Envoy Gateway control plane Deployment. |
