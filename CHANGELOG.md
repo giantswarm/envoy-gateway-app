@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update `perf-report` claude skill so that the report is posted as a tar file in the PR's comments.
+
 ## [1.9.0] - 2026-07-28
 
 ### Changed
