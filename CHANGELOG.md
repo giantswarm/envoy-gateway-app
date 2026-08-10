@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Update `perf-report` claude skill so that the report is posted as a tar file in the PR's comments.
+- Bump performance test dependencies: `ingress-nginx` to 4.3.5 and `kong-app` to 5.2.3.
+- Align the performance test suites' `RELEASE` with the newest published CAPA release (34.5.0).
 
 ## [1.9.0] - 2026-07-28
 
