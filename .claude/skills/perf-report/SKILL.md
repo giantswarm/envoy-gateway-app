@@ -11,7 +11,8 @@ description: >-
 # Envoy Gateway performance report
 
 Turns a finished performance test (the `envoy-gateway-app` `tests/performance`
-suite) into a ready-to-read HTML report plus a PR summary comment, by querying
+suite) into a self-contained HTML report — shipped to the PR as a `.tar.gz` the
+reader downloads and extracts locally — plus a PR summary comment, by querying
 the installation's Mimir with the same PromQL as the Grafana dashboards — no
 manual dashboard reading.
 
@@ -112,21 +113,57 @@ Work in a scratch dir.
    python3 "$DIR/render_report.py" --input results.json --format markdown --output summary.md
    ```
 
-5. **Publish (if a PR number was given):**
-   - `gh` can't attach a file to a comment, so create a gist and link it:
+5. **Package the report as a tarball** — the PR gets the compressed archive, never
+   the bare HTML (GitHub won't render it inline anyway):
 
-     ```bash
-     gh gist create report.html --public=false --desc "Envoy perf report <cluster_id>"
-     ```
+   ```bash
+   tar -czf report.tar.gz report.html
+   ```
 
-     Then re-render the markdown with the gist URL:
-     `render_report.py ... --format markdown --report-url <gist-url> --output summary.md`.
-   - Post the comment: `gh pr comment <pr> --body-file summary.md`.
-   - In-cluster, the pipeline may prefer uploading `report.html` as a pipeline
-     artifact instead of a gist — either is fine; still post `summary.md`.
-   - Always also report the local `report.html` path.
+6. **Publish (if a PR number was given):** comments can't carry attachments and
+   gists can't hold binaries, so upload the tarball to the repo's dedicated
+   `perf-reports` branch and link its download URL.
 
-6. **Clean up** the port-forward (local mode only).
+   ```bash
+   REPO=giantswarm/envoy-gateway-app
+   BRANCH=perf-reports
+   DEST="pr-<pr>/<cluster_id>-$(date -u +%Y%m%dT%H%M%SZ)/report.tar.gz"
+
+   # create the branch once, off main, if it does not exist yet
+   gh api "repos/$REPO/git/ref/heads/$BRANCH" >/dev/null 2>&1 || \
+     gh api --method POST "repos/$REPO/git/refs" \
+       -f ref="refs/heads/$BRANCH" \
+       -f sha="$(gh api "repos/$REPO/git/ref/heads/main" --jq .object.sha)"
+
+   # upload; body built by python so the base64 blob never goes through argv
+   python3 -c 'import base64,json,sys; print(json.dumps({
+     "message": sys.argv[2], "branch": sys.argv[3],
+     "content": base64.b64encode(open(sys.argv[1],"rb").read()).decode()}))' \
+     report.tar.gz "perf report for PR #<pr> (<cluster_id>)" "$BRANCH" \
+     | gh api --method PUT "repos/$REPO/contents/$DEST" --input -
+
+   URL="https://github.com/$REPO/raw/$BRANCH/$DEST"
+   ```
+
+   The timestamp in `DEST` keeps every run at a fresh path, so the upload is
+   always a create and never needs an existing blob `sha`.
+
+   Then re-render the markdown with that URL and post it:
+
+   ```bash
+   python3 "$DIR/render_report.py" --input results.json --format markdown \
+     --report-url "$URL" --output summary.md
+   gh pr comment <pr> --body-file summary.md
+   ```
+
+   - `render_report.py` already writes the download-and-extract instructions into
+     the comment — don't restate them in your narrative.
+   - Same flow in-cluster; it only needs `gh` authenticated with a token that can
+     push to the repo. If the pipeline also uploads `report.tar.gz` as its own
+     artifact, fine — still post `summary.md`.
+   - Always also report the local `report.tar.gz` path.
+
+7. **Clean up** the port-forward (local mode only).
 
 ## Adding narrative
 

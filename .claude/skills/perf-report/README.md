@@ -12,6 +12,10 @@ fetch_metrics.py  Mimir → results.json (stdlib HTTP; needs PyYAML)
 render_report.py  results.json → report.html and/or a markdown PR summary
 ```
 
+The HTML report is never posted to the PR as-is: it is tarred (`report.tar.gz`),
+uploaded to the repo's `perf-reports` branch, and linked from the summary comment,
+so the reader downloads the archive and extracts `report.html` on their machine.
+
 ## Two run modes
 
 Same scripts, two environments. `fetch_metrics.py` auto-selects based on whether
@@ -42,6 +46,7 @@ kubectl -n mimir port-forward svc/mimir-gateway 8080:80 &      # background
 python3 fetch_metrics.py --cluster-id <wc> --output results.json   # mode auto=local
 python3 render_report.py --input results.json --output report.html
 python3 render_report.py --input results.json --format markdown --output summary.md
+tar -czf report.tar.gz report.html                                 # what the PR gets
 ```
 
 Or just run `/perf-report` in Claude Code and answer the prompts.
@@ -101,10 +106,10 @@ here) that, after the suite passes:
 1. runs in a pod with in-cluster access to `mimir-gateway.mimir.svc` (no
    port-forward needed — use `--mimir-url http://mimir-gateway.mimir.svc/`),
 2. runs `fetch_metrics.py` + `render_report.py` with the run's `cluster_id`,
-3. posts `summary.md` to the PR (the pipeline already knows the PR) and uploads
-   `report.html` as a pipeline artifact / gist.
+3. tars `report.html` into `report.tar.gz`, uploads it to the `perf-reports`
+   branch (or as a pipeline artifact), and posts `summary.md` — linking that
+   archive — to the PR (the pipeline already knows the PR).
 
 The scripts are dependency-light (Python 3 + PyYAML, stdlib HTTP) specifically so
 the same code runs unchanged in that pod. The cluster_id and PR number are known
 to the pipeline; pass them as args instead of prompting.
-```
