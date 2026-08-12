@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Update `perf-report` claude skill so that the report is posted as a tar file in the PR's comments.
+- Update `perf-report` claude skill:
+  - the report is posted as a tar file in the PR's comments.
+  - `perf-report` no longer needs a `cluster_id`.
 
 ## [1.9.0] - 2026-07-28
 
