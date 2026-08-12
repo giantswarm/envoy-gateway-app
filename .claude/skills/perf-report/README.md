@@ -43,7 +43,8 @@ Prereqs: `python3`, `pip install pyyaml`, `kubectl` context for the installation
 ```bash
 kubectl config use-context <installation>
 kubectl -n mimir port-forward svc/mimir-gateway 8080:80 &      # background
-python3 fetch_metrics.py --cluster-id <wc> --output results.json   # mode auto=local
+python3 fetch_metrics.py --output results.json                      # mode auto=local,
+                                                                   # cluster auto-discovered
 python3 render_report.py --input results.json --output report.html
 python3 render_report.py --input results.json --format markdown --output summary.md
 tar -czf report.tar.gz report.html                                 # what the PR gets
@@ -54,14 +55,21 @@ Or just run `/perf-report` in Claude Code and answer the prompts.
 ### In-cluster (Phase 2 — Tekton)
 
 ```bash
-python3 fetch_metrics.py --cluster-id <wc> --mode in-cluster --output results.json
+python3 fetch_metrics.py --mode in-cluster --output results.json
 # ... render + gh pr comment, as above
 ```
 
 ### Inputs
 
-- `--cluster-id` (required): the `cluster_id` / `$workload_cluster` label.
-- `--testid`: defaults to `e2e-load-test-<cluster-id>`.
+- `--cluster-id` (default `auto`): the `cluster_id` / `$workload_cluster` label.
+  `auto` recovers it from the k6 `testid` label (`e2e-load-test-<cluster_id>`),
+  which is the only trace left once the suite has deleted the cluster. Runs
+  overlapping in time are refused instead of guessed — pass the cluster
+  explicitly, or use `--list-runs`.
+- `--list-runs`: print the discoverable runs as JSON and exit, for fanning out
+  one report per cluster.
+- `--testid`: defaults to `e2e-load-test-<cluster-id>`; conversely, given alone it
+  is where `--cluster-id auto` reads the cluster from.
 - `--mode auto|local|in-cluster`: selects the default Mimir URL (default auto).
 - `--mimir-url`: explicit base URL; overrides `--mode`.
 - `--username`/`--password` (or `MIMIR_USERNAME`/`MIMIR_PASSWORD`): gateway basic auth.
@@ -105,11 +113,16 @@ here) that, after the suite passes:
 
 1. runs in a pod with in-cluster access to `mimir-gateway.mimir.svc` (no
    port-forward needed — use `--mimir-url http://mimir-gateway.mimir.svc/`),
-2. runs `fetch_metrics.py` + `render_report.py` with the run's `cluster_id`,
+2. runs `fetch_metrics.py` + `render_report.py`,
 3. tars `report.html` into `report.tar.gz`, uploads it to the `perf-reports`
    branch (or as a pipeline artifact), and posts `summary.md` — linking that
    archive — to the PR (the pipeline already knows the PR).
 
 The scripts are dependency-light (Python 3 + PyYAML, stdlib HTTP) specifically so
-the same code runs unchanged in that pod. The cluster_id and PR number are known
-to the pipeline; pass them as args instead of prompting.
+the same code runs unchanged in that pod. The PR number is known to the pipeline;
+pass it as an arg instead of prompting. The cluster is **not** passed in — the
+workload cluster is deleted by the suite's AfterSuite before this step runs, so
+`fetch_metrics.py` discovers it from Mimir instead (`--cluster-id auto`). That
+also keeps the pipeline free of any Tekton result plumbing between the test task
+and the report task, which matters because the test task is matrixed and a
+matrixed task's results can only be consumed as an array.
