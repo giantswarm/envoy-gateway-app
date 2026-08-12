@@ -15,13 +15,21 @@ Two modes, auto-selected (override with --mode / --mimir-url):
                 (no port-forward; picked automatically when KUBERNETES_SERVICE_HOST
                 is set)
 
-    # local
+    # local, discovering the most recent e2e run by itself
+    python3 fetch_metrics.py --output results.json
+    # local, explicit cluster
     python3 fetch_metrics.py --cluster-id my-wc --output results.json
     # in-cluster (Tekton) — creds via env
     MIMIR_USERNAME=... MIMIR_PASSWORD=... \
-      python3 fetch_metrics.py --cluster-id my-wc --output results.json
+      python3 fetch_metrics.py --output results.json
+    # just list what runs are visible (JSON on stdout), report nothing
+    python3 fetch_metrics.py --list-runs
 
 The k6 testid defaults to  e2e-load-test-<cluster-id>  (see the perf suite).
+Conversely, with no --cluster-id the workload cluster is recovered *from* that
+testid: the suites tag every k6 series with  testid=e2e-load-test-<cluster_id>,
+so the run is identifiable from Mimir alone — which is the only option once the
+cluster has been deleted by the suite's AfterSuite.
 The Mimir gateway may require basic auth (same creds the perf suite mirrors from
 kube-system/alloy-metrics) — pass --username/--password or MIMIR_USERNAME/MIMIR_PASSWORD.
 """
@@ -41,6 +49,11 @@ except ImportError:
 
 ENVOY_SCENARIO = "envoy_simulation"
 COMPETITOR_SCENARIOS = {"nginx_simulation": "nginx", "kong_simulation": "kong"}
+
+# The perf suites name their k6 TestRun (and therefore the testid label)
+# "e2e-load-test-<cluster name>" — see testRunName in performance_suite_test.go.
+# That embedded cluster name is what makes --cluster-id optional.
+E2E_TESTID_PREFIX = "e2e-load-test-"
 
 # In-cluster Mimir gateway (Tekton pipeline mode). Reachable without a
 # port-forward from any pod running in the management cluster.
@@ -160,6 +173,81 @@ def detect_scenarios(base, headers, testid, now, lookback_s, step=30):
     return windows
 
 
+def discover_runs(base, headers, now, lookback_s, step=60):
+    """List the e2e perf runs visible in Mimir, newest last-sample first.
+
+    The workload cluster is gone by the time a report is generated (the suite's
+    AfterSuite deletes it), so it cannot be looked up on the management cluster.
+    What survives is the k6 series, tagged testid="e2e-load-test-<cluster_id>",
+    from which the cluster is recovered by stripping the prefix.
+
+    Returns [{'testid', 'cluster_id', 'start', 'end'}]. Runs whose testid does
+    not follow the suite's convention are skipped — they carry no cluster name,
+    so they can only be reported on with an explicit --cluster-id.
+    """
+    expr = "sum by (testid) (k6_http_reqs_total)"
+    runs = []
+    for s in query_range(base, headers, expr, now - lookback_s, now, step):
+        testid = s["labels"].get("testid", "")
+        pts = s["points"]
+        if not pts or not testid.startswith(E2E_TESTID_PREFIX):
+            continue
+        cluster_id = testid[len(E2E_TESTID_PREFIX):]
+        if not cluster_id:
+            continue
+        runs.append({"testid": testid, "cluster_id": cluster_id,
+                     "start": pts[0][0], "end": pts[-1][0]})
+    runs.sort(key=lambda r: r["end"], reverse=True)
+    return runs
+
+
+def resolve_target(base, headers, args, now, lookback_s):
+    """Work out which (cluster_id, testid) to report on.
+
+    Explicit --cluster-id always wins. Otherwise the most recent run found in
+    Mimir is used, and overlapping runs are a hard error rather than a guess:
+    two suites running concurrently (a multi-suite pipeline matrix, say) produce
+    two clusters at once and there is no way to tell which one was meant.
+    """
+    explicit = args.cluster_id not in (None, "", "auto")
+    if explicit:
+        return args.cluster_id, args.testid or f"{E2E_TESTID_PREFIX}{args.cluster_id}"
+
+    # --testid given without a cluster: derive the cluster from it when it
+    # follows the suite convention, otherwise we genuinely cannot know.
+    if args.testid:
+        if not args.testid.startswith(E2E_TESTID_PREFIX):
+            sys.exit(f"Cannot derive the cluster from testid={args.testid!r} "
+                     f"(expected the {E2E_TESTID_PREFIX}<cluster_id> form). "
+                     f"Pass --cluster-id explicitly.")
+        return args.testid[len(E2E_TESTID_PREFIX):], args.testid
+
+    print(f"Discovering e2e runs from the last {args.lookback}h ...", file=sys.stderr)
+    runs = discover_runs(base, headers, now, lookback_s)
+    if not runs:
+        sys.exit(f"No k6 series with a {E2E_TESTID_PREFIX}* testid in the last "
+                 f"{args.lookback}h. Either the run is outside the lookback / Mimir "
+                 f"retention, the metrics never reached this Mimir, or the testid was "
+                 f"overridden via K6_TEST_ID — pass --cluster-id/--testid explicitly.")
+
+    newest = runs[0]
+    overlapping = [r for r in runs[1:] if r["end"] >= newest["start"]]
+    if overlapping:
+        listing = "\n".join(
+            f"  {r['cluster_id']}  {_fmt_win((r['start'], r['end']))}"
+            for r in [newest] + overlapping)
+        sys.exit("Several e2e runs overlap in time, so the intended one is ambiguous.\n"
+                 f"{listing}\n"
+                 "Pass --cluster-id to pick one (or --list-runs to report on each).")
+
+    for r in runs[1:]:
+        print(f"  ignoring earlier run {r['cluster_id']} "
+              f"({_fmt_win((r['start'], r['end']))})", file=sys.stderr)
+    print(f"  discovered cluster_id={newest['cluster_id']} "
+          f"({_fmt_win((newest['start'], newest['end']))})", file=sys.stderr)
+    return newest["cluster_id"], newest["testid"]
+
+
 # --------------------------------------------------------------------------- #
 # Main
 # --------------------------------------------------------------------------- #
@@ -194,8 +282,13 @@ def run_side(base, headers, spec, cluster_id, testid, rate, window, side_key):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--cluster-id", required=True, help="workload cluster_id")
+    ap.add_argument("--cluster-id", default="auto",
+                    help="workload cluster_id, or 'auto' (the default) to discover the most "
+                         "recent e2e run from the k6 testid labels in Mimir")
     ap.add_argument("--testid", help="k6 testid (default: e2e-load-test-<cluster-id>)")
+    ap.add_argument("--list-runs", action="store_true",
+                    help="print the discoverable e2e runs as JSON and exit; report nothing. "
+                         "Use it to fan out one report per cluster when several ran at once.")
     ap.add_argument("--mode", choices=["auto", "local", "in-cluster"], default="auto",
                     help="local = port-forward on localhost; in-cluster = mimir-gateway.mimir.svc "
                          "(Tekton). 'auto' picks in-cluster when running inside a pod.")
@@ -222,8 +315,6 @@ def main():
         manifest = yaml.safe_load(f)
     rate = manifest.get("rate_interval", "5m")
 
-    testid = args.testid or f"e2e-load-test-{args.cluster_id}"
-
     # Resolve the Mimir URL: explicit --mimir-url wins; else derive from --mode
     # (auto = in-cluster when running inside a pod, local otherwise).
     if args.mimir_url:
@@ -240,6 +331,13 @@ def main():
 
     now = args.now if args.now is not None else datetime.now(timezone.utc).timestamp()
     lookback_s = args.lookback * 3600
+
+    if args.list_runs:
+        json.dump(discover_runs(base, headers, now, lookback_s), sys.stdout, indent=2)
+        print()
+        return
+
+    cluster_id, testid = resolve_target(base, headers, args, now, lookback_s)
 
     print(f"Detecting k6 scenarios for testid={testid} ...", file=sys.stderr)
     windows = detect_scenarios(base, headers, testid, now, lookback_s)
@@ -267,7 +365,7 @@ def main():
 
     results = {
         "meta": {
-            "cluster_id": args.cluster_id,
+            "cluster_id": cluster_id,
             "testid": testid,
             "competitor": competitor,
             "mode": mode,
@@ -299,9 +397,9 @@ def main():
             "kind": spec.get("kind", "single"),
             "lower_is_better": spec.get("lower_is_better", True),
         }
-        entry["envoy"] = run_side(base, headers, spec, args.cluster_id, testid, rate,
+        entry["envoy"] = run_side(base, headers, spec, cluster_id, testid, rate,
                                   envoy_win, "envoy")
-        entry["competitor"] = run_side(base, headers, spec, args.cluster_id, testid, rate,
+        entry["competitor"] = run_side(base, headers, spec, cluster_id, testid, rate,
                                        comp_win, competitor)
         results["comparison"][key] = entry
         print(f"  fetched {key}", file=sys.stderr)

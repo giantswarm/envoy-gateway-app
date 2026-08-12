@@ -31,25 +31,39 @@ explicitly — but be deliberate about which environment you are in.
   machine. Mimir is reached via a `kubectl port-forward`.
 - **In-cluster (Tekton)** — the pipeline spawns a headless agent in a pod on the
   management cluster. Mimir is reached directly at `mimir-gateway.mimir.svc`,
-  with no port-forward. Inputs (cluster_id, PR number) arrive as arguments in
-  the invoking prompt, not by asking.
+  with no port-forward. The PR number arrives as an argument in the invoking
+  prompt, not by asking.
 
 ## Inputs to collect
 
-- **cluster_id** — the workload cluster the test ran on (`cluster_id` /
-  `$workload_cluster` label).
 - **installation / MC** — the management cluster whose Mimir holds the metrics.
   (Local mode: the kubeconfig context. In-cluster: already the pod's cluster.)
 - **PR number** — where `/run envoy-performance-test` was triggered, for posting.
-- optional: `testid` (default `e2e-load-test-<cluster_id>`), `competitor`
-  (`auto`|`nginx`|`kong`, default auto-detected), `lookback` hours (default 6).
+- optional: `cluster_id` (see below), `testid` (default
+  `e2e-load-test-<cluster_id>`), `competitor` (`auto`|`nginx`|`kong`, default
+  auto-detected), `lookback` hours (default 6).
 
-In **local** mode, ask the user for anything missing (never guess the cluster).
-In **in-cluster** mode, take them from the invocation prompt/args and fail
-loudly if absent — do not prompt an unattended pipeline.
+**Don't go looking for the workload cluster.** The suite's AfterSuite deletes it
+long before the report is generated, so there is nothing left to list on the MC.
+It is recovered from Mimir instead: the suites tag every k6 series with
+`testid=e2e-load-test-<cluster_id>`, and `fetch_metrics.py` defaults to
+`--cluster-id auto`, which reads that label back. Neither mode needs the cluster
+as an input — pass `--cluster-id` only when the user names one explicitly, or to
+disambiguate (below).
 
-The competitor (nginx vs kong) and both scenario time windows are **always
-auto-detected** from the k6 series — never ask for them.
+In **local** mode, ask the user for anything still missing. In **in-cluster**
+mode, take it from the invocation prompt/args and fail loudly if absent — do not
+prompt an unattended pipeline.
+
+The competitor (nginx vs kong), both scenario time windows, and the cluster are
+**always auto-detected** from the k6 series — never ask for them.
+
+Discovery picks the most recent run inside the lookback and prints which one it
+chose plus any earlier runs it ignored. Read that line back to the user — it is
+the only confirmation that the report covers the run they meant. Runs that
+*overlap in time* (several suites in one pipeline matrix, or two PRs at once) are
+refused rather than guessed: use `--list-runs` to get them as JSON and generate
+one report per `cluster_id`.
 
 ## Mimir credentials (both modes)
 
@@ -91,20 +105,23 @@ Work in a scratch dir.
 3. **Fetch the metrics** (mode auto-detected; add `--mode` only to force it):
 
    ```bash
-   # Local
-   python3 "$DIR/fetch_metrics.py" --cluster-id <cluster_id> \
-     --lookback 6 --output results.json
+   # Local — cluster discovered from the k6 testid labels
+   python3 "$DIR/fetch_metrics.py" --lookback 6 --output results.json
    # In-cluster (equivalent to --mode in-cluster --mimir-url http://mimir-gateway.mimir.svc/)
-   python3 "$DIR/fetch_metrics.py" --cluster-id <cluster_id> \
-     --mode in-cluster --output results.json
+   python3 "$DIR/fetch_metrics.py" --mode in-cluster --output results.json
+   # Pin a specific run instead of discovering it
+   python3 "$DIR/fetch_metrics.py" --cluster-id <cluster_id> --output results.json
+   # Several runs at once: list them, then loop
+   python3 "$DIR/fetch_metrics.py" --list-runs
    ```
 
    Requires `python3` + PyYAML (`pip install pyyaml` if missing). It prints the
-   chosen `mode`/`url`, the detected competitor, and both windows to stderr —
-   sanity-check that the windows look like real ~20-minute runs, not stray
-   seconds. If it reports no `envoy_simulation` data, widen `--lookback` or
-   re-check cluster_id/testid; the k6 metrics must still be within Mimir
-   retention.
+   chosen `mode`/`url`, the discovered `cluster_id`, the detected competitor, and
+   both windows to stderr — sanity-check that the cluster is the one you expect
+   and that the windows look like real ~20-minute runs, not stray seconds. If it
+   finds no run at all, widen `--lookback`; if it reports no `envoy_simulation`
+   data for a run it did find, re-check testid; the k6 metrics must still be
+   within Mimir retention either way.
 
 4. **Render the report + PR summary:**
 
