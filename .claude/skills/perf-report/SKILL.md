@@ -16,8 +16,19 @@ reader downloads and extracts locally — plus a PR summary comment, by querying
 the installation's Mimir with the same PromQL as the Grafana dashboards — no
 manual dashboard reading.
 
-The scripts live next to this file. `$DIR` below = the directory containing this
-`SKILL.md` (when installed as a plugin skill, that is the plugin's copy).
+The scripts live next to this file. In this repo that is
+`.claude/skills/perf-report/`; when installed as a plugin skill it is the
+plugin's copy. The commands below use the in-repo path — substitute the plugin
+path if that is where the skill is installed.
+
+> **Never put a shell variable assignment in a Bash command.** Write
+> `python3 .claude/skills/perf-report/fetch_metrics.py …`, not
+> `DIR=... && python3 "$DIR/fetch_metrics.py" …`. When this skill runs in CI it
+> is under an allowlist (`--permission-mode dontAsk`), and a permission rule
+> **cannot match past a variable assignment** — the whole call gets denied even
+> though `python3 …` on its own is allowed. This silently cost a full pipeline
+> run. Spell every path out literally. (Referencing an already-exported variable
+> mid-command is fine; it is the leading `VAR=…` that breaks matching.)
 
 ## Pick the execution mode first
 
@@ -114,13 +125,13 @@ Work in a scratch dir.
 
    ```bash
    # Local — cluster discovered from the k6 testid labels
-   python3 "$DIR/fetch_metrics.py" --lookback 6 --output results.json
-   # Pipeline — always pass the mimir-url the task gave you
-   python3 "$DIR/fetch_metrics.py" --mimir-url "$MIMIR_URL" --output results.json
+   python3 .claude/skills/perf-report/fetch_metrics.py --lookback 6 --output results.json
+   # Pipeline — pass the mimir-url the task gave you, spelled out literally
+   python3 .claude/skills/perf-report/fetch_metrics.py --mimir-url http://localhost:8080 --output results.json
    # Pin a specific run instead of discovering it
-   python3 "$DIR/fetch_metrics.py" --cluster-id <cluster_id> --output results.json
+   python3 .claude/skills/perf-report/fetch_metrics.py --cluster-id <cluster_id> --output results.json
    # Several runs at once: list them, then loop
-   python3 "$DIR/fetch_metrics.py" --list-runs
+   python3 .claude/skills/perf-report/fetch_metrics.py --list-runs
    ```
 
    Requires `python3` + PyYAML (`pip install pyyaml` if missing). It prints the
@@ -134,8 +145,8 @@ Work in a scratch dir.
 4. **Render the report + PR summary:**
 
    ```bash
-   python3 "$DIR/render_report.py" --input results.json --output report.html
-   python3 "$DIR/render_report.py" --input results.json --format markdown --output summary.md
+   python3 .claude/skills/perf-report/render_report.py --input results.json --output report.html
+   python3 .claude/skills/perf-report/render_report.py --input results.json --format markdown --output summary.md
    ```
 
 5. **Package the report as a tarball** — the PR gets the compressed archive, never
@@ -176,7 +187,7 @@ Work in a scratch dir.
    Then re-render the markdown with that URL and post it:
 
    ```bash
-   python3 "$DIR/render_report.py" --input results.json --format markdown \
+   python3 .claude/skills/perf-report/render_report.py --input results.json --format markdown \
      --report-url "$URL" --output summary.md
    gh pr comment <pr> --body-file summary.md
    ```

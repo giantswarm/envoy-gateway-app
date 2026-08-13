@@ -20,6 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     of a `kubectl port-forward` to the management cluster.
   - add `.claude/perf-report-ci-settings.json`, the permission allowlist used by
     the pipeline's `generate-perf-report` task (`--permission-mode dontAsk`).
+  - stop using a `$DIR` shell variable in the `SKILL.md` examples and spell the
+    script paths out literally. A permission rule cannot match past a variable
+    assignment, so the `DIR=... && python3 "$DIR/fetch_metrics.py" ...` form the
+    examples produced was denied under the CI allowlist even though
+    `Bash(python3 *)` is allowed — the agent could not run a single script and
+    the pipeline reported success with no report.
 
 ## [1.9.0] - 2026-07-28
 

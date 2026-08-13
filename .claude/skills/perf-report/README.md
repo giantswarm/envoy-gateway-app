@@ -151,3 +151,20 @@ auto-denies anything not pre-approved. The allowlist it needs is
 name is loaded automatically for everyone working in this repo, and these rules
 should apply only to the unattended pipeline run. Add a rule there whenever the
 skill starts using a new command.
+
+Two things about that allowlist are easy to get wrong:
+
+- **No shell variable assignments.** A permission rule cannot match past a
+  variable assignment, so `DIR=... && python3 ...` is denied even though
+  `Bash(python3 *)` is allowed — and no extra rule can fix it, because the
+  restriction is on matching past the assignment. This is why the steps above
+  spell every path out literally. It cost one whole pipeline run.
+- **`env` is intentionally not allowlisted.** The agent sometimes tries
+  `env | grep -c MIMIR_USERNAME` as a sanity check; that gets denied and it
+  retries without it, which is fine. Do not "fix" this by allowing `env` — the
+  pod's environment holds `MIMIR_PASSWORD`, `GITHUB_TOKEN` and
+  `ANTHROPIC_API_KEY`, and a dump would land in the Tekton log.
+
+If a run misbehaves, the task passes `--output-format stream-json --verbose`, so
+the denied command appears in the step log. Plain `-p` output only shows the
+model saying it needs permission, without naming the call.
