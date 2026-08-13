@@ -38,6 +38,8 @@ import base64
 import json
 import os
 import sys
+import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
@@ -87,10 +89,44 @@ def build_headers(tenant, username, password):
 # --------------------------------------------------------------------------- #
 # Mimir HTTP
 # --------------------------------------------------------------------------- #
+# A `kubectl port-forward` to the MC over teleport stalls for stretches after a
+# couple of range queries, and a report issues ~30 of them back to back. Without
+# retries the run dies mid-fetch on a ConnectionReset / read timeout. Retry the
+# transport errors and 5xx; let 4xx through immediately (a bad query or bad
+# credentials will not fix itself).
+_RETRY_ATTEMPTS = 15
+_RETRY_BACKOFF_START = 2.0
+_RETRY_BACKOFF_MAX = 8.0
+_PER_ATTEMPT_TIMEOUT = 12
+
+
 def _get(url, headers, timeout):
-    req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return json.loads(resp.read().decode())
+    attempt_timeout = min(timeout, _PER_ATTEMPT_TIMEOUT)
+    backoff = _RETRY_BACKOFF_START
+    last_err = None
+
+    for attempt in range(1, _RETRY_ATTEMPTS + 1):
+        req = urllib.request.Request(url, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=attempt_timeout) as resp:
+                return json.loads(resp.read().decode())
+        except urllib.error.HTTPError as e:
+            if e.code < 500:
+                raise
+            last_err = e
+        except (urllib.error.URLError, TimeoutError, ConnectionError, json.JSONDecodeError) as e:
+            last_err = e
+
+        if attempt < _RETRY_ATTEMPTS:
+            print(
+                f"  retry {attempt}/{_RETRY_ATTEMPTS - 1} after {type(last_err).__name__}: "
+                f"{last_err} (sleeping {backoff:.0f}s)",
+                file=sys.stderr,
+            )
+            time.sleep(backoff)
+            backoff = min(backoff * 1.5, _RETRY_BACKOFF_MAX)
+
+    raise RuntimeError(f"Mimir request failed after {_RETRY_ATTEMPTS} attempts: {url} ({last_err})")
 
 
 def query_range(base, headers, expr, start, end, step, timeout=60):

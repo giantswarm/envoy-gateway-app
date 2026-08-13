@@ -81,7 +81,7 @@ comparison:
     kind: single
     lower_is_better: false
     envoy: 'sum(rate(envoy_http_downstream_rq_total{cluster_id="{cluster_id}"}[{rate}]))'
-    nginx: 'sum(rate(nginx_ingress_controller_requests{cluster_id="{cluster_id}",controller_namespace="kube-system"}[{rate}]))'
+    nginx: 'sum(rate(nginx_ingress_controller_requests{cluster_id="{cluster_id}",controller_namespace="default"}[{rate}]))'
     kong: 'sum(rate(kong_kong_latency_ms_count{cluster_id="{cluster_id}"}[{rate}]))'
 
   success_rate:
@@ -114,7 +114,7 @@ comparison:
     kind: single
     lower_is_better: true
     envoy: 'sum(max by (cluster_id, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{cluster_id="{cluster_id}", namespace="envoy-gateway-system"}) * on(cluster_id, namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster_id="{cluster_id}", namespace="envoy-gateway-system", workload_type="deployment"}) by (cluster_id)'
-    nginx: 'sum(max by (cluster_id, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{cluster_id="{cluster_id}", namespace="kube-system"}) * on(cluster_id, namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster_id="{cluster_id}", namespace="kube-system", workload="ingress-nginx-controller", workload_type="deployment"}) by (workload)'
+    nginx: 'sum(max by (cluster_id, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{cluster_id="{cluster_id}", namespace="default"}) * on(cluster_id, namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster_id="{cluster_id}", namespace="default", workload="ingress-nginx-controller", workload_type="deployment"}) by (workload)'
     kong: 'sum(max by (cluster_id, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{cluster_id="{cluster_id}", namespace="kong"}) * on(cluster_id, namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster_id="{cluster_id}", namespace="kong", workload="kong-app-kong-app", workload_type="deployment"}) by (workload)'
 
   memory_usage:
@@ -123,5 +123,5 @@ comparison:
     kind: single
     lower_is_better: true
     envoy: 'sum(max by (cluster_id, namespace, pod, container)(container_memory_working_set_bytes{cluster_id="{cluster_id}", namespace="envoy-gateway-system", container!="", image!=""}) * on(cluster_id, namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster_id="{cluster_id}", namespace="envoy-gateway-system", workload_type="deployment"}) by (cluster_id)'
-    nginx: 'sum(max by (cluster_id, namespace, pod, container)(container_memory_working_set_bytes{cluster_id="{cluster_id}", namespace="kube-system", container!="", image!=""}) * on(cluster_id, namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster_id="{cluster_id}", namespace="kube-system", workload="ingress-nginx-controller", workload_type="deployment"}) by (workload)'
+    nginx: 'sum(max by (cluster_id, namespace, pod, container)(container_memory_working_set_bytes{cluster_id="{cluster_id}", namespace="default", container!="", image!=""}) * on(cluster_id, namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster_id="{cluster_id}", namespace="default", workload="ingress-nginx-controller", workload_type="deployment"}) by (workload)'
     kong: 'sum(max by (cluster_id, namespace, pod, container)(container_memory_working_set_bytes{cluster_id="{cluster_id}", namespace="kong", container!="", image!=""}) * on(cluster_id, namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster_id="{cluster_id}", namespace="kong", workload="kong-app-kong-app", workload_type="deployment"}) by (workload)'

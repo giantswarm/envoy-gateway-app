@@ -107,12 +107,11 @@ w(d["panels"])' <dashboard.json>
 ## Phase 2 — automate at pipeline end
 
 `/run` is a central Giant Swarm **Tekton** mechanism, not wired in this repo's
-`.github`. To make the report generate automatically when the TestRun finishes,
-add a step to the performance pipeline (in the Tekton pipeline definition, not
-here) that, after the suite passes:
+`.github`. The `envoy-performance-test` pipeline runs this skill from its
+`generate-perf-report` finally-task (see `tekton-resources`). That task:
 
-1. runs in a pod with in-cluster access to `mimir-gateway.mimir.svc` (no
-   port-forward needed — use `--mimir-url http://mimir-gateway.mimir.svc/`),
+1. port-forwards `svc/mimir-gateway` on the test MC and passes
+   `--mimir-url http://localhost:8080`,
 2. runs `fetch_metrics.py` + `render_report.py`,
 3. tars `report.html` into `report.tar.gz`, uploads it to the `perf-reports`
    branch (or as a pipeline artifact), and posts `summary.md` — linking that
@@ -126,3 +125,29 @@ workload cluster is deleted by the suite's AfterSuite before this step runs, so
 also keeps the pipeline free of any Tekton result plumbing between the test task
 and the report task, which matters because the test task is matrixed and a
 matrixed task's results can only be consumed as an array.
+
+### Why the pipeline port-forwards instead of using Mimir's public host
+
+The report pod runs on the CI installation, not on the test MC, so
+`mimir-gateway.mimir.svc` is not resolvable from it. The obvious alternative —
+Mimir's public `HTTPRoute` host, `mimir.<mc>.gaws.gigantic.io` — does **not**
+work: that route only exposes `/api/v1/push`, `/prometheus/config/v1/rules`,
+`/prometheus/api/v1/query` and `/otlp/v1/metrics`. Gateway-API `PathPrefix`
+matching is segment-based, so `/prometheus/api/v1/query` does not cover
+`/prometheus/api/v1/query_range`, and `query_range` is the only endpoint
+`fetch_metrics.py` uses — every request 404s. The sibling
+`observability.<mc>.gaws.gigantic.io` route does expose `query_range` but
+requires a JWT and rejects the `alloy-metrics` basic-auth credentials with 401.
+A port-forward to the in-cluster service bypasses the route and serves the full
+Prometheus API, which is why `_get()` also carries a retry loop: that tunnel
+stalls periodically and a report makes ~30 sequential range queries.
+
+### Permissions in the pipeline
+
+The task runs `claude --permission-mode dontAsk`, which never prompts and
+auto-denies anything not pre-approved. The allowlist it needs is
+`.claude/perf-report-ci-settings.json` in this repo, passed explicitly with
+`--settings`. It is deliberately **not** named `.claude/settings.json`: that
+name is loaded automatically for everyone working in this repo, and these rules
+should apply only to the unattended pipeline run. Add a rule there whenever the
+skill starts using a new command.
