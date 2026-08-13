@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(python3 *)",
+      "Bash(tar *)",
+      "Bash(gzip *)",
+      "Bash(base64 *)",
+      "Bash(date *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(curl *)",
+      "Bash(gh api *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr comment *)",
+      "Bash(gh auth status *)",
+      "Bash(kubectl get *)",
+      "Bash(kubectl -n * get *)",
+      "Bash(kubectl --context * get *)",
+      "Bash(kubectl config current-context *)",
+      "Bash(kubectl config get-contexts *)",
+      "Read(//workspace/**)",
+      "Edit(//workspace/**)",
+      "Read(//tmp/**)",
+      "Edit(//tmp/**)"
+    ],
+    "deny": [
+      "Bash(rm *)",
+      "Bash(kubectl delete *)",
+      "Bash(kubectl apply *)",
+      "Bash(kubectl patch *)",
+      "Bash(git push *)",
+      "Bash(git commit *)"
+    ]
+  }
+}

@@ -22,17 +22,25 @@ The scripts live next to this file. `$DIR` below = the directory containing this
 ## Pick the execution mode first
 
 This skill runs in one of two environments. Detect which and follow the matching
-path in step 2. `fetch_metrics.py` **auto-detects** the mode (it uses the
-in-cluster Mimir service when `KUBERNETES_SERVICE_HOST` is set, i.e. inside a
-pod, and localhost otherwise), so in practice you rarely pass `--mode`
-explicitly — but be deliberate about which environment you are in.
+path in step 2.
 
 - **Local (interactive)** — a human runs `/perf-report` in Claude Code on their
-  machine. Mimir is reached via a `kubectl port-forward`.
-- **In-cluster (Tekton)** — the pipeline spawns a headless agent in a pod on the
-  management cluster. Mimir is reached directly at `mimir-gateway.mimir.svc`,
-  with no port-forward. The PR number arrives as an argument in the invoking
-  prompt, not by asking.
+  machine. Mimir is reached via a `kubectl port-forward` you open yourself.
+- **Pipeline (Tekton)** — the `generate-perf-report` finally-task of
+  `envoy-performance-test` spawns a headless agent. The PR number and a
+  `mimir-url` arrive as arguments in the invoking prompt, not by asking.
+
+> **If the prompt gives you a `mimir-url`, always pass it through as
+> `--mimir-url` and do not open a port-forward of your own.** The pipeline pod
+> runs on the CI installation, not the test MC, so `mimir-gateway.mimir.svc` is
+> *not* resolvable there — but `fetch_metrics.py` auto-detects "in-cluster" from
+> `KUBERNETES_SERVICE_HOST` and would silently pick exactly that unreachable
+> URL. The task has already opened the tunnel and exported
+> `MIMIR_USERNAME`/`MIMIR_PASSWORD`; skip steps 1 and 2 entirely.
+
+Outside that case `fetch_metrics.py` auto-detects the mode (in-cluster Mimir
+service when `KUBERNETES_SERVICE_HOST` is set, localhost otherwise), so you
+rarely pass `--mode` explicitly.
 
 ## Inputs to collect
 
@@ -99,16 +107,16 @@ Work in a scratch dir.
    stop and tell the user what's needed (VPN, teleport login, kubeconfig).
    Prefer the kubernetes MCP tools if they're wired up for this installation.
 
-   **In-cluster (Tekton):** nothing to do — the service URL is reachable
-   directly. Skip the port-forward.
+   **Pipeline (Tekton):** nothing to do — the task already opened the tunnel and
+   told you the `mimir-url`. Do not start your own port-forward.
 
 3. **Fetch the metrics** (mode auto-detected; add `--mode` only to force it):
 
    ```bash
    # Local — cluster discovered from the k6 testid labels
    python3 "$DIR/fetch_metrics.py" --lookback 6 --output results.json
-   # In-cluster (equivalent to --mode in-cluster --mimir-url http://mimir-gateway.mimir.svc/)
-   python3 "$DIR/fetch_metrics.py" --mode in-cluster --output results.json
+   # Pipeline — always pass the mimir-url the task gave you
+   python3 "$DIR/fetch_metrics.py" --mimir-url "$MIMIR_URL" --output results.json
    # Pin a specific run instead of discovering it
    python3 "$DIR/fetch_metrics.py" --cluster-id <cluster_id> --output results.json
    # Several runs at once: list them, then loop
