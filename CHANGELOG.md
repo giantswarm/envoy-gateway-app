@@ -14,6 +14,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update `perf-report` claude skill:
   - the report is posted as a tar file in the PR's comments.
   - `perf-report` no longer needs a `cluster_id`.
+  - fix the nginx `downstream_rps`, `cpu_usage` and `memory_usage` queries: they
+    filtered on the `kube-system` namespace, but the performance suites install
+    `ingress-nginx` into `default`, so those three metrics were always empty and
+    the comparison table rendered them as `—`.
+  - retry Mimir requests in `fetch_metrics.py`, so a report survives the stalls
+    of a `kubectl port-forward` to the management cluster.
+  - add `.claude/perf-report-ci-settings.json`, the permission allowlist used by
+    the pipeline's `generate-perf-report` task (`--permission-mode dontAsk`).
 
 ## [1.9.0] - 2026-07-28
 
