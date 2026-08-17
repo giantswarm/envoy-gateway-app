@@ -3,3 +3,4 @@ checks:
   - "unset-cpu-requirements"
   - "liveness-port"
   - "readiness-port"
+  - "startup-port"
