@@ -159,6 +159,11 @@ Two things about that allowlist are easy to get wrong:
   `Bash(python3 *)` is allowed — and no extra rule can fix it, because the
   restriction is on matching past the assignment. This is why the steps above
   spell every path out literally. It cost one whole pipeline run.
+- **A `cd` outside the working directory cannot be allowlisted.** `Bash(cd /some/path*)` has no
+  effect — Claude Code decides `cd` from the session's allowed directories, not from Bash rules
+  (verified). The pipeline therefore passes `--add-dir` for its output directory; without it the
+  agent's `cd <out-dir> && … | gh api …` upload is denied and the tarball never reaches the
+  `perf-reports` branch, while the PR comment still posts, so the run looks half-successful.
 - **`env` is intentionally not allowlisted.** The agent sometimes tries
   `env | grep -c MIMIR_USERNAME` as a sanity check; that gets denied and it
   retries without it, which is fine. Do not "fix" this by allowing `env` — the
