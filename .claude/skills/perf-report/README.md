@@ -142,6 +142,20 @@ A port-forward to the in-cluster service bypasses the route and serves the full
 Prometheus API, which is why `_get()` also carries a retry loop: that tunnel
 stalls periodically and a report makes ~30 sequential range queries.
 
+### The pipeline publishes, the agent only analyses
+
+`generate-perf-report` does the branch creation, tarball upload, upload
+verification, markdown re-render and PR comment in its own bash, not through the
+agent. Three consecutive runs failed in the publish step, each for a different
+reason — a `cd` outside the working directory, a nested `$(gh api ...)`
+substitution, and a `gh api --method PUT` pipeline whose denial could not be
+reproduced in isolation. Every individual feature of those commands is
+allowlistable, but the agent composes a slightly different command each run, so
+the allowlist could never be complete. Task bash is not permission-gated, so this
+is deterministic; and the download URL is now only written *after* an upload the
+task verified with a read-back, which is what stops a comment carrying a dead
+link. The agent writes `narrative.md` and the task prepends it to the comment.
+
 ### Permissions in the pipeline
 
 The task runs `claude --permission-mode dontAsk`, which never prompts and
@@ -159,6 +173,11 @@ Two things about that allowlist are easy to get wrong:
   `Bash(python3 *)` is allowed — and no extra rule can fix it, because the
   restriction is on matching past the assignment. This is why the steps above
   spell every path out literally. It cost one whole pipeline run.
+- **A `cd` outside the working directory cannot be allowlisted.** `Bash(cd /some/path*)` has no
+  effect — Claude Code decides `cd` from the session's allowed directories, not from Bash rules
+  (verified). The pipeline therefore passes `--add-dir` for its output directory; without it the
+  agent's `cd <out-dir> && … | gh api …` upload is denied and the tarball never reaches the
+  `perf-reports` branch, while the PR comment still posts, so the run looks half-successful.
 - **`env` is intentionally not allowlisted.** The agent sometimes tries
   `env | grep -c MIMIR_USERNAME` as a sanity check; that gets denied and it
   retries without it, which is fine. Do not "fix" this by allowing `env` — the
