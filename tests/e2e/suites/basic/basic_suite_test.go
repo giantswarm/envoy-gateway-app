@@ -24,6 +24,7 @@ func TestBasic(t *testing.T) {
 		WithInstallNamespace("envoy-gateway-system").
 		WithIsUpgrade(isUpgrade).
 		WithValuesFile("./values.yaml").
+		WithBundleValuesFile("./bundle_values.yaml").
 		Tests(func() {
 			It("should have created a bundle application", func() {
 				Expect(state.GetBundleApplication()).ToNot(BeNil())
