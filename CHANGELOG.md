@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     filtered on the `kube-system` namespace, but the performance suites install
     `ingress-nginx` into `default`, so those three metrics were always empty and
     the comparison table rendered them as `—`.
+  - in pipeline mode the skill no longer publishes: the `generate-perf-report`
+    Tekton task creates the branch, uploads the tarball, verifies it and posts the
+    comment itself, and the agent writes its interpretation to `narrative.md`
+    instead. `gh` moved from the CI allowlist's allow list to its deny list.
   - retry Mimir requests in `fetch_metrics.py`, so a report survives the stalls
     of a `kubectl port-forward` to the management cluster.
   - add `.claude/perf-report-ci-settings.json`, the permission allowlist used by
