@@ -160,6 +160,16 @@ Work in a scratch dir.
    gists can't hold binaries, so upload the tarball to the repo's dedicated
    `perf-reports` branch and link its download URL.
 
+   > **Pipeline mode: skip this entire step.** The `generate-perf-report` Tekton
+   > task publishes by itself — it creates the branch, uploads the tarball,
+   > verifies it is readable, re-renders the markdown with the resulting URL and
+   > posts the comment. Write your interpretation to `narrative.md` in the output
+   > directory instead and stop; the task prepends it to the comment. Do not run
+   > `gh` at all (the CI allowlist denies it), and do not construct a download URL
+   > yourself — a URL written before a verified upload produces a comment with a
+   > dead link, which is exactly what happened before this was moved out of the
+   > agent's hands.
+
    ```bash
    REPO=giantswarm/envoy-gateway-app
    BRANCH=perf-reports

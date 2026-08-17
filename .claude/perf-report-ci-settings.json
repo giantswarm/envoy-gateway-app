@@ -11,10 +11,6 @@
       "Bash(cp *)",
       "Bash(mv *)",
       "Bash(curl *)",
-      "Bash(gh api *)",
-      "Bash(gh pr view *)",
-      "Bash(gh pr comment *)",
-      "Bash(gh auth status *)",
       "Bash(kubectl get *)",
       "Bash(kubectl -n * get *)",
       "Bash(kubectl --context * get *)",
@@ -31,7 +27,8 @@
       "Bash(kubectl apply *)",
       "Bash(kubectl patch *)",
       "Bash(git push *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(gh *)"
     ]
   }
 }
