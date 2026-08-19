@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Update Envoy Gateway to [v1.9.0](https://gateway.envoyproxy.io/news/releases/notes/v1.9.0). Requires Gateway API v1.6 CRDs. Note that Lua `EnvoyExtensionPolicy` is now opt-in via `config.envoyGateway.extensionApis.enableLua`, and `EndpointSliceIndex` is enabled by default and can raise control plane memory usage.
+- Pin `gateway-api-crds` to 1.9.0 in the e2e and performance test suites.
 - Update `perf-report` claude skill:
   - the report is posted as a tar file in the PR's comments.
   - `perf-report` no longer needs a `cluster_id`.
@@ -30,6 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     examples produced was denied under the CI allowlist even though
     `Bash(python3 *)` is allowed — the agent could not run a single script and
     the pipeline reported success with no report.
+
+### Added
+
+- Add control plane startup, liveness and readiness probes as configurable values.
 
 ## [1.9.0] - 2026-07-28
 

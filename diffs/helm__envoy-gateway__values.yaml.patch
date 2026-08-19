@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index 817e2ff..2e5d752 100644
+index a999508..2690a97 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,8 @@
@@ -15,32 +15,32 @@ index 817e2ff..2e5d752 100644
 @@ -11,7 +12,7 @@ global:
    images:
      envoyGateway:
-       # This is the full image name including the hub, repo, and tag.
--      image: docker.io/envoyproxy/gateway:v1.8.3
-+      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.8.3
-       # Specify image pull policy if default behavior isn't desired.
+       # -- Full image for the Envoy Gateway control plane Deployment installed by this chart.
+-      image: docker.io/envoyproxy/gateway:v1.9.0
++      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.9.0
+       # -- Image pull policy for the Envoy Gateway control plane Deployment.
        # Default behavior: latest images will be Always else IfNotPresent.
        pullPolicy: IfNotPresent
 @@ -19,7 +20,7 @@ global:
        pullSecrets: []
      ratelimit:
        # This is the full image name including the hub, repo, and tag.
--      image: "docker.io/envoyproxy/ratelimit:1e50889b"
-+      image: "gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:1e50889b"
+-      image: "docker.io/envoyproxy/ratelimit:17b1956c"
++      image: "gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:17b1956c"
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: latest images will be Always else IfNotPresent.
        pullPolicy: IfNotPresent
-@@ -28,24 +29,22 @@ global:
-     envoyProxy:
-       # This is the full image name including the hub, repo, and tag for the Envoy Proxy data plane.
-       # If not specified, uses the default image built into envoy-gateway.
+@@ -30,25 +31,22 @@ global:
+       # This updates the generated `envoyProxy` config and does not change the `envoy-gateway`
+       # control plane Deployment image. If not specified, the default image built into
+       # `envoy-gateway` is used.
 -      image: ""
-+      image: "gsoci.azurecr.io/giantswarm/envoy:distroless-v1.38.3"
-       # Specify image pull policy if default behavior isn't desired.
++      image: "gsoci.azurecr.io/giantswarm/envoy:distroless-v1.39.0"
+       # -- Image pull policy for the managed Envoy Proxy data plane.
        # Default behavior: IfNotPresent.
 -      pullPolicy: ""
 +      pullPolicy: IfNotPresent
-       # List of secrets in the same namespace of the component that can be used to pull images from private repositories.
+       # -- Pull secrets for the managed Envoy Proxy data plane.
        pullSecrets: []
  
 -# Values for CRDs dependency
@@ -57,19 +57,12 @@ index 817e2ff..2e5d752 100644
 -  minAvailable: 0
 +  minAvailable: 1
    # maxUnavailable: 1
+-  # unhealthyPodEvictionPolicy: IfHealthyBudget
 +  unhealthyPodEvictionPolicy: AlwaysAllow
  
  deployment:
    annotations: {}
-@@ -73,6 +72,7 @@ deployment:
-       runAsNonRoot: true
-       runAsGroup: 65532
-       runAsUser: 65532
-+      readOnlyRootFilesystem: true
-       seccompProfile:
-         type: RuntimeDefault
-   ports:
-@@ -88,15 +88,26 @@ deployment:
+@@ -124,15 +122,26 @@ deployment:
      - name: metrics
        port: 19001
        targetPort: 19001
@@ -99,7 +92,7 @@ index 817e2ff..2e5d752 100644
      tolerations: []
      nodeSelector: {}
      # Additional volumeMounts on the deployment definition.
-@@ -120,10 +131,16 @@ service:
+@@ -163,10 +172,16 @@ service:
    type: "ClusterIP"
  
  hpa:
@@ -120,10 +113,10 @@ index 817e2ff..2e5d752 100644
    behavior: {}
  
  config:
-@@ -154,7 +171,12 @@ certgen:
-     pod:
-       annotations: {}
-       labels: {}
+@@ -204,7 +219,12 @@ certgen:
+         fsGroup: 65532
+         seccompProfile:
+           type: RuntimeDefault
 -    resources: {}
 +    resources:
 +      requests:
@@ -134,7 +127,7 @@ index 817e2ff..2e5d752 100644
      affinity: {}
      tolerations: []
      nodeSelector: {}
-@@ -178,3 +200,36 @@ certgen:
+@@ -228,3 +248,36 @@ certgen:
  topologyInjector:
    enabled: true
    annotations: {}
