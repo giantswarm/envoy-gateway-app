@@ -1,4 +1,4 @@
 apps:
   gatewayApiCrds:
     # Envoy Gateway 1.9 requires Gateway API v1.6 CRDs.
-    version: 1.9.1-dev.crds-image.2026-08-18.08-28-03.hed5fe08
+    version: 1.9.1
