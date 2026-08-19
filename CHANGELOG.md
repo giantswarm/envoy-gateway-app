@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-19
+
 ### Changed
 
 - **Breaking:** Use upstream's `global.imageRegistry` value instead of `global.image.registry`, dropping the image registry patch now that upstream supports the override natively.
@@ -203,7 +205,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set requests and limits for certgen Job
 - Improve security for PSS compliance
 
-[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.0...HEAD
+[1.10.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.7.3...v1.8.0
 [1.7.3]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.7.2...v1.7.3
