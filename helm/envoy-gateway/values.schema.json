@@ -524,16 +524,11 @@
         "global": {
             "type": "object",
             "properties": {
-                "image": {
-                    "type": "object",
-                    "properties": {
-                        "registry": {
-                            "type": "string"
-                        }
-                    }
-                },
                 "imagePullSecrets": {
                     "type": "array"
+                },
+                "imageRegistry": {
+                    "type": "string"
                 },
                 "images": {
                     "type": "object",

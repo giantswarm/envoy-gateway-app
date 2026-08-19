@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking:** Use upstream's `global.imageRegistry` value instead of `global.image.registry`, dropping the image registry patch now that upstream supports the override natively.
 - Update Envoy Gateway to [v1.9.0](https://gateway.envoyproxy.io/news/releases/notes/v1.9.0). Requires Gateway API v1.6 CRDs. Note that Lua `EnvoyExtensionPolicy` is now opt-in via `config.envoyGateway.extensionApis.enableLua`, and `EndpointSliceIndex` is enabled by default and can raise control plane memory usage.
 - Pin `gateway-api-crds` to 1.9.0 in the e2e and performance test suites.
 - Update `perf-report` claude skill:

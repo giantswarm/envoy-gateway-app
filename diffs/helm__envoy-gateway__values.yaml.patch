@@ -1,18 +1,17 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index a999508..2690a97 100644
+index a999508..b8441fd 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
-@@ -2,7 +2,8 @@
+@@ -2,7 +2,7 @@
  global:
    # If set, these take highest precedence and change envoyGateway, envoyProxy, and ratelimit's container registry and pull secrets.
    # -- Global override for image registry
 -  imageRegistry: ""
-+  image:
-+    registry: "gsoci.azurecr.io"
++  imageRegistry: "gsoci.azurecr.io"
    # -- Global override for image pull secrets
    imagePullSecrets: []
  
-@@ -11,7 +12,7 @@ global:
+@@ -11,7 +11,7 @@ global:
    images:
      envoyGateway:
        # -- Full image for the Envoy Gateway control plane Deployment installed by this chart.
@@ -21,7 +20,7 @@ index a999508..2690a97 100644
        # -- Image pull policy for the Envoy Gateway control plane Deployment.
        # Default behavior: latest images will be Always else IfNotPresent.
        pullPolicy: IfNotPresent
-@@ -19,7 +20,7 @@ global:
+@@ -19,7 +19,7 @@ global:
        pullSecrets: []
      ratelimit:
        # This is the full image name including the hub, repo, and tag.
@@ -30,7 +29,7 @@ index a999508..2690a97 100644
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: latest images will be Always else IfNotPresent.
        pullPolicy: IfNotPresent
-@@ -30,25 +31,22 @@ global:
+@@ -30,25 +30,22 @@ global:
        # This updates the generated `envoyProxy` config and does not change the `envoy-gateway`
        # control plane Deployment image. If not specified, the default image built into
        # `envoy-gateway` is used.
@@ -62,7 +61,7 @@ index a999508..2690a97 100644
  
  deployment:
    annotations: {}
-@@ -124,15 +122,26 @@ deployment:
+@@ -124,15 +121,26 @@ deployment:
      - name: metrics
        port: 19001
        targetPort: 19001
@@ -92,7 +91,7 @@ index a999508..2690a97 100644
      tolerations: []
      nodeSelector: {}
      # Additional volumeMounts on the deployment definition.
-@@ -163,10 +172,16 @@ service:
+@@ -163,10 +171,16 @@ service:
    type: "ClusterIP"
  
  hpa:
@@ -113,7 +112,7 @@ index a999508..2690a97 100644
    behavior: {}
  
  config:
-@@ -204,7 +219,12 @@ certgen:
+@@ -204,7 +218,12 @@ certgen:
          fsGroup: 65532
          seccompProfile:
            type: RuntimeDefault
@@ -127,7 +126,7 @@ index a999508..2690a97 100644
      affinity: {}
      tolerations: []
      nodeSelector: {}
-@@ -228,3 +248,36 @@ certgen:
+@@ -228,3 +247,36 @@ certgen:
  topologyInjector:
    enabled: true
    annotations: {}
