@@ -1,9 +1,9 @@
 diff --git a/helm/envoy-gateway/templates/crds/job.yaml b/helm/envoy-gateway/templates/crds/job.yaml
 new file mode 100644
-index 0000000..795ba9b
+index 0000000..5bcf656
 --- /dev/null
 +++ b/helm/envoy-gateway/templates/crds/job.yaml
-@@ -0,0 +1,62 @@
+@@ -0,0 +1,66 @@
 +apiVersion: batch/v1
 +kind: Job
 +metadata:
@@ -24,6 +24,10 @@ index 0000000..795ba9b
 +        {{- include "eg.labels" . | nindent 8 }}
 +    spec:
 +      serviceAccountName: {{ .Chart.Name }}-crd-installer
++      {{- with .Values.global.imagePullSecrets }}
++      imagePullSecrets:
++        {{- toYaml . | nindent 8 }}
++      {{- end }}
 +      securityContext:
 +        runAsNonRoot: true
 +        runAsUser: 1000
@@ -39,7 +43,7 @@ index 0000000..795ba9b
 +        effect: NoSchedule
 +      containers:
 +      - name: crd-installer
-+        image: {{ .Values.crds.image.registry }}/{{ .Values.crds.image.repository }}:{{ .Chart.Version | splitList "+" | first }}
++        image: {{ default .Values.crds.image.registry .Values.global.imageRegistry }}/{{ .Values.crds.image.repository }}:{{ .Chart.Version | splitList "+" | first }}
 +        imagePullPolicy: IfNotPresent
 +        command:
 +        - sh
