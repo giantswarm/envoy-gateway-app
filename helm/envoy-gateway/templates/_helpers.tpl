@@ -101,7 +101,7 @@ The name of the Envoy Gateway image.
 {{-   $imageTag := $repositoryParts._1 -}}
 {{-   printf "%s/%s:%s" $registryName $repositoryName $imageTag -}}
 {{- else -}}
-docker.io/envoyproxy/gateway:{{ .Chart.Version }}
+{{- printf "%s/giantswarm/envoyproxy-gateway:v%s" (default "gsoci.azurecr.io" .Values.global.imageRegistry) .Chart.AppVersion -}}
 {{- end -}}
 {{- end -}}
 

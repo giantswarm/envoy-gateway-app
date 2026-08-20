@@ -1,0 +1,11 @@
+diff --git a/helm/envoy-gateway/templates/_helpers.tpl b/helm/envoy-gateway/templates/_helpers.tpl
+--- a/helm/envoy-gateway/templates/_helpers.tpl
++++ b/helm/envoy-gateway/templates/_helpers.tpl
+@@ -100,6 +100,6 @@
+ {{-   $imageTag := $repositoryParts._1 -}}
+ {{-   printf "%s/%s:%s" $registryName $repositoryName $imageTag -}}
+ {{- else -}}
+-docker.io/envoyproxy/gateway:{{ .Chart.Version }}
++{{- printf "%s/giantswarm/envoyproxy-gateway:v%s" (default "gsoci.azurecr.io" .Values.global.imageRegistry) .Chart.AppVersion -}}
+ {{- end -}}
+ {{- end -}}
