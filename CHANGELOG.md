@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.1] - 2026-08-20
+
 ### Fixed
 
 - Point the `eg.image` fallback at the `gsoci.azurecr.io` mirror. When both `global.images.envoyGateway.image` and `deployment.envoyGateway.image.repository` are empty, the chart resolved the Envoy Gateway control plane, certgen and `shutdownManager` images to `docker.io/envoyproxy/gateway:<chart version>` — a tag that never exists upstream, ignoring `global.imageRegistry`.
@@ -210,7 +212,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set requests and limits for certgen Job
 - Improve security for PSS compliance
 
-[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.0...HEAD
+[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.1...HEAD
+[1.10.1]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.7.3...v1.8.0
