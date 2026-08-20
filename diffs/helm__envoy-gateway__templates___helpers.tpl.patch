@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/templates/_helpers.tpl b/helm/envoy-gateway/templates/_helpers.tpl
-index df9bb58..8d4db30 100644
+index df9bb58..ca5a6fe 100644
 --- a/vendor/gateway-helm/templates/_helpers.tpl
 +++ b/helm/envoy-gateway/templates/_helpers.tpl
 @@ -47,6 +47,7 @@ helm.sh/chart: {{ include "eg.chart" . }}
@@ -10,6 +10,15 @@ index df9bb58..8d4db30 100644
  {{- with .Values.commonLabels }}
  {{ toYaml . }}
  {{- end }}
+@@ -100,7 +101,7 @@ The name of the Envoy Gateway image.
+ {{-   $imageTag := $repositoryParts._1 -}}
+ {{-   printf "%s/%s:%s" $registryName $repositoryName $imageTag -}}
+ {{- else -}}
+-docker.io/envoyproxy/gateway:{{ .Chart.Version }}
++{{- printf "%s/giantswarm/envoyproxy-gateway:v%s" (default "gsoci.azurecr.io" .Values.global.imageRegistry) .Chart.AppVersion -}}
+ {{- end -}}
+ {{- end -}}
+ 
 @@ -236,10 +237,16 @@ provider:
        {{- end }}
      shutdownManager:

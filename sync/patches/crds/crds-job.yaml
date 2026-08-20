@@ -18,6 +18,10 @@ spec:
         {{- include "eg.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Chart.Name }}-crd-installer
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -33,7 +37,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: crd-installer
-        image: {{ .Values.crds.image.registry }}/{{ .Values.crds.image.repository }}:{{ .Chart.Version | splitList "+" | first }}
+        image: {{ default .Values.crds.image.registry .Values.global.imageRegistry }}/{{ .Values.crds.image.repository }}:{{ .Chart.Version | splitList "+" | first }}
         imagePullPolicy: IfNotPresent
         command:
         - sh

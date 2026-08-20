@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Point the `eg.image` fallback at the `gsoci.azurecr.io` mirror. When both `global.images.envoyGateway.image` and `deployment.envoyGateway.image.repository` are empty, the chart resolved the Envoy Gateway control plane, certgen and `shutdownManager` images to `docker.io/envoyproxy/gateway:<chart version>` — a tag that never exists upstream, ignoring `global.imageRegistry`.
+- Honour `global.imageRegistry` and `global.imagePullSecrets` in the CRD installer Job, so the `envoy-gateway-crds` image can be pulled from a private mirror like every other image in the chart.
+
 ## [1.10.0] - 2026-08-19
 
 ### Changed

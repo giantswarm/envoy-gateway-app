@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index a999508..b8441fd 100644
+index a999508..e4b60a6 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,7 @@
@@ -29,7 +29,7 @@ index a999508..b8441fd 100644
        # Specify image pull policy if default behavior isn't desired.
        # Default behavior: latest images will be Always else IfNotPresent.
        pullPolicy: IfNotPresent
-@@ -30,25 +30,22 @@ global:
+@@ -30,31 +30,28 @@ global:
        # This updates the generated `envoyProxy` config and does not change the `envoy-gateway`
        # control plane Deployment image. If not specified, the default image built into
        # `envoy-gateway` is used.
@@ -61,6 +61,13 @@ index a999508..b8441fd 100644
  
  deployment:
    annotations: {}
+   envoyGateway:
+     image:
+-      # if both this and global.imageRegistry are specified, this has to include both registry and repository explicitly, eg docker.io/envoyproxy/gateway
++      # if both this and global.imageRegistry are specified, this has to include both registry and repository explicitly, eg gsoci.azurecr.io/giantswarm/envoyproxy-gateway
+       repository: ""
+       tag: ""
+     imagePullPolicy: ""
 @@ -124,15 +121,26 @@ deployment:
      - name: metrics
        port: 19001

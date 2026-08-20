@@ -51,7 +51,7 @@ deployment:
   annotations: {}
   envoyGateway:
     image:
-      # if both this and global.imageRegistry are specified, this has to include both registry and repository explicitly, eg docker.io/envoyproxy/gateway
+      # if both this and global.imageRegistry are specified, this has to include both registry and repository explicitly, eg gsoci.azurecr.io/giantswarm/envoyproxy-gateway
       repository: ""
       tag: ""
     imagePullPolicy: ""
