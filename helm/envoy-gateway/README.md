@@ -94,7 +94,6 @@ To uninstall the chart:
 | deployment.envoyGateway.strategy | object | `{}` | Volume source for the Wasm module cache mounted at /var/lib/eg/wasm. Defaults to an emptyDir when left empty. Example: persist the Wasm module cache across controller restarts by backing it with a PersistentVolumeClaim:   wasmCacheVolume:     persistentVolumeClaim:       claimName: envoy-gateway-wasm-cache |
 | deployment.envoyGateway.wasmCacheVolume | object | `{}` |  |
 | deployment.pod.affinity | object | `{}` |  |
-| deployment.pod.annotations."karpenter.sh/do-not-disrupt" | string | `"true"` |  |
 | deployment.pod.annotations."prometheus.io/port" | string | `"19001"` |  |
 | deployment.pod.annotations."prometheus.io/scrape" | string | `"true"` |  |
 | deployment.pod.extraVolumeMounts | list | `[]` |  |

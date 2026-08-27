@@ -1,5 +1,5 @@
 diff --git a/vendor/gateway-helm/values.yaml b/helm/envoy-gateway/values.yaml
-index a999508..e4b60a6 100644
+index a999508..5c88be1 100644
 --- a/vendor/gateway-helm/values.yaml
 +++ b/helm/envoy-gateway/values.yaml
 @@ -2,7 +2,7 @@
@@ -68,7 +68,7 @@ index a999508..e4b60a6 100644
        repository: ""
        tag: ""
      imagePullPolicy: ""
-@@ -124,15 +121,26 @@ deployment:
+@@ -124,15 +121,21 @@ deployment:
      - name: metrics
        port: 19001
        targetPort: 19001
@@ -81,11 +81,6 @@ index a999508..e4b60a6 100644
      annotations:
        prometheus.io/scrape: 'true'
        prometheus.io/port: '19001'
-+      # Prevent Karpenter from voluntarily disrupting (consolidating) the control-plane
-+      # pods. A control-plane reschedule forces the Envoy proxies to reconnect and can
-+      # leave them wedged with stale/absent TLS secrets over delta xDS until they are
-+      # restarted (see https://github.com/envoyproxy/gateway/issues/9519).
-+      karpenter.sh/do-not-disrupt: 'true'
      labels: {}
 -    topologySpreadConstraints: []
 +    topologySpreadConstraints:
@@ -98,7 +93,7 @@ index a999508..e4b60a6 100644
      tolerations: []
      nodeSelector: {}
      # Additional volumeMounts on the deployment definition.
-@@ -163,10 +171,16 @@ service:
+@@ -163,10 +166,16 @@ service:
    type: "ClusterIP"
  
  hpa:
@@ -119,7 +114,7 @@ index a999508..e4b60a6 100644
    behavior: {}
  
  config:
-@@ -204,7 +218,12 @@ certgen:
+@@ -204,7 +213,12 @@ certgen:
          fsGroup: 65532
          seccompProfile:
            type: RuntimeDefault
@@ -133,7 +128,7 @@ index a999508..e4b60a6 100644
      affinity: {}
      tolerations: []
      nodeSelector: {}
-@@ -228,3 +247,36 @@ certgen:
+@@ -228,3 +242,36 @@ certgen:
  topologyInjector:
    enabled: true
    annotations: {}
