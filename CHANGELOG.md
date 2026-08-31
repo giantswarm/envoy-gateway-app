@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Remove the `karpenter.sh/do-not-disrupt` annotation from the Envoy Gateway control-plane pods.
+
 ## [1.10.1] - 2026-08-20
 
 ### Fixed
