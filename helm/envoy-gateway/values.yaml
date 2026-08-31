@@ -11,7 +11,7 @@ global:
   images:
     envoyGateway:
       # -- Full image for the Envoy Gateway control plane Deployment installed by this chart.
-      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.9.0
+      image: gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.9.1
       # -- Image pull policy for the Envoy Gateway control plane Deployment.
       # Default behavior: latest images will be Always else IfNotPresent.
       pullPolicy: IfNotPresent
@@ -19,7 +19,7 @@ global:
       pullSecrets: []
     ratelimit:
       # This is the full image name including the hub, repo, and tag.
-      image: "gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:17b1956c"
+      image: "gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:8fe6ea42"
       # Specify image pull policy if default behavior isn't desired.
       # Default behavior: latest images will be Always else IfNotPresent.
       pullPolicy: IfNotPresent
@@ -30,7 +30,7 @@ global:
       # This updates the generated `envoyProxy` config and does not change the `envoy-gateway`
       # control plane Deployment image. If not specified, the default image built into
       # `envoy-gateway` is used.
-      image: "gsoci.azurecr.io/giantswarm/envoy:distroless-v1.39.0"
+      image: "gsoci.azurecr.io/giantswarm/envoy:distroless-v1.39.1"
       # -- Image pull policy for the managed Envoy Proxy data plane.
       # Default behavior: IfNotPresent.
       pullPolicy: IfNotPresent
