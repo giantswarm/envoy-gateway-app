@@ -126,13 +126,13 @@ To uninstall the chart:
 | deployment.replicas | int | `2` |  |
 | global.imagePullSecrets | list | `[]` | Global override for image pull secrets |
 | global.imageRegistry | string | `"gsoci.azurecr.io"` | Global override for image registry |
-| global.images.envoyGateway.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.9.0"` | Full image for the Envoy Gateway control plane Deployment installed by this chart. |
+| global.images.envoyGateway.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-gateway:v1.9.1"` | Full image for the Envoy Gateway control plane Deployment installed by this chart. |
 | global.images.envoyGateway.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the Envoy Gateway control plane Deployment. Default behavior: latest images will be Always else IfNotPresent. |
 | global.images.envoyGateway.pullSecrets | list | `[]` | Pull secrets for the Envoy Gateway control plane Deployment. |
-| global.images.envoyProxy.image | string | `"gsoci.azurecr.io/giantswarm/envoy:distroless-v1.39.0"` | Full image for the managed Envoy Proxy data plane. This updates the generated `envoyProxy` config and does not change the `envoy-gateway` control plane Deployment image. If not specified, the default image built into `envoy-gateway` is used. |
+| global.images.envoyProxy.image | string | `"gsoci.azurecr.io/giantswarm/envoy:distroless-v1.39.1"` | Full image for the managed Envoy Proxy data plane. This updates the generated `envoyProxy` config and does not change the `envoy-gateway` control plane Deployment image. If not specified, the default image built into `envoy-gateway` is used. |
 | global.images.envoyProxy.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the managed Envoy Proxy data plane. Default behavior: IfNotPresent. |
 | global.images.envoyProxy.pullSecrets | list | `[]` | Pull secrets for the managed Envoy Proxy data plane. |
-| global.images.ratelimit.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:17b1956c"` |  |
+| global.images.ratelimit.image | string | `"gsoci.azurecr.io/giantswarm/envoyproxy-ratelimit:8fe6ea42"` |  |
 | global.images.ratelimit.pullPolicy | string | `"IfNotPresent"` |  |
 | global.images.ratelimit.pullSecrets | list | `[]` |  |
 | hpa.behavior | object | `{}` |  |
