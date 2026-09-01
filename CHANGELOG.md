@@ -9,8 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Bump performance test dependencies: `ingress-nginx` to 4.3.5 and `kong-app` to 5.2.3.
-- Align the performance test suites' `RELEASE` with the newest published CAPA release (34.5.0).
+- Bump performance test dependencies: `ingress-nginx` to 4.3.5 and `kong-app` to 5.2.3 and remove `Release` setting from config.
+
+## [1.10.2] - 2026-08-31
+
+### Removed
+
+- Remove the `karpenter.sh/do-not-disrupt` annotation from the Envoy Gateway control-plane pods.
+
+## [1.10.1] - 2026-08-20
+
+### Fixed
+
+- Point the `eg.image` fallback at the `gsoci.azurecr.io` mirror. When both `global.images.envoyGateway.image` and `deployment.envoyGateway.image.repository` are empty, the chart resolved the Envoy Gateway control plane, certgen and `shutdownManager` images to `docker.io/envoyproxy/gateway:<chart version>` — a tag that never exists upstream, ignoring `global.imageRegistry`.
+- Honour `global.imageRegistry` and `global.imagePullSecrets` in the CRD installer Job, so the `envoy-gateway-crds` image can be pulled from a private mirror like every other image in the chart.
+
+## [1.10.0] - 2026-08-19
+
+### Changed
+
+- **Breaking:** Use upstream's `global.imageRegistry` value instead of `global.image.registry`, dropping the image registry patch now that upstream supports the override natively.
+- Update Envoy Gateway to [v1.9.0](https://gateway.envoyproxy.io/news/releases/notes/v1.9.0). Requires Gateway API v1.6 CRDs. Note that Lua `EnvoyExtensionPolicy` is now opt-in via `config.envoyGateway.extensionApis.enableLua`, and `EndpointSliceIndex` is enabled by default and can raise control plane memory usage.
+- Pin `gateway-api-crds` to 1.9.0 in the e2e and performance test suites.
 - Update `perf-report` claude skill:
   - the report is posted as a tar file in the PR's comments.
   - `perf-report` no longer needs a `cluster_id`.
@@ -32,6 +52,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     examples produced was denied under the CI allowlist even though
     `Bash(python3 *)` is allowed — the agent could not run a single script and
     the pipeline reported success with no report.
+
+### Added
+
+- Add control plane startup, liveness and readiness probes as configurable values.
 
 ## [1.9.0] - 2026-07-28
 
@@ -198,7 +222,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set requests and limits for certgen Job
 - Improve security for PSS compliance
 
-[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.2...HEAD
+[1.10.2]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.1...v1.10.2
+[1.10.1]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.0...v1.10.1
+[1.10.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.7.3...v1.8.0
 [1.7.3]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.7.2...v1.7.3

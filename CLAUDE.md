@@ -37,7 +37,7 @@ The core pattern is: **vendir + ordered patches**.
 - `vendor/` — contains the raw upstream chart after `vendir sync`
 - `sync/sync.sh` — orchestrates the full sync: runs vendir, applies patches, generates diffs
 - `sync/patches/` — Git patch files applied in this order:
-  1. `image-registry` — switches image registry to `gsoci.azurecr.io`
+  1. `image-registry` — points the `eg.image` fallback at the `gsoci.azurecr.io` mirror at `appVersion`
   2. `team-label` — adds `app.giantswarm.io/team: cabbage` labels
   3. `backend` — safe enable/disable of the Backend extension API
   4. `kyverno-policies` — restricts Backend API (blocks localhost, metadata service, admin port)

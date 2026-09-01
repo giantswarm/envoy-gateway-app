@@ -1,9 +1,9 @@
 diff --git a/helm/envoy-gateway/values.schema.json b/helm/envoy-gateway/values.schema.json
 new file mode 100644
-index 0000000..7af996e
+index 0000000..ab5a53e
 --- /dev/null
 +++ b/helm/envoy-gateway/values.schema.json
-@@ -0,0 +1,571 @@
+@@ -0,0 +1,697 @@
 +{
 +    "$schema": "http://json-schema.org/schema#",
 +    "type": "object",
@@ -42,6 +42,31 @@ index 0000000..7af996e
 +                                },
 +                                "labels": {
 +                                    "type": "object"
++                                },
++                                "securityContext": {
++                                    "type": "object",
++                                    "properties": {
++                                        "fsGroup": {
++                                            "type": "integer"
++                                        },
++                                        "runAsGroup": {
++                                            "type": "integer"
++                                        },
++                                        "runAsNonRoot": {
++                                            "type": "boolean"
++                                        },
++                                        "runAsUser": {
++                                            "type": "integer"
++                                        },
++                                        "seccompProfile": {
++                                            "type": "object",
++                                            "properties": {
++                                                "type": {
++                                                    "type": "string"
++                                                }
++                                            }
++                                        }
++                                    }
 +                                }
 +                            }
 +                        },
@@ -233,6 +258,56 @@ index 0000000..7af996e
 +                        "imagePullSecrets": {
 +                            "type": "array"
 +                        },
++                        "livenessProbe": {
++                            "type": "object",
++                            "properties": {
++                                "httpGet": {
++                                    "type": "object",
++                                    "properties": {
++                                        "path": {
++                                            "type": "string"
++                                        },
++                                        "port": {
++                                            "type": "integer"
++                                        }
++                                    }
++                                },
++                                "periodSeconds": {
++                                    "type": "integer"
++                                },
++                                "successThreshold": {
++                                    "type": "integer"
++                                },
++                                "timeoutSeconds": {
++                                    "type": "integer"
++                                }
++                            }
++                        },
++                        "readinessProbe": {
++                            "type": "object",
++                            "properties": {
++                                "httpGet": {
++                                    "type": "object",
++                                    "properties": {
++                                        "path": {
++                                            "type": "string"
++                                        },
++                                        "port": {
++                                            "type": "integer"
++                                        }
++                                    }
++                                },
++                                "periodSeconds": {
++                                    "type": "integer"
++                                },
++                                "successThreshold": {
++                                    "type": "integer"
++                                },
++                                "timeoutSeconds": {
++                                    "type": "integer"
++                                }
++                            }
++                        },
 +                        "resources": {
 +                            "type": "object",
 +                            "properties": {
@@ -298,6 +373,40 @@ index 0000000..7af996e
 +                                    }
 +                                }
 +                            }
++                        },
++                        "startupProbe": {
++                            "type": "object",
++                            "properties": {
++                                "failureThreshold": {
++                                    "type": "integer"
++                                },
++                                "httpGet": {
++                                    "type": "object",
++                                    "properties": {
++                                        "path": {
++                                            "type": "string"
++                                        },
++                                        "port": {
++                                            "type": "integer"
++                                        }
++                                    }
++                                },
++                                "periodSeconds": {
++                                    "type": "integer"
++                                },
++                                "successThreshold": {
++                                    "type": "integer"
++                                },
++                                "timeoutSeconds": {
++                                    "type": "integer"
++                                }
++                            }
++                        },
++                        "strategy": {
++                            "type": "object"
++                        },
++                        "wasmCacheVolume": {
++                            "type": "object"
 +                        }
 +                    }
 +                },
@@ -310,9 +419,6 @@ index 0000000..7af996e
 +                        "annotations": {
 +                            "type": "object",
 +                            "properties": {
-+                                "karpenter.sh/do-not-disrupt": {
-+                                    "type": "string"
-+                                },
 +                                "prometheus.io/port": {
 +                                    "type": "string"
 +                                },
@@ -332,6 +438,31 @@ index 0000000..7af996e
 +                        },
 +                        "nodeSelector": {
 +                            "type": "object"
++                        },
++                        "securityContext": {
++                            "type": "object",
++                            "properties": {
++                                "fsGroup": {
++                                    "type": "integer"
++                                },
++                                "runAsGroup": {
++                                    "type": "integer"
++                                },
++                                "runAsNonRoot": {
++                                    "type": "boolean"
++                                },
++                                "runAsUser": {
++                                    "type": "integer"
++                                },
++                                "seccompProfile": {
++                                    "type": "object",
++                                    "properties": {
++                                        "type": {
++                                            "type": "string"
++                                        }
++                                    }
++                                }
++                            }
 +                        },
 +                        "tolerations": {
 +                            "type": "array"
@@ -396,16 +527,11 @@ index 0000000..7af996e
 +        "global": {
 +            "type": "object",
 +            "properties": {
-+                "image": {
-+                    "type": "object",
-+                    "properties": {
-+                        "registry": {
-+                            "type": "string"
-+                        }
-+                    }
-+                },
 +                "imagePullSecrets": {
 +                    "type": "array"
++                },
++                "imageRegistry": {
++                    "type": "string"
 +                },
 +                "images": {
 +                    "type": "object",
