@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Bump performance test dependencies: `ingress-nginx` to 4.3.5 and `kong-app` to 5.2.3 and remove `Release` setting from config.
+
 ## [1.10.2] - 2026-08-31
 
 ### Removed
