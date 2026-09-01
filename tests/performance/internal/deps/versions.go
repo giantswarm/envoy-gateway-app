@@ -10,7 +10,7 @@ package deps
 // is intentionally not listed here.
 var Versions = map[string]string{
 	"aws-lb-controller-bundle": "5.2.0",
-	"ingress-nginx":            "4.3.3",
-	"kong-app":                 "5.2.2",
+	"ingress-nginx":            "4.3.5",
+	"kong-app":                 "5.2.3",
 	"microservices-demo-app":   "0.8.1",
 }
