@@ -10,7 +10,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/giantswarm/apptest-framework/v5/pkg/state"
@@ -78,14 +80,23 @@ httproute:
     create: true
     number: ${PUBLIC_ENDPOINTS}
 
+# Per-pod sizing for a PEAK_HTTP_RPS=5000 run. Every PUBLIC_ENDPOINTS hostname
+# fans into the single frontend Service in this namespace, so the whole budget
+# lands on one set of deployments and the only lever left (HPA maxReplicas is
+# pinned by HPA_MAX_REPLICAS) is vertical size. Requests are kept well below
+# limits on purpose: the HPA targets 80% of *requests*, so a modest request
+# makes it scale out early while the limit leaves burst headroom for the
+# fan-out spikes. Rough budget at 20 replicas: ~68 CPU of requests, which is
+# why cluster_values_test.go provisions m5.4xlarge nodes.
 adService:
+  # Java/JVM, one GetAds per product page. Needs heap headroom above requests.
   resources:
     requests:
-      cpu: 200m
-      memory: 180Mi
+      cpu: 500m
+      memory: 512Mi
     limits:
-      cpu: 300m
-      memory: 300Mi
+      cpu: 1500m
+      memory: 1536Mi
   hpa:
     enabled: true
     minReplicas: ${HPA_MIN_REPLICAS}
@@ -93,13 +104,14 @@ adService:
     targetCPUUtilizationPercentage: 80
 
 cartService:
+  # .NET, one GetCart on every single page render — same rate as the frontend.
   resources:
     requests:
-      cpu: 200m
-      memory: 128Mi
-    limits:
-      cpu: 300m
+      cpu: 400m
       memory: 256Mi
+    limits:
+      cpu: 1500m
+      memory: 1Gi
   hpa:
     enabled: true
     minReplicas: ${HPA_MIN_REPLICAS}
@@ -107,13 +119,15 @@ cartService:
     targetCPUUtilizationPercentage: 80
 
 checkoutService:
+  # Go, only on the checkout flow (~1/32 of requests) but fans out to payment,
+  # shipping, email, cart and productcatalog per order.
   resources:
     requests:
-      cpu: 100m
-      memory: 64Mi
-    limits:
       cpu: 200m
       memory: 128Mi
+    limits:
+      cpu: 1
+      memory: 512Mi
   hpa:
     enabled: true
     minReplicas: ${HPA_MIN_REPLICAS}
@@ -121,13 +135,17 @@ checkoutService:
     targetCPUUtilizationPercentage: 80
 
 currencyService:
+  # Node.js and the worst amplifier in the stack: the frontend calls Convert
+  # once per product per render, so ~10x the HTTP rate (~35-45k gRPC calls/s at
+  # peak). JS is single-threaded, so extra CPU beyond ~1 core only buys libuv
+  # and gRPC thread headroom — this service is the first thing to watch.
   resources:
     requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 200m
+      cpu: 500m
       memory: 256Mi
+    limits:
+      cpu: 1500m
+      memory: 1Gi
   hpa:
     enabled: true
     minReplicas: ${HPA_MIN_REPLICAS}
@@ -135,13 +153,14 @@ currencyService:
     targetCPUUtilizationPercentage: 80
 
 emailService:
+  # Python, checkout flow only.
   resources:
     requests:
-      cpu: 100m
-      memory: 64Mi
-    limits:
       cpu: 200m
-      memory: 128Mi
+      memory: 256Mi
+    limits:
+      cpu: 1
+      memory: 512Mi
   hpa:
     enabled: true
     minReplicas: ${HPA_MIN_REPLICAS}
@@ -149,13 +168,14 @@ emailService:
     targetCPUUtilizationPercentage: 80
 
 frontend:
+  # Go, terminates every request from both proxies and renders the templates.
   resources:
     requests:
-      cpu: 100m
-      memory: 64Mi
+      cpu: 500m
+      memory: 256Mi
     limits:
-      cpu: 200m
-      memory: 128Mi
+      cpu: 2
+      memory: 1Gi
   hpa:
     enabled: true
     minReplicas: ${HPA_MIN_REPLICAS}
@@ -163,6 +183,8 @@ frontend:
     targetCPUUtilizationPercentage: 80
 
 loadGenerator:
+  # create defaults to false — k6 is the only load source. Sized only so an
+  # accidental enable doesn't land a BestEffort pod on a saturated node.
   resources:
     requests:
       cpu: 300m
@@ -172,13 +194,14 @@ loadGenerator:
       memory: 512Mi
 
 paymentService:
+  # Node.js, checkout flow only.
   resources:
     requests:
-      cpu: 100m
+      cpu: 200m
       memory: 128Mi
     limits:
-      cpu: 200m
-      memory: 256Mi
+      cpu: 1
+      memory: 512Mi
   hpa:
     enabled: true
     minReplicas: ${HPA_MIN_REPLICAS}
@@ -186,13 +209,14 @@ paymentService:
     targetCPUUtilizationPercentage: 80
 
 productCatalogService:
+  # Go, one ListProducts or GetProduct on every render.
   resources:
     requests:
-      cpu: 100m
-      memory: 64Mi
+      cpu: 300m
+      memory: 256Mi
     limits:
-      cpu: 200m
-      memory: 128Mi
+      cpu: 1
+      memory: 1Gi
   hpa:
     enabled: true
     minReplicas: ${HPA_MIN_REPLICAS}
@@ -200,13 +224,15 @@ productCatalogService:
     targetCPUUtilizationPercentage: 80
 
 recommendationService:
+  # Python, on product pages only (~60% of requests) but the slowest runtime
+  # per call in the stack, and it re-reads the catalog on each request.
   resources:
     requests:
-      cpu: 100m
-      memory: 220Mi
+      cpu: 400m
+      memory: 512Mi
     limits:
-      cpu: 200m
-      memory: 450Mi
+      cpu: 1500m
+      memory: 1Gi
   hpa:
     enabled: true
     minReplicas: ${HPA_MIN_REPLICAS}
@@ -214,13 +240,14 @@ recommendationService:
     targetCPUUtilizationPercentage: 80
 
 shippingService:
+  # Go, cart and checkout flows.
   resources:
     requests:
-      cpu: 100m
-      memory: 64Mi
-    limits:
       cpu: 200m
       memory: 128Mi
+    limits:
+      cpu: 1
+      memory: 512Mi
   hpa:
     enabled: true
     minReplicas: ${HPA_MIN_REPLICAS}
@@ -404,6 +431,32 @@ func TestPerformance(t *testing.T) {
 				waitForDependency(microservicesDemoApp)
 			})
 
+			It("should raise redis-cart resources for the load test", func() {
+				// The microservices-demo-app chart hard-codes redis-cart at
+				// 125m CPU / 256Mi with no values override and no HPA (see
+				// templates/cart-service/cartservice.yaml). Every page render
+				// does a GetCart, so at PEAK_HTTP_RPS a 125m limit throttles
+				// the whole boutique and the Envoy-vs-proxy delta disappears
+				// behind cart latency. Patch it in place instead of forking
+				// the chart.
+				//
+				// Vertical only: redis is single-threaded, so it cannot use
+				// more than ~1 core, and extra replicas would shard carts
+				// across pods with per-pod emptyDir storage — a checkout would
+				// then find an empty cart and fail the "order is complete"
+				// check.
+				patchDeploymentResources("loadtesting", "redis-cart", "redis",
+					corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("1"),
+						corev1.ResourceMemory: resource.MustParse("1Gi"),
+					},
+					corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("2"),
+						corev1.ResourceMemory: resource.MustParse("2Gi"),
+					},
+				)
+			})
+
 			It("should have ready LoadBalancer services on the workload cluster", func() {
 				namespaces := []string{"envoy-gateway-system"}
 				switch proxyController {
@@ -505,7 +558,10 @@ func TestPerformance(t *testing.T) {
 					}
 					return stage, nil
 				}).
-					WithTimeout(120 * time.Minute).
+					// SCENARIO_DURATION_SECONDS runs once per controller with
+					// WAIT_BETWEEN_SCENARIOS in between: at 1h each that is
+					// ~2h05 of wall clock, so the gate needs room beyond it.
+					WithTimeout(180 * time.Minute).
 					WithPolling(30 * time.Second).
 					Should(BeElementOf("finished", "error", testRunGone))
 

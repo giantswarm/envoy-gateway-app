@@ -12,5 +12,6 @@ global:
       useDnsChallenges: true
   nodePools:
     def00:
-      minSize: 5
-      maxSize: 5
+      instanceType: m5.4xlarge
+      minSize: 10
+      maxSize: 15

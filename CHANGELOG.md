@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Bump performance test dependencies: `ingress-nginx` to 4.3.5 and `kong-app` to 5.2.3 and remove `Release` setting from config.
+- Scale the `basic` performance test suite up to a 5000 HTTP req/s peak held for 45 minutes per proxy (10 ramp steps of 500 req/s over 15 minutes, 1 hour per controller). Adds k6 runner/initializer/starter resource requests and limits plus a configurable `K6_PARALLELISM` to the `TestRun`, resizes the microservices-demo-app pods and pre-warms their HPAs, raises the workload cluster node pool to 10-15 `m5.4xlarge`, and patches the chart's hard-coded `redis-cart` resources so the cart store isn't the bottleneck.
 
 ## [1.10.2] - 2026-08-31
 

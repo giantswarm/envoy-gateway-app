@@ -15,6 +15,16 @@ const clusterValuesFile = "test_data/cluster_values.yaml"
 // baseClusterValues is the default (nginx) workload-cluster configuration. It
 // must stay byte-identical to the checked-in test_data/cluster_values.yaml so a
 // default run rewrites it to the same content (no-op, no git churn).
+//
+// The node pool is sized for the PEAK_HTTP_RPS=5000 run in config.env, not for
+// a smoke test. All PUBLIC_ENDPOINTS hostnames fan into one frontend
+// deployment, and letting every HPA'd boutique service reach HPA_MAX_REPLICAS
+// costs roughly 68 CPU of requests on top of the proxies, cert-manager and the
+// aws-load-balancer-controller. 10 x m5.4xlarge gives ~160 vCPU / 640 GiB with
+// autoscaling room to 15 nodes, so pods never sit Pending and block a HPA
+// scale-up mid-ramp. Note that MIN_NODES / MAX_NODES / INSTANCE_TYPE in
+// config.env do NOT feed this — they belong to the manual load-testing
+// pipeline — so resize both together.
 const baseClusterValues = `global:
   apps:
     certManager:
@@ -29,8 +39,9 @@ const baseClusterValues = `global:
       useDnsChallenges: true
   nodePools:
     def00:
-      minSize: 5
-      maxSize: 5
+      instanceType: m5.4xlarge
+      minSize: 10
+      maxSize: 15
 `
 
 // kongClusterValues additionally points the cluster's wildcard DNS CNAME at the
@@ -51,8 +62,9 @@ const kongClusterValues = `global:
       useDnsChallenges: true
   nodePools:
     def00:
-      minSize: 5
-      maxSize: 5
+      instanceType: m5.4xlarge
+      minSize: 10
+      maxSize: 15
 `
 
 // init materializes test_data/cluster_values.yaml before the apptest framework
