@@ -9,6 +9,17 @@ apps:
         values: |
           gateways:
             default:
+              # The chart defaults tlsIssuer.enabled to true, which renders an
+              # ACME Issuer whose only solver is http01.gatewayHTTPRoute — and
+              # that solver needs cert-manager's ExperimentalGatewayAPISupport
+              # (enableGatewayAPI), which we deliberately do NOT enable because
+              # it crashloops the controller until the Gateway API CRDs exist.
+              # Nothing references this Issuer: the gateway's HTTPS Certificate
+              # below is issued by the cluster's letsencrypt-giantswarm
+              # ClusterIssuer over DNS-01. Disabling it leaves the Certificate
+              # byte-identical and removes the last dependency on the flag.
+              tlsIssuer:
+                enabled: false
               backendTrafficPolicy:
                 circuitBreaker:
                   maxConnections: 8192

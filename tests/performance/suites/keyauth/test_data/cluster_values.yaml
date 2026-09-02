@@ -1,12 +1,10 @@
+# NOTE: do NOT add global.apps.certManager.values...enableGatewayAPI here.
+# cert-manager's controller exits 1 when ExperimentalGatewayAPISupport is on
+# but the Gateway API CRDs are absent — they only arrive with
+# gateway-api-bundle, installed after BeforeSuite's HelmRelease gate. That
+# deadlock killed the perf runs on 2026-09-01 and 2026-09-02. All
+# Certificates here are explicit cert-manager.io/v1 resources using DNS-01.
 global:
-  apps:
-    certManager:
-      values:
-        cert-manager:
-          config:
-            apiVersion: controller.config.cert-manager.io/v1alpha1
-            enableGatewayAPI: true
-            kind: ControllerConfiguration
   connectivity:
     dns:
       wildcardCnameTarget: gateway

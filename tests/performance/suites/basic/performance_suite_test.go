@@ -126,7 +126,7 @@ checkoutService:
       cpu: 200m
       memory: 128Mi
     limits:
-      cpu: 1
+      cpu: 1000m
       memory: 512Mi
   hpa:
     enabled: true
@@ -159,7 +159,7 @@ emailService:
       cpu: 200m
       memory: 256Mi
     limits:
-      cpu: 1
+      cpu: 1000m
       memory: 512Mi
   hpa:
     enabled: true
@@ -174,7 +174,7 @@ frontend:
       cpu: 500m
       memory: 256Mi
     limits:
-      cpu: 2
+      cpu: 2000m
       memory: 1Gi
   hpa:
     enabled: true
@@ -200,7 +200,7 @@ paymentService:
       cpu: 200m
       memory: 128Mi
     limits:
-      cpu: 1
+      cpu: 1000m
       memory: 512Mi
   hpa:
     enabled: true
@@ -215,7 +215,7 @@ productCatalogService:
       cpu: 300m
       memory: 256Mi
     limits:
-      cpu: 1
+      cpu: 1000m
       memory: 1Gi
   hpa:
     enabled: true
@@ -246,7 +246,7 @@ shippingService:
       cpu: 200m
       memory: 128Mi
     limits:
-      cpu: 1
+      cpu: 1000m
       memory: 512Mi
   hpa:
     enabled: true

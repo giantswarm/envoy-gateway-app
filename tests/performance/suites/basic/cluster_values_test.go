@@ -12,6 +12,17 @@ import (
 // selected proxy controller.
 const clusterValuesFile = "test_data/cluster_values.yaml"
 
+// NOTE: do NOT add global.apps.certManager.values...config.enableGatewayAPI
+// here. It turns on cert-manager's ExperimentalGatewayAPISupport, and the
+// controller then exits 1 with "the Gateway API CRDs do not seem to be present,
+// but ExperimentalGatewayAPISupport is set to true" — those CRDs only arrive
+// with gateway-api-bundle, which this suite installs *after* BeforeSuite's
+// HelmRelease gate. The resulting deadlock (crashlooping cert-manager ->
+// aws-pod-identity-webhook's Certificate never issued -> its TLS secret never
+// created -> its HelmRelease never Ready) blew the 900s gate and killed the
+// runs on 2026-09-01 and 2026-09-02. Every Certificate in this suite is an
+// explicit cert-manager.io/v1 resource solved via DNS-01, so cert-manager
+// needs no Gateway API support at all.
 // baseClusterValues is the default (nginx) workload-cluster configuration. It
 // must stay byte-identical to the checked-in test_data/cluster_values.yaml so a
 // default run rewrites it to the same content (no-op, no git churn).
@@ -26,14 +37,6 @@ const clusterValuesFile = "test_data/cluster_values.yaml"
 // config.env do NOT feed this — they belong to the manual load-testing
 // pipeline — so resize both together.
 const baseClusterValues = `global:
-  apps:
-    certManager:
-      values:
-        cert-manager:
-          config:
-            apiVersion: controller.config.cert-manager.io/v1alpha1
-            enableGatewayAPI: true
-            kind: ControllerConfiguration
   connectivity:
     certManager:
       useDnsChallenges: true
@@ -48,13 +51,6 @@ const baseClusterValues = `global:
 // gateway. Kong serves the boutique purely via Gateway API; without this the
 // DNS-01 ACME challenge for the kong wildcard certificate self-loops and fails.
 const kongClusterValues = `global:
-  apps:
-    certManager:
-      values:
-        config:
-          apiVersion: controller.config.cert-manager.io/v1alpha1
-          enableGatewayAPI: true
-          kind: ControllerConfiguration
   connectivity:
     dns:
       wildcardCnameTarget: gateway
