@@ -1,7 +1,15 @@
 apps:
   gatewayApiCrds:
-    # Envoy Gateway 1.9 requires Gateway API v1.6 CRDs.
-    version: 1.9.0
+    # Envoy Gateway 1.9 requires Gateway API v1.6 CRDs; 1.9.1 ships
+    # gateway-api v1.6.1. Do NOT pin back to 1.9.0: that version renders
+    # ~1.19MB of CRD manifests straight into templates/, so app-operator
+    # cannot store the Helm release and the install dies with
+    #   Secret "sh.helm.release.v1.gateway-api-crds.v1" is invalid:
+    #   data: Too long: may not be more than 1048576 bytes
+    # 1.9.1 applies the CRDs via a gateway-api-crds-installer Job instead, so
+    # the release holds only ~9.5KB. envoy-gateway dependsOn gateway-api-crds,
+    # so a failure here blocks the whole bundle.
+    version: 1.9.1
   gatewayApiConfig:
     enabled: true
     userConfig:
