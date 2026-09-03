@@ -9,8 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Bump performance test dependencies: `ingress-nginx` to 4.3.5 and `kong-app` to 5.2.3 and remove `Release` setting from config.
 - Fix all performance tests suites.
+
+## [1.10.3] - 2026-09-01
+
+### Changed
+
+- Bump performance test dependencies: `ingress-nginx` to 4.3.5 and `kong-app` to 5.2.3 and remove `Release` setting from config.
+- Update Envoy Gateway to [v1.9.1](https://gateway.envoyproxy.io/news/releases/notes/v1.9.1).
 
 ## [1.10.2] - 2026-08-31
 
@@ -223,7 +229,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set requests and limits for certgen Job
 - Improve security for PSS compliance
 
-[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.2...HEAD
+[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.3...HEAD
+[1.10.3]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.2...v1.10.3
 [1.10.2]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.1...v1.10.2
 [1.10.1]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.9.0...v1.10.0
