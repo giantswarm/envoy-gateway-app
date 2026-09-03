@@ -7,12 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Fix all performance tests suites.
+
 ## [1.10.3] - 2026-09-01
 
 ### Changed
 
 - Bump performance test dependencies: `ingress-nginx` to 4.3.5 and `kong-app` to 5.2.3 and remove `Release` setting from config.
-- Update Envoy Gateway to [v1.9.1](https://gateway.envoyproxy.io/news/releases/notes/v1.9.1). 
+- Update Envoy Gateway to [v1.9.1](https://gateway.envoyproxy.io/news/releases/notes/v1.9.1).
 
 ## [1.10.2] - 2026-08-31
 
