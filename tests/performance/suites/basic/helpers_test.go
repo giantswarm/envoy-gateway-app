@@ -140,6 +140,78 @@ func endpointMatchesNoProxy(endpoint, noProxy string) bool {
 	return false
 }
 
+// patchDeploymentResources overwrites the resource requests/limits of a single
+// container in an already-deployed Deployment on the workload cluster, then
+// waits for the resulting rollout to finish. Used for chart values that a
+// dependency app doesn't expose (see the redis-cart step), so the load-test
+// sizing can stay in this repo instead of forking the upstream chart.
+//
+// Helm won't undo this on its own — app-operator only re-renders on an App CR
+// change — but a chart upgrade or a HelmRelease drift correction would, so this
+// runs after the app is deployed and before traffic starts.
+func patchDeploymentResources(namespace, name, container string, requests, limits corev1.ResourceList) {
+	wcClient, err := state.GetFramework().WC(state.GetCluster().Name)
+	Expect(err).NotTo(HaveOccurred())
+
+	By(fmt.Sprintf("patching resources of %s/%s container %q", namespace, name, container))
+	Eventually(func() error {
+		dep := &appsv1.Deployment{}
+		if err := wcClient.Get(state.GetContext(), client.ObjectKey{Namespace: namespace, Name: name}, dep); err != nil {
+			return err
+		}
+
+		idx := -1
+		for i := range dep.Spec.Template.Spec.Containers {
+			if dep.Spec.Template.Spec.Containers[i].Name == container {
+				idx = i
+				break
+			}
+		}
+		if idx < 0 {
+			return fmt.Errorf("container %q not found in deployment %s/%s", container, namespace, name)
+		}
+
+		dep.Spec.Template.Spec.Containers[idx].Resources = corev1.ResourceRequirements{
+			Requests: requests,
+			Limits:   limits,
+		}
+
+		// Conflicts are expected here — the deployment controller writes
+		// status concurrently — so re-read and retry rather than failing.
+		return wcClient.Update(state.GetContext(), dep)
+	}).
+		WithTimeout(5 * time.Minute).
+		WithPolling(10 * time.Second).
+		Should(Succeed())
+
+	By(fmt.Sprintf("waiting for %s/%s to roll out", namespace, name))
+	Eventually(func() (bool, error) {
+		dep := &appsv1.Deployment{}
+		if err := wcClient.Get(state.GetContext(), client.ObjectKey{Namespace: namespace, Name: name}, dep); err != nil {
+			return false, err
+		}
+		if dep.Status.ObservedGeneration < dep.Generation {
+			logger.Log("Deployment %s/%s rollout not observed yet", namespace, name)
+			return false, nil
+		}
+		desired := int32(1)
+		if dep.Spec.Replicas != nil {
+			desired = *dep.Spec.Replicas
+		}
+		ready := dep.Status.UpdatedReplicas == desired &&
+			dep.Status.ReadyReplicas == desired &&
+			dep.Status.UnavailableReplicas == 0
+		if !ready {
+			logger.Log("Deployment %s/%s rolling out: %d/%d updated, %d/%d ready",
+				namespace, name, dep.Status.UpdatedReplicas, desired, dep.Status.ReadyReplicas, desired)
+		}
+		return ready, nil
+	}).
+		WithTimeout(10 * time.Minute).
+		WithPolling(5 * time.Second).
+		Should(BeTrue())
+}
+
 func deploymentReadyInNamespace(namespace string) (bool, error) {
 	wcClient, err := state.GetFramework().WC(state.GetCluster().Name)
 	if err != nil {

@@ -16,14 +16,6 @@ const clusterValuesFile = "test_data/cluster_values.yaml"
 // must stay byte-identical to the checked-in test_data/cluster_values.yaml so a
 // default run rewrites it to the same content (no-op, no git churn).
 const baseClusterValues = `global:
-  apps:
-    certManager:
-      values:
-        cert-manager:
-          config:
-            apiVersion: controller.config.cert-manager.io/v1alpha1
-            enableGatewayAPI: true
-            kind: ControllerConfiguration
   connectivity:
     certManager:
       useDnsChallenges: true
@@ -37,13 +29,6 @@ const baseClusterValues = `global:
 // gateway. Kong serves the boutique purely via Gateway API; without this the
 // DNS-01 ACME challenge for the kong wildcard certificate self-loops and fails.
 const kongClusterValues = `global:
-  apps:
-    certManager:
-      values:
-        config:
-          apiVersion: controller.config.cert-manager.io/v1alpha1
-          enableGatewayAPI: true
-          kind: ControllerConfiguration
   connectivity:
     dns:
       wildcardCnameTarget: gateway

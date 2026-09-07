@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"time"
 
 	. "github.com/onsi/gomega"
@@ -140,6 +141,58 @@ func containerSecurityContext() map[string]any {
 	}
 }
 
+// k6Parallelism is the number of runner pods k6-operator splits the test
+// across. k6's execution segments divide the scenario's rate and its
+// preAllocatedVUs/maxVUs by this number, so PRE_ALLOCATED_VUS / MAX_VUS in
+// config.env stay cluster-wide totals regardless of the value here.
+func k6Parallelism() int64 {
+	raw := envOrDefault("K6_PARALLELISM", "4")
+	n, err := strconv.ParseInt(raw, 10, 32)
+	Expect(err).NotTo(HaveOccurred(), "K6_PARALLELISM must be an integer, got %q", raw)
+	Expect(n).To(BeNumerically(">", 0), "K6_PARALLELISM must be greater than zero, got %d", n)
+	return n
+}
+
+func resourceRequirements(cpuRequest, memRequest, cpuLimit, memLimit string) map[string]any {
+	return map[string]any{
+		"requests": map[string]any{
+			"cpu":    cpuRequest,
+			"memory": memRequest,
+		},
+		"limits": map[string]any{
+			"cpu":    cpuLimit,
+			"memory": memLimit,
+		},
+	}
+}
+
+// runnerResources sizes the k6 runner pods. Without an explicit request the
+// pods land in the BestEffort QoS class, which makes them the first candidates
+// for CPU throttling and eviction — and a throttled load generator inflates
+// the very latency the test is measuring. CPU limit is deliberately well above
+// the request so a runner can burst through a latency spike instead of
+// queueing iterations locally and reporting it as server-side latency.
+func runnerResources() map[string]any {
+	return resourceRequirements(
+		envOrDefault("K6_RUNNER_CPU_REQUEST", "2"),
+		envOrDefault("K6_RUNNER_MEMORY_REQUEST", "4Gi"),
+		envOrDefault("K6_RUNNER_CPU_LIMIT", "4"),
+		envOrDefault("K6_RUNNER_MEMORY_LIMIT", "8Gi"),
+	)
+}
+
+// helperResources sizes the initializer and starter pods. The initializer only
+// evaluates the script's init context to discover the scenarios and the starter
+// only POSTs /v1/status to each runner, so both stay small.
+func helperResources() map[string]any {
+	return resourceRequirements(
+		envOrDefault("K6_HELPER_CPU_REQUEST", "200m"),
+		envOrDefault("K6_HELPER_MEMORY_REQUEST", "256Mi"),
+		envOrDefault("K6_HELPER_CPU_LIMIT", "1"),
+		envOrDefault("K6_HELPER_MEMORY_LIMIT", "512Mi"),
+	)
+}
+
 func buildTestRunUnstructured(name, namespace, configMapName, baseDomain, testID string) *unstructured.Unstructured {
 	image := envOrDefault("K6_IMAGE", "gsoci.azurecr.io/giantswarm/k6:1.6.0")
 
@@ -164,12 +217,13 @@ func buildTestRunUnstructured(name, namespace, configMapName, baseDomain, testID
 	runner := map[string]any{
 		"image":                    image,
 		"env":                      env,
+		"resources":                runnerResources(),
 		"containerSecurityContext": containerSecurityContext(),
 		"securityContext":          securityContext(),
 	}
 
 	spec := map[string]any{
-		"parallelism": int64(4),
+		"parallelism": k6Parallelism(),
 		"quiet":       "false",
 		"separate":    false,
 		"script": map[string]any{
@@ -180,10 +234,12 @@ func buildTestRunUnstructured(name, namespace, configMapName, baseDomain, testID
 		},
 		"initializer": map[string]any{
 			"image":                    image,
+			"resources":                helperResources(),
 			"containerSecurityContext": containerSecurityContext(),
 			"securityContext":          securityContext(),
 		},
 		"starter": map[string]any{
+			"resources":                helperResources(),
 			"containerSecurityContext": containerSecurityContext(),
 			"securityContext":          securityContext(),
 		},
