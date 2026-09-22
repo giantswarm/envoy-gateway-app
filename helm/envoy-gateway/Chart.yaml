@@ -17,4 +17,3 @@ sources:
   - https://github.com/envoyproxy/gateway
 type: application
 version: 1.10.3
-
