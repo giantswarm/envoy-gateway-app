@@ -26,6 +26,7 @@ find vendor/ -type f -exec sed -i 's/[[:space:]]*$//' {} \;
 ./sync/patches/pod-disruption-budget/patch.sh
 ./sync/patches/crds/patch.sh
 ./sync/patches/chart_yaml/patch.sh
+./sync/patches/chart-label/patch.sh
 
 HELM_DOCS="docker run --rm -u $(id -u) -v ${PWD}:/helm-docs -w /helm-docs jnorwood/helm-docs:v1.11.0"
 $HELM_DOCS --template-files=sync/readme.gotmpl -g helm/envoy-gateway -f values.yaml -o README.md
