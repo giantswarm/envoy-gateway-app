@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Fix all performance tests suites.
+- Fix stale and contradictory instructions in `CLAUDE.md` and the `perf-report` claude skill.
 
 ## [1.10.3] - 2026-09-01
 
