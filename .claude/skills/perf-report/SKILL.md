@@ -21,14 +21,15 @@ The scripts live next to this file. In this repo that is
 plugin's copy. The commands below use the in-repo path — substitute the plugin
 path if that is where the skill is installed.
 
-> **Never put a shell variable assignment in a Bash command.** Write
-> `python3 .claude/skills/perf-report/fetch_metrics.py …`, not
-> `DIR=... && python3 "$DIR/fetch_metrics.py" …`. When this skill runs in CI it
-> is under an allowlist (`--permission-mode dontAsk`), and a permission rule
-> **cannot match past a variable assignment** — the whole call gets denied even
-> though `python3 …` on its own is allowed. This silently cost a full pipeline
-> run. Spell every path out literally. (Referencing an already-exported variable
-> mid-command is fine; it is the leading `VAR=…` that breaks matching.)
+> **In pipeline mode, never start a Bash command with a shell variable
+> assignment.** Write `python3 .claude/skills/perf-report/fetch_metrics.py …`,
+> not `DIR=... && python3 "$DIR/fetch_metrics.py" …`. The pipeline runs under an
+> allowlist (`--permission-mode dontAsk`), and a permission rule cannot match
+> past a variable assignment, so the whole call is denied even though
+> `python3 …` on its own is allowed. Spell every path out literally.
+> (Referencing an already-exported variable mid-command is fine; it is the
+> leading `VAR=…` that breaks matching.) Local runs, including the publish
+> commands in step 6, are not affected.
 
 ## Pick the execution mode first
 
@@ -167,8 +168,7 @@ Work in a scratch dir.
    > directory instead and stop; the task prepends it to the comment. Do not run
    > `gh` at all (the CI allowlist denies it), and do not construct a download URL
    > yourself — a URL written before a verified upload produces a comment with a
-   > dead link, which is exactly what happened before this was moved out of the
-   > agent's hands.
+   > dead link.
 
    ```bash
    REPO=giantswarm/envoy-gateway-app
@@ -218,8 +218,9 @@ verdict. After generating them, read `results.json` and add 2–4 sentences of
 interpretation — where Envoy's latency advantage is largest, whether the
 CPU/memory trade-off is expected (Envoy typically uses more memory), and any SLO
 breaches (p95<500ms / p99<1000ms / error<0.1% — baked into the k6 scenario).
-Cite only values present in `results.json`; never invent numbers. In unattended
-in-cluster runs keep this brief and prepend it to the PR comment.
+Cite only values present in `results.json`; never invent numbers. In pipeline
+mode write it to `narrative.md` in the output directory (step 6); the task
+prepends it to the PR comment.
 
 ## Notes / limits
 

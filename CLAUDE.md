@@ -44,8 +44,9 @@ The core pattern is: **vendir + ordered patches**.
   5. `values` — Giant Swarm defaults and `values.schema.json`
   6. `network-policies` — Cilium/Calico network policies
   7. `monitoring` — PodMonitor for metrics
-  8. `crds` — removes CRDs (installed separately via `gateway-api-bundle`)
-  9. `chart_yaml` — updates `appVersion` from vendir lock
+  8. `pod-disruption-budget` — adds a PodDisruptionBudget for the controller
+  9. `crds` — removes CRDs (installed separately via `gateway-api-bundle`)
+  10. `chart_yaml` — updates `appVersion` from vendir lock
 
 The actual chart lives in `helm/envoy-gateway/`. Never edit files there directly that are managed by patches — edit the patch source in `sync/patches/` and re-run `sync.sh`.
 
