@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.4] - 2026-09-29
+
 ### Added
 
 - Chart metadata: add `io.giantswarm.application.managed` annotation (`"true"`).
@@ -235,7 +237,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set requests and limits for certgen Job
 - Improve security for PSS compliance
 
-[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.3...HEAD
+[Unreleased]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.4...HEAD
+[1.10.4]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.3...v1.10.4
 [1.10.3]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.2...v1.10.3
 [1.10.2]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.1...v1.10.2
 [1.10.1]: https://github.com/giantswarm/envoy-gateway-app/compare/v1.10.0...v1.10.1
