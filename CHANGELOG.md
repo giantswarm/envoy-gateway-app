@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix all performance tests suites.
 - Fix stale and contradictory instructions in `CLAUDE.md` and the `perf-report` claude skill.
+- Update Envoy Gateway to [v1.9.2](https://gateway.envoyproxy.io/news/releases/notes/v1.9.2).
 
 ## [1.10.3] - 2026-09-01
 
