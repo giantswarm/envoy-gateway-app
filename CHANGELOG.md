@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update gsoci.azurecr.io/giantswarm/docker-kubectl to v1.37.1 (giantswarm/envoy-gateway-app#259)
+
 ## [1.10.4] - 2026-09-29
 
 ### Added
