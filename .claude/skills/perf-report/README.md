@@ -25,7 +25,7 @@ an explicit `--mimir-url`.
 | Mode | When | Mimir URL | Reach |
 | --- | --- | --- | --- |
 | `local` | a human runs `/perf-report` in Claude Code | `http://localhost:8080` | `kubectl -n mimir port-forward svc/mimir-gateway 8080:80` |
-| `in-cluster` | Tekton pipeline pod on the MC | `http://mimir-gateway.mimir.svc/` | direct, no port-forward |
+| `in-cluster` | a pod on the MC that holds the metrics | `http://mimir-gateway.mimir.svc/` | direct, no port-forward |
 
 Both modes may need the Mimir gateway's **basic-auth credentials** — the same
 `kube-system/alloy-metrics` creds the perf suite mirrors for remote-write. Pass
@@ -52,11 +52,15 @@ tar -czf report.tar.gz report.html                                 # what the PR
 
 Or just run `/perf-report` in Claude Code and answer the prompts.
 
-### In-cluster (Phase 2 — Tekton)
+### Pipeline (Tekton)
+
+The pipeline pod runs on the CI installation, not the test MC, so it does not
+use `in-cluster` mode: the task opens a port-forward and passes the URL
+explicitly (see "Phase 2" below).
 
 ```bash
-python3 fetch_metrics.py --mode in-cluster --output results.json
-# ... render + gh pr comment, as above
+python3 fetch_metrics.py --mimir-url http://localhost:8080 --output results.json
+# ... render; the task publishes and comments, the agent writes narrative.md
 ```
 
 ### Inputs
@@ -166,7 +170,7 @@ name is loaded automatically for everyone working in this repo, and these rules
 should apply only to the unattended pipeline run. Add a rule there whenever the
 skill starts using a new command.
 
-Two things about that allowlist are easy to get wrong:
+Three things about that allowlist are easy to get wrong:
 
 - **No shell variable assignments.** A permission rule cannot match past a
   variable assignment, so `DIR=... && python3 ...` is denied even though
