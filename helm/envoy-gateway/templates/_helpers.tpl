@@ -140,7 +140,7 @@ The name of the Envoy Ratelimit image.
 {{-   $repositoryTag := $imageParts._1 -}}
 {{-   $repositoryParts := splitn ":" 2 $repositoryTag -}}
 {{-   $repositoryName := $repositoryParts._0 -}}
-{{-   $imageTag := default "0482748e" $repositoryParts._1 -}}
+{{-   $imageTag := default "5ae0682e" $repositoryParts._1 -}}
 {{-   printf "%s/%s:%s" $registryName $repositoryName $imageTag -}}
 {{- end -}}
 
@@ -169,7 +169,7 @@ Resolve the Envoy Proxy image.
 {{-   $repositoryTag := $imageParts._1 -}}
 {{-   $repositoryParts := splitn ":" 2 $repositoryTag -}}
 {{-   $repositoryName := $repositoryParts._0 -}}
-{{-   $imageTag := default "distroless-v1.39.1" $repositoryParts._1 -}}
+{{-   $imageTag := default "distroless-v1.39.5" $repositoryParts._1 -}}
 {{-   printf "%s/%s:%s" $registryName $repositoryName $imageTag -}}
 {{- end -}}
 

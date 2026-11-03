@@ -9,10 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Update Envoy Gateway to [v1.9.3](https://gateway.envoyproxy.io/news/releases/notes/v1.9.3).
+- Update Envoy Proxy image to `distroless-v1.39.6`, which includes CVE fixes and ca-certificates without the compromised eMudhra intermediate CAs.
 - Update architect to v10.16.4, which pushes the chart to the git catalogs with the architect GitHub App instead of the `catalogbot` account.
 
 ### Fixed
 
+- Fix the basic e2e suite for `gateway-api-bundle` v2, which deploys `envoy-gateway` as a Flux `HelmRelease` instead of an `App` CR.
 - The `helm.sh/chart` label is valid for long chart versions: the 63-character cut trims the whole trailing run of `-`, `.` and `_`.
 
 ## [1.10.4] - 2026-09-29
