@@ -6,11 +6,10 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"k8s.io/apimachinery/pkg/api/errors"
 
+	"github.com/giantswarm/apptest-framework/v5/pkg/client"
 	"github.com/giantswarm/apptest-framework/v5/pkg/state"
 	"github.com/giantswarm/apptest-framework/v5/pkg/suite"
-	"github.com/giantswarm/clustertest/v5/pkg/logger"
 	"github.com/giantswarm/clustertest/v5/pkg/wait"
 )
 
@@ -38,18 +37,10 @@ func TestBasic(t *testing.T) {
 					Should(BeTrue())
 			})
 
+			// gateway-api-bundle v2 renders its children as Flux HelmReleases instead of App CRs.
 			It("should have deployed the test app", func() {
 				Eventually(func() (bool, error) {
-					done, err := wait.IsAppDeployed(state.GetContext(), state.GetFramework().MC(), state.GetApplication().InstallName, state.GetApplication().Organization.GetNamespace())()
-					if err != nil {
-						if errors.IsNotFound(err) {
-							logger.Log("App '%s/%s' doesn't exist yet", state.GetApplication().Organization.GetNamespace(), state.GetApplication().InstallName)
-							return false, nil
-						}
-						return false, err
-					}
-
-					return done, nil
+					return client.IsHelmReleaseReady(state.GetContext(), state.GetApplication().InstallName, state.GetApplication().Organization.GetNamespace())
 				}).
 					WithTimeout(15 * time.Minute).
 					WithPolling(5 * time.Second).
@@ -57,7 +48,9 @@ func TestBasic(t *testing.T) {
 			})
 
 			It("should have deployed the test app with correct version", func() {
-				Eventually(wait.IsAppVersion(state.GetContext(), state.GetFramework().MC(), state.GetApplication().InstallName, state.GetApplication().Organization.GetNamespace(), state.GetApplication().Version)).
+				Eventually(func() (bool, error) {
+					return client.IsHelmReleaseVersion(state.GetContext(), state.GetApplication().InstallName, state.GetApplication().Organization.GetNamespace(), state.GetApplication().Version)
+				}).
 					WithTimeout(5 * time.Minute).
 					WithPolling(5 * time.Second).
 					Should(BeTrue())

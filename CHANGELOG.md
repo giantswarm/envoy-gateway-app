@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix the basic e2e suite for `gateway-api-bundle` v2, which deploys `envoy-gateway` as a Flux `HelmRelease` instead of an `App` CR.
 - The `helm.sh/chart` label is valid for long chart versions: the 63-character cut trims the whole trailing run of `-`, `.` and `_`.
 
 ## [1.10.4] - 2026-09-29
