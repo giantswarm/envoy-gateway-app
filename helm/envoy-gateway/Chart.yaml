@@ -16,4 +16,4 @@ name: envoy-gateway
 sources:
   - https://github.com/envoyproxy/gateway
 type: application
-version: 1.10.4
+version: 1.10.5
