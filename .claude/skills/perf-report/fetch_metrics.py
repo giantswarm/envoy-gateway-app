@@ -2,7 +2,7 @@
 """Fetch Envoy-vs-competitor performance metrics from Mimir into results.json.
 
 Reads the PromQL manifest (queries.yaml), auto-detects the competitor
-(nginx/kong) and both k6 scenario windows from the k6 series, runs every query
+(nginx) and both k6 scenario windows from the k6 series, runs every query
 over the matching window, and writes a results.json consumed by render_report.py.
 
 HTTP uses only the standard library. The single third-party dependency is
@@ -50,7 +50,7 @@ except ImportError:
     sys.exit("PyYAML is required: pip install pyyaml")
 
 ENVOY_SCENARIO = "envoy_simulation"
-COMPETITOR_SCENARIOS = {"nginx_simulation": "nginx", "kong_simulation": "kong"}
+COMPETITOR_SCENARIOS = {"nginx_simulation": "nginx"}
 
 # The perf suites name their k6 TestRun (and therefore the testid label)
 # "e2e-load-test-<cluster name>" — see testRunName in performance_suite_test.go.
@@ -337,7 +337,7 @@ def main():
     ap.add_argument("--password", default=None,
                     help="Mimir basic-auth password (or env MIMIR_PASSWORD); "
                          "mirrors kube-system/alloy-metrics metrics-password")
-    ap.add_argument("--competitor", choices=["auto", "nginx", "kong"], default="auto")
+    ap.add_argument("--competitor", choices=["auto", "nginx"], default="auto")
     ap.add_argument("--lookback", type=float, default=6.0, help="hours to search for the run")
     ap.add_argument("--now", type=float, default=None,
                     help="reference unix time (default: real now)")
@@ -391,7 +391,7 @@ def main():
         want = f"{args.competitor}_simulation"
         comp_scen = want if want in windows else comp_scen
     if not comp_scen:
-        sys.exit(f"No competitor scenario (nginx/kong) found. Scenarios seen: {list(windows)}")
+        sys.exit(f"No competitor scenario (nginx) found. Scenarios seen: {list(windows)}")
     competitor = COMPETITOR_SCENARIOS[comp_scen]
 
     envoy_win = windows[ENVOY_SCENARIO]

@@ -9,8 +9,8 @@ import encoding from "k6/encoding";
 const ENDPOINTS  = parseInt(__ENV.ENDPOINTS || "10", 10);
 const BASE_DOMAIN = __ENV.BASE_DOMAIN;
 const PROXY_CONTROLLER = (__ENV.PROXY_CONTROLLER || "nginx").toLowerCase();
-if (PROXY_CONTROLLER !== "nginx" && PROXY_CONTROLLER !== "kong") {
-  throw new Error(`PROXY_CONTROLLER must be 'nginx' or 'kong' (got: '${PROXY_CONTROLLER}')`);
+if (PROXY_CONTROLLER !== "nginx") {
+  throw new Error(`PROXY_CONTROLLER must be 'nginx' (got: '${PROXY_CONTROLLER}')`);
 }
 
 // Basic Auth credentials — must match what the suite provisions on the
@@ -61,12 +61,6 @@ function pickNginxBaseUrl() {
   return `https://nginx-onlineboutique-${n}.loadtesting.${BASE_DOMAIN}`;
 }
 
-function kongBaseUrl() {
-  // Kong runs as a Gateway API implementation here: the chart exposes a single
-  // HTTPRoute host (kong-onlineboutique.loadtesting.<base>), with no per-endpoint
-  // fan-out like the Envoy/nginx sides, so all kong traffic targets that host.
-  return `https://kong-onlineboutique.loadtesting.${BASE_DOMAIN}`;
-}
 
 function buildScenarioConfig() {
   const base = {
@@ -109,7 +103,7 @@ const { config: SCENARIO_CONFIG, totalSeconds: SCENARIO_TOTAL_SECONDS } = buildS
 // total runtime + the wait window so we don't synchronize request bursts.
 const reverseProxyStartTime = `${SCENARIO_TOTAL_SECONDS + WAIT_BETWEEN_SCENARIOS}s`;
 const reverseProxyScenarioName = `${PROXY_CONTROLLER}_simulation`;
-const reverseProxyExec = PROXY_CONTROLLER === "kong" ? "kongScenario" : "nginxScenario";
+const reverseProxyExec = "nginxScenario";
 
 export const options = {
   scenarios: {
@@ -194,8 +188,4 @@ export function envoyScenario() {
 
 export function nginxScenario() {
   basicAuthFlow(pickNginxBaseUrl(), false);
-}
-
-export function kongScenario() {
-  basicAuthFlow(kongBaseUrl(), false);
 }

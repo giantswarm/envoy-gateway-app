@@ -2,7 +2,7 @@ package deps
 
 // Versions maps a dependency app name to the chart/app version each suite
 // installs via deployDependency. Suites look it up by name, so a suite that
-// doesn't deploy a given dependency (e.g. the kong-only keyauth suite never
+// doesn't deploy a given dependency (e.g. the envoy-only keyauth suite never
 // installs ingress-nginx) simply never reads that entry — extra entries are
 // harmless.
 //
@@ -11,6 +11,5 @@ package deps
 var Versions = map[string]string{
 	"aws-lb-controller-bundle": "5.2.0",
 	"ingress-nginx":            "4.3.5",
-	"kong-app":                 "5.2.3",
 	"microservices-demo-app":   "0.8.1",
 }

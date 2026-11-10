@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Remove Kong from the performance tests and the `perf-report` skill. The `keyauth` suite now runs against Envoy Gateway only.
+
 ## [1.10.5] - 2026-11-03
 
 ### Changed

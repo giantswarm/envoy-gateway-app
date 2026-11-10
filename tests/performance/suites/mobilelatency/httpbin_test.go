@@ -214,7 +214,7 @@ func httpbinReady() (bool, error) {
 
 // routeHttpbinThroughGateways overlays the /delay path of the existing boutique
 // hostnames onto go-httpbin: an HTTPRoute on the Envoy gateway always, and an
-// Ingress (nginx) or HTTPRoute (kong) for the selected reverse proxy. The more
+// Ingress for the selected reverse proxy (nginx). The more
 // specific /delay PathPrefix wins over the boutique frontend's "/" route, so the
 // boutique keeps serving everything else.
 func routeHttpbinThroughGateways() {
@@ -241,14 +241,6 @@ func routeHttpbinThroughGateways() {
 	case proxyControllerNginx:
 		By("Routing /delay to go-httpbin on ingress-nginx")
 		createOrUpdate(httpbinNginxIngress(fmt.Sprintf("nginx-onlineboutique-0.loadtesting.%s", baseDomain)))
-	case proxyControllerKong:
-		By("Routing /delay to go-httpbin on the kong gateway")
-		applyHTTPRoute(httpbinHTTPRoute(
-			"httpbin-kong",
-			httpbinNamespace,
-			"Gateway", "kong", "loadtesting",
-			fmt.Sprintf("kong-onlineboutique.loadtesting.%s", baseDomain),
-		))
 	}
 }
 
