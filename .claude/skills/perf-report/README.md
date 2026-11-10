@@ -77,18 +77,18 @@ python3 fetch_metrics.py --mimir-url http://localhost:8080 --output results.json
 - `--mode auto|local|in-cluster`: selects the default Mimir URL (default auto).
 - `--mimir-url`: explicit base URL; overrides `--mode`.
 - `--username`/`--password` (or `MIMIR_USERNAME`/`MIMIR_PASSWORD`): gateway basic auth.
-- `--competitor auto|nginx|kong`: auto-detected from the k6 scenarios by default.
+- `--competitor auto|nginx`: auto-detected from the k6 scenarios by default.
 - `--lookback <hours>`: how far back to search for the run (default 6).
 - `--tenant` (default `giantswarm`): `X-Scope-OrgID` header.
 
 ## Data flow it mirrors
 
 `/run envoy-performance-test` → Tekton runs the Ginkgo suite in `tests/performance`
-→ deploys Envoy Gateway + nginx **or** kong + the microservices demo → creates a
+→ deploys Envoy Gateway + nginx + the microservices demo → creates a
 k6 `TestRun`. k6 runs two staggered scenarios (`envoy_simulation`, then
-`nginx_simulation`/`kong_simulation`) and remote-writes to
+`nginx_simulation`) and remote-writes to
 `mimir-gateway.mimir.svc/api/v1/push` tagged `testid=e2e-load-test-<cluster>`.
-Envoy/nginx/kong + cAdvisor metrics land in the same Mimir. The scripts query
+Envoy/nginx + cAdvisor metrics land in the same Mimir. The scripts query
 `…/prometheus/api/v1/query_range` with header `X-Scope-OrgID: giantswarm`.
 
 ## Keeping queries in sync with the dashboards

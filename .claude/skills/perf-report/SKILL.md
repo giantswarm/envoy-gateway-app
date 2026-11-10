@@ -1,10 +1,10 @@
 ---
 name: perf-report
 description: >-
-  Generate an Envoy-Gateway-vs-competitor (nginx/kong) performance report from a
+  Generate an Envoy-Gateway-vs-competitor (nginx) performance report from a
   finished load test. Use after the `/run envoy-performance-test` pipeline
   completes, or when the user asks for a "performance report", "perf report",
-  "envoy vs nginx report", "envoy vs kong report", or to summarize load-test /
+  "envoy vs nginx report", or to summarize load-test /
   k6 results into an HTML report and PR comment.
 ---
 
@@ -60,7 +60,7 @@ rarely pass `--mode` explicitly.
   (Local mode: the kubeconfig context. In-cluster: already the pod's cluster.)
 - **PR number** — where `/run envoy-performance-test` was triggered, for posting.
 - optional: `cluster_id` (see below), `testid` (default
-  `e2e-load-test-<cluster_id>`), `competitor` (`auto`|`nginx`|`kong`, default
+  `e2e-load-test-<cluster_id>`), `competitor` (`auto`|`nginx`, default
   auto-detected), `lookback` hours (default 6).
 
 **Don't go looking for the workload cluster.** The suite's AfterSuite deletes it
@@ -75,7 +75,7 @@ In **local** mode, ask the user for anything still missing. In **in-cluster**
 mode, take it from the invocation prompt/args and fail loudly if absent — do not
 prompt an unattended pipeline.
 
-The competitor (nginx vs kong), both scenario time windows, and the cluster are
+The competitor (nginx), both scenario time windows, and the cluster are
 **always auto-detected** from the k6 series — never ask for them.
 
 Discovery picks the most recent run inside the lookback and prints which one it
@@ -227,9 +227,9 @@ prepends it to the PR comment.
 - The two scenarios run in **separate time windows** (Envoy first, competitor
   after a wait). Charts overlay them on a common elapsed-time axis; they are not
   concurrent traffic.
-- nginx exposes no upstream-latency histogram, so that comparison is Envoy-only
-  for nginx runs (kong has it). Expected, not a bug.
-- Latencies are normalized to milliseconds (Envoy/kong histograms are already ms;
+- nginx exposes no upstream-latency histogram, so that comparison is Envoy-only.
+  Expected, not a bug.
+- Latencies are normalized to milliseconds (Envoy histograms are already ms;
   nginx seconds ×1000), matching the dashboards.
 - `queries.yaml` is the source of truth for what's measured; keep it in sync with
   the Grafana dashboards (see README.md).

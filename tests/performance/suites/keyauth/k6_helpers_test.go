@@ -147,7 +147,6 @@ func buildTestRunUnstructured(name, namespace, configMapName, baseDomain, testID
 		map[string]any{"name": "ENDPOINTS", "value": envOrDefault("ENDPOINTS", "10")},
 		map[string]any{"name": "BASE_DOMAIN", "value": baseDomain},
 		map[string]any{"name": "SCENARIO_DURATION_SECONDS", "value": envOrDefault("SCENARIO_DURATION_SECONDS", "1200")},
-		map[string]any{"name": "WAIT_BETWEEN_SCENARIOS", "value": envOrDefault("WAIT_BETWEEN_SCENARIOS", "300")},
 		map[string]any{"name": "PEAK_HTTP_RPS", "value": envOrDefault("PEAK_HTTP_RPS", "50")},
 		map[string]any{"name": "RAMP_STEP_HTTP_RPS", "value": envOrDefault("RAMP_STEP_HTTP_RPS", "10")},
 		map[string]any{"name": "RAMP_STEP_DURATION_SECONDS", "value": envOrDefault("RAMP_STEP_DURATION_SECONDS", "300")},
@@ -159,7 +158,7 @@ func buildTestRunUnstructured(name, namespace, configMapName, baseDomain, testID
 		map[string]any{"name": "SLO_ERROR_RATE", "value": envOrDefault("SLO_ERROR_RATE", "0.001")},
 		map[string]any{"name": "SLO_CHECKS_RATE", "value": envOrDefault("SLO_CHECKS_RATE", "0.95")},
 		// API key the scenario sends on the "valid key" request; must match what
-		// enforceEnvoyKeyAuth / enforceKongKeyAuth provisions on the gateways.
+		// enforceEnvoyKeyAuth provisions on the gateway.
 		map[string]any{"name": "API_KEY", "value": apiKey()},
 	}
 

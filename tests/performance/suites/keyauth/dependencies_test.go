@@ -8,18 +8,11 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	applicationv1alpha1 "github.com/giantswarm/apiextensions-application/api/v1alpha1"
 	"github.com/giantswarm/apptest-framework/v5/pkg/state"
 	"github.com/giantswarm/clustertest/v5/pkg/application"
-	"github.com/giantswarm/clustertest/v5/pkg/logger"
 	"github.com/giantswarm/clustertest/v5/pkg/wait"
 
 	"performance/internal/deps"
-
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 const awsLBControllerBundleValues = `
@@ -39,67 +32,8 @@ global:
 enableServiceMutatorWebhook: false
 `
 
-const kongAppValues = `
-ingressController:
-  enabled: true
-  createIngressClass: false
-  watchNamespaces:
-    - loadtesting
-    - kong
-  rbac:
-    gatewayAPI:
-      enabled: true
-  ingressClass: none  # Prevents KIC from reconciling Ingress resources; Gateway API only
-proxy:
-  annotations:
-    giantswarm.io/external-dns: managed
-    external-dns.alpha.kubernetes.io/hostname: kong-ingress.%s
-`
-
-// kongExtraObjectsValues is applied as an extraConfig overlay AFTER kong-app is
-// deployed and its KongClusterPlugin CRD is registered. Inlining these into the
-// initial kongAppValues fails on first install because Helm renders
-// extraObjects before the chart's own CRDs are applied.
-const kongExtraObjectsValues = `
-extraObjects:
-  - apiVersion: configuration.konghq.com/v1
-    kind: KongClusterPlugin
-    metadata:
-      name: prometheus
-      annotations:
-        kubernetes.io/ingress.class: none
-      labels:
-        global: "true"
-    plugin: prometheus
-    config:
-      status_code_metrics: true
-      latency_metrics: true
-      bandwidth_metrics: true
-      upstream_health_metrics: true
-  - apiVersion: rbac.authorization.k8s.io/v1
-    kind: ClusterRole
-    metadata:
-      name: kong-app-kong-app-ingressclass-reader
-    rules:
-      - apiGroups: ["networking.k8s.io"]
-        resources: ["ingressclasses"]
-        verbs: ["get", "list", "watch"]
-  - apiVersion: rbac.authorization.k8s.io/v1
-    kind: ClusterRoleBinding
-    metadata:
-      name: kong-app-kong-app-ingressclass-reader
-    roleRef:
-      apiGroup: rbac.authorization.k8s.io
-      kind: ClusterRole
-      name: kong-app-kong-app-ingressclass-reader
-    subjects:
-      - kind: ServiceAccount
-        name: kong-app-kong-app
-        namespace: kong
-`
-
-// This suite compares Envoy against Kong only (API key auth is not natively
-// supported by ingress-nginx), so it never deploys ingress-nginx — the shared
+// This suite runs against Envoy only (API key auth is not natively supported
+// by ingress-nginx), so it never deploys ingress-nginx — the shared
 // deps.Versions map still lists it, but this suite simply never looks it up.
 func deployDependency(depName, depValues string, installNs ...string) *application.Application {
 	By(fmt.Sprintf("deploying %s", depName))
@@ -144,54 +78,4 @@ func waitForDependency(app *application.Application) {
 		WithTimeout(10 * time.Minute).
 		WithPolling(5 * time.Second).
 		Should(BeTrue())
-}
-
-// addExtraConfigToApp creates a ConfigMap with the given values and adds it
-// to the App CR's spec.extraConfigs list. Idempotent — safe to call on retry.
-func addExtraConfigToApp(appName, configMapName, values string) {
-	ctx := state.GetContext()
-	mc := state.GetFramework().MC()
-	org := state.GetCluster().Organization
-	namespace := org.GetNamespace()
-
-	logger.Log("Ensuring extra config ConfigMap %s/%s for App %s", namespace, configMapName, appName)
-
-	cm := &corev1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      configMapName,
-			Namespace: namespace,
-		},
-		Data: map[string]string{
-			"values": values,
-		},
-	}
-	err := mc.Create(ctx, cm)
-	if err != nil && !errors.IsAlreadyExists(err) {
-		Expect(err).NotTo(HaveOccurred(), "failed to create extra config ConfigMap %s/%s", namespace, configMapName)
-	}
-
-	// Read the current App CR to preserve existing extraConfigs
-	appCR := &applicationv1alpha1.App{}
-	err = mc.Get(ctx, types.NamespacedName{Name: appName, Namespace: namespace}, appCR)
-	Expect(err).NotTo(HaveOccurred(), "failed to get App CR %s/%s", namespace, appName)
-
-	// Check if the extra config is already present
-	for _, ec := range appCR.Spec.ExtraConfigs {
-		if ec.Name == configMapName && ec.Namespace == namespace {
-			logger.Log("Extra config %s already present on App %s/%s", configMapName, namespace, appName)
-			return
-		}
-	}
-
-	appCR.Spec.ExtraConfigs = append(appCR.Spec.ExtraConfigs, applicationv1alpha1.AppExtraConfig{
-		Kind:      "configMap",
-		Name:      configMapName,
-		Namespace: namespace,
-		Priority:  25,
-	})
-
-	err = mc.Update(ctx, appCR)
-	Expect(err).NotTo(HaveOccurred(), "failed to update App CR %s/%s with extraConfigs", namespace, appName)
-
-	logger.Log("Added extra config %s to App %s/%s", configMapName, namespace, appName)
 }

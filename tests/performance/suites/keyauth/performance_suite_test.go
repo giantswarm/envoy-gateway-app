@@ -19,11 +19,7 @@ import (
 	"github.com/giantswarm/clustertest/v5/pkg/wait"
 )
 
-const (
-	isUpgrade = false
-
-	proxyControllerKong = "kong"
-)
+const isUpgrade = false
 
 // microservicesDemoAppValuesTmpl mirrors
 // envoy-loadtesting/wc-deployment/values/microservices-demo.yaml. ${BASE}
@@ -38,13 +34,6 @@ ingress:
   number: ${PUBLIC_ENDPOINTS}
   base: ${BASE}
   host: nginx-onlineboutique
-
-kong:
-  enabled: ${KONG_ENABLED}
-  number: ${PUBLIC_ENDPOINTS}
-  base: ${BASE}
-  host: kong-onlineboutique
-  ingressCname: kong-ingress.${BASE}
 
 httproute:
   enabled: true
@@ -209,14 +198,12 @@ shippingService:
 // envoy-loadtesting/wc-deployment/values/microservices-demo.yaml; the
 // PUBLIC_ENDPOINTS / HPA_MIN_REPLICAS / HPA_MAX_REPLICAS knobs are read via
 // envOrDefault so config.env (loaded by loadConfigEnv) supplies the same
-// defaults as the manual pipeline. Only the chosen ingress controller branch
-// is enabled.
+// defaults as the manual pipeline. API key auth is not natively supported by
+// ingress-nginx, so this suite runs against Envoy only and the nginx ingress
+// branch of the chart stays disabled.
 func buildMicroservicesDemoAppValues(baseDomain string) string {
-	// This suite only compares against Kong (see resolveProxyController), so the
-	// nginx ingress branch of the chart stays disabled.
 	vars := map[string]string{
 		"INGRESS_NGINX_ENABLED": "false",
-		"KONG_ENABLED":          "true",
 		"BASE":                  baseDomain,
 		"PUBLIC_ENDPOINTS":      envOrDefault("PUBLIC_ENDPOINTS", "10"),
 		"HPA_MIN_REPLICAS":      envOrDefault("HPA_MIN_REPLICAS", "1"),
@@ -240,10 +227,7 @@ func TestPerformance(t *testing.T) {
 		WithValuesFile("./values.yaml").
 		WithBundleValuesFile("./bundle_values.yaml").
 		AfterClusterReady(func() {
-			var (
-				awsLBApp *application.Application
-				kongApp  *application.Application
-			)
+			var awsLBApp *application.Application
 
 			It("should create the loadtesting namespace", FlakeAttempts(3), func() {
 				createWorkloadClusterNamespace("loadtesting")
@@ -258,42 +242,14 @@ func TestPerformance(t *testing.T) {
 			It("should wait for aws-load-balancer-controller to be ready", FlakeAttempts(3), func() {
 				waitForDependency(awsLBApp)
 			})
-
-			It("should install kong-app", FlakeAttempts(3), func() {
-				baseDomain := getWorkloadClusterBaseDomain()
-				kongApp = deployDependency("kong-app", fmt.Sprintf(kongAppValues, baseDomain), "kong")
-				waitForDependency(kongApp)
-			})
-
-			It("should configure kong prometheus plugin", FlakeAttempts(3), func() {
-				By("Waiting for KongClusterPlugin CRD to be registered")
-				Eventually(func() (bool, error) {
-					return crdExists("kongclusterplugins.configuration.konghq.com")
-				}).
-					WithTimeout(5 * time.Minute).
-					WithPolling(10 * time.Second).
-					Should(BeTrue())
-
-				By("Adding extraObjects config to kong-app via spec.extraConfigs")
-				clusterName := state.GetCluster().Name
-				addExtraConfigToApp(
-					fmt.Sprintf("%s-kong-app", clusterName),
-					fmt.Sprintf("%s-kong-extra-objects", clusterName),
-					kongExtraObjectsValues,
-				)
-			})
 		}).
 		Tests(func() {
 			var (
 				microservicesDemoApp *application.Application
 				envoyUrl             string
-				kongUrl              string
 			)
 			BeforeEach(func() {
 				envoyUrl = fmt.Sprintf("https://onlineboutique.loadtesting-0.%s", getWorkloadClusterBaseDomain())
-				// Kong runs as a Gateway API implementation: the chart exposes a
-				// single HTTPRoute host (no per-endpoint fan-out like Envoy).
-				kongUrl = fmt.Sprintf("https://kong-onlineboutique.loadtesting.%s", getWorkloadClusterBaseDomain())
 			})
 
 			It("should have deployed envoy-gateway via the gateway-api-bundle", func() {
@@ -337,7 +293,7 @@ func TestPerformance(t *testing.T) {
 			})
 
 			It("should have ready dependency deployments on the workload cluster", func() {
-				namespaces := []string{"aws-load-balancer-controller", "envoy-gateway-system", "kong"}
+				namespaces := []string{"aws-load-balancer-controller", "envoy-gateway-system"}
 				for _, ns := range namespaces {
 					Eventually(func() (bool, error) {
 						return deploymentReadyInNamespace(ns)
@@ -355,21 +311,17 @@ func TestPerformance(t *testing.T) {
 			})
 
 			It("should have ready LoadBalancer services on the workload cluster", func() {
-				namespaces := []string{"envoy-gateway-system", "kong"}
-				for _, ns := range namespaces {
-					Eventually(func() (bool, error) {
-						return loadBalancerServiceReadyInNamespace(ns)
-					}).
-						WithTimeout(10 * time.Minute).
-						WithPolling(10 * time.Second).
-						Should(BeTrue())
-				}
+				Eventually(func() (bool, error) {
+					return loadBalancerServiceReadyInNamespace("envoy-gateway-system")
+				}).
+					WithTimeout(10 * time.Minute).
+					WithPolling(10 * time.Second).
+					Should(BeTrue())
 			})
 
 			It("should have ready certificates on the workload cluster", func() {
 				expected := []types.NamespacedName{
 					{Namespace: "loadtesting-0", Name: "gateway-0-https"},
-					{Namespace: "loadtesting", Name: "frontend-kong-wildcard"},
 				}
 
 				Eventually(func() (bool, error) {
@@ -387,24 +339,13 @@ func TestPerformance(t *testing.T) {
 				})
 				expectEndpointServesTraffic(envoyUrl)
 			})
-			It("should serve traffic from kong", func() {
-				DeferCleanup(func() {
-					if CurrentSpecReport().Failed() {
-						AbortSuite("kong failed to serve traffic, aborting remaining tests")
-					}
-				})
-				expectEndpointServesTraffic(kongUrl)
-			})
 
 			// With the unauthenticated baseline confirmed above, enforce API key
-			// auth at each gateway and verify it before load testing the
+			// auth at the gateway and verify it before load testing the
 			// authenticated path. The k6 key-auth scenario then asserts
 			// valid->200, wrong->401, missing->401 under load.
 			It("should enforce api key auth on the envoy gateway", FlakeAttempts(3), func() {
 				enforceEnvoyKeyAuth()
-			})
-			It("should enforce api key auth on kong", FlakeAttempts(3), func() {
-				enforceKongKeyAuth()
 			})
 			It("should require an api key on envoy gateway", func() {
 				DeferCleanup(func() {
@@ -413,14 +354,6 @@ func TestPerformance(t *testing.T) {
 					}
 				})
 				expectEndpointRequiresKey(envoyUrl)
-			})
-			It("should require an api key on kong", func() {
-				DeferCleanup(func() {
-					if CurrentSpecReport().Failed() {
-						AbortSuite("kong api key auth not enforced, aborting remaining tests")
-					}
-				})
-				expectEndpointRequiresKey(kongUrl)
 			})
 			It("should run k6 load tests successfully", func() {
 				k6Namespace := getK6Namespace()

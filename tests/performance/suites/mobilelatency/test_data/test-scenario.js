@@ -11,13 +11,13 @@ import { check } from "k6";
 //
 // Mirrors the "basic" suite's Envoy-vs-reverse-proxy layout: the five envoy
 // bands run first, then the five reverse-proxy bands after a wait, so the two
-// don't synchronize. PROXY_CONTROLLER selects nginx or kong.
+// don't synchronize. PROXY_CONTROLLER selects the reverse proxy (nginx).
 
 const BASE_DOMAIN = __ENV.BASE_DOMAIN;
 const ENDPOINTS = parseInt(__ENV.ENDPOINTS || "10", 10);
 const PROXY_CONTROLLER = (__ENV.PROXY_CONTROLLER || "nginx").toLowerCase();
-if (PROXY_CONTROLLER !== "nginx" && PROXY_CONTROLLER !== "kong") {
-  throw new Error(`PROXY_CONTROLLER must be 'nginx' or 'kong' (got: '${PROXY_CONTROLLER}')`);
+if (PROXY_CONTROLLER !== "nginx") {
+  throw new Error(`PROXY_CONTROLLER must be 'nginx' (got: '${PROXY_CONTROLLER}')`);
 }
 
 // Per-simulation duration (k6 duration string), the wait inserted before the
@@ -34,14 +34,13 @@ const SLO_CHECKS_RATE = __ENV.SLO_CHECKS_RATE || "0.99";
 // httpbin is overlaid on the /delay path of the existing boutique hosts (so DNS
 // + TLS are reused). Envoy has one endpoint per loadtesting-{i} namespace, so
 // each request picks one at random to spread load across all of them, the way
-// the other suites' envoy scenarios do. nginx/kong each expose a single host.
+// the other suites' envoy scenarios do. nginx exposes a single host.
 function envoyBaseUrl() {
   const n = Math.floor(Math.random() * ENDPOINTS);
   return `https://onlineboutique.loadtesting-${n}.${BASE_DOMAIN}`;
 }
 function nginxBaseUrl() { return `https://nginx-onlineboutique-0.loadtesting.${BASE_DOMAIN}`; }
-function kongBaseUrl()  { return `https://kong-onlineboutique.loadtesting.${BASE_DOMAIN}`; }
-function proxyBaseUrl() { return PROXY_CONTROLLER === "kong" ? kongBaseUrl() : nginxBaseUrl(); }
+function proxyBaseUrl() { return nginxBaseUrl(); }
 
 // Latency bands (requests/second + injected delay in seconds), from
 // mobile-latency.js / MOBILE.md. go-httpbin is deployed with -max-duration=60s

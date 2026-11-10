@@ -24,7 +24,6 @@ const (
 	isUpgrade = false
 
 	proxyControllerNginx = "nginx"
-	proxyControllerKong  = "kong"
 
 	// proxyControllerEnvVar selects which ingress controller is deployed
 	// alongside Envoy Gateway.
@@ -42,10 +41,10 @@ func resolveProxyController() string {
 	switch v {
 	case "":
 		return proxyControllerNginx
-	case proxyControllerNginx, proxyControllerKong:
+	case proxyControllerNginx:
 		return v
 	default:
-		panic(fmt.Sprintf("%s must be %q or %q (got: %q)", proxyControllerEnvVar, proxyControllerNginx, proxyControllerKong, v))
+		panic(fmt.Sprintf("%s must be %q (got: %q)", proxyControllerEnvVar, proxyControllerNginx, v))
 	}
 }
 
@@ -62,13 +61,6 @@ ingress:
   number: ${PUBLIC_ENDPOINTS}
   base: ${BASE}
   host: nginx-onlineboutique
-
-kong:
-  enabled: ${KONG_ENABLED}
-  number: ${PUBLIC_ENDPOINTS}
-  base: ${BASE}
-  host: kong-onlineboutique
-  ingressCname: kong-ingress.${BASE}
 
 httproute:
   enabled: true
@@ -237,16 +229,12 @@ shippingService:
 // is enabled.
 func buildMicroservicesDemoAppValues(baseDomain string) string {
 	ingressEnabled := "false"
-	kongEnabled := "false"
 	switch proxyController {
 	case proxyControllerNginx:
 		ingressEnabled = "true"
-	case proxyControllerKong:
-		kongEnabled = "true"
 	}
 	vars := map[string]string{
 		"INGRESS_NGINX_ENABLED": ingressEnabled,
-		"KONG_ENABLED":          kongEnabled,
 		"BASE":                  baseDomain,
 		"PUBLIC_ENDPOINTS":      envOrDefault("PUBLIC_ENDPOINTS", "10"),
 		"HPA_MIN_REPLICAS":      envOrDefault("HPA_MIN_REPLICAS", "1"),
@@ -273,7 +261,6 @@ func TestPerformance(t *testing.T) {
 			var (
 				awsLBApp        *application.Application
 				ingressNginxApp *application.Application
-				kongApp         *application.Application
 			)
 
 			It("should create the loadtesting namespace", FlakeAttempts(3), func() {
@@ -302,45 +289,16 @@ func TestPerformance(t *testing.T) {
 				})
 			}
 
-			if proxyController == proxyControllerKong {
-				It("should install kong-app", FlakeAttempts(3), func() {
-					baseDomain := getWorkloadClusterBaseDomain()
-					kongApp = deployDependency("kong-app", fmt.Sprintf(kongAppValues, baseDomain), "kong")
-					waitForDependency(kongApp)
-				})
-
-				It("should configure kong prometheus plugin", FlakeAttempts(3), func() {
-					By("Waiting for KongClusterPlugin CRD to be registered")
-					Eventually(func() (bool, error) {
-						return crdExists("kongclusterplugins.configuration.konghq.com")
-					}).
-						WithTimeout(5 * time.Minute).
-						WithPolling(10 * time.Second).
-						Should(BeTrue())
-
-					By("Adding extraObjects config to kong-app via spec.extraConfigs")
-					clusterName := state.GetCluster().Name
-					addExtraConfigToApp(
-						fmt.Sprintf("%s-kong-app", clusterName),
-						fmt.Sprintf("%s-kong-extra-objects", clusterName),
-						kongExtraObjectsValues,
-					)
-				})
-			}
 		}).
 		Tests(func() {
 			var (
 				microservicesDemoApp *application.Application
 				nginxUrl             string
 				envoyUrl             string
-				kongUrl              string
 			)
 			BeforeEach(func() {
 				nginxUrl = fmt.Sprintf("https://nginx-onlineboutique-0.loadtesting.%s", getWorkloadClusterBaseDomain())
 				envoyUrl = fmt.Sprintf("https://onlineboutique.loadtesting-0.%s", getWorkloadClusterBaseDomain())
-				// Kong runs as a Gateway API implementation: the chart exposes a
-				// single HTTPRoute host (no per-endpoint fan-out like Envoy/nginx).
-				kongUrl = fmt.Sprintf("https://kong-onlineboutique.loadtesting.%s", getWorkloadClusterBaseDomain())
 			})
 
 			It("should have deployed envoy-gateway via the gateway-api-bundle", func() {
@@ -385,9 +343,6 @@ func TestPerformance(t *testing.T) {
 
 			It("should have ready dependency deployments on the workload cluster", func() {
 				namespaces := []string{"aws-load-balancer-controller", "envoy-gateway-system"}
-				if proxyController == proxyControllerKong {
-					namespaces = append(namespaces, "kong")
-				}
 				for _, ns := range namespaces {
 					Eventually(func() (bool, error) {
 						return deploymentReadyInNamespace(ns)
@@ -409,8 +364,6 @@ func TestPerformance(t *testing.T) {
 				switch proxyController {
 				case proxyControllerNginx:
 					namespaces = append(namespaces, "default")
-				case proxyControllerKong:
-					namespaces = append(namespaces, "kong")
 				}
 				for _, ns := range namespaces {
 					Eventually(func() (bool, error) {
@@ -429,8 +382,6 @@ func TestPerformance(t *testing.T) {
 				switch proxyController {
 				case proxyControllerNginx:
 					expected = append(expected, types.NamespacedName{Namespace: "loadtesting", Name: "frontend-nginx-wildcard"})
-				case proxyControllerKong:
-					expected = append(expected, types.NamespacedName{Namespace: "loadtesting", Name: "frontend-kong-wildcard"})
 				}
 
 				Eventually(func() (bool, error) {
@@ -458,16 +409,6 @@ func TestPerformance(t *testing.T) {
 				})
 				expectEndpointServesTraffic(envoyUrl)
 			})
-			if proxyController == proxyControllerKong {
-				It("should serve traffic from kong", func() {
-					DeferCleanup(func() {
-						if CurrentSpecReport().Failed() {
-							AbortSuite("kong failed to serve traffic, aborting remaining tests")
-						}
-					})
-					expectEndpointServesTraffic(kongUrl)
-				})
-			}
 			// The boutique frontend can't synthesize per-request latency, so the
 			// mobile-latency bands are served by go-httpbin's /delay endpoint,
 			// overlaid on the /delay path of the existing boutique hostnames
@@ -500,16 +441,6 @@ func TestPerformance(t *testing.T) {
 						}
 					})
 					expectDelayServesTraffic(nginxUrl)
-				})
-			}
-			if proxyController == proxyControllerKong {
-				It("should serve /delay from go-httpbin via kong", func() {
-					DeferCleanup(func() {
-						if CurrentSpecReport().Failed() {
-							AbortSuite("go-httpbin not reachable via kong, aborting remaining tests")
-						}
-					})
-					expectDelayServesTraffic(kongUrl)
 				})
 			}
 			It("should run k6 load tests successfully", func() {
