@@ -17,3 +17,8 @@ directories:
     ignorePaths:
       - Chart.yaml
       - Chart.lock
+      - README.md.gotmpl
+      - values.schema.json
+      - .schema.yaml
+      - zz_generated.app-platform.values.yaml
+      - schemas/**

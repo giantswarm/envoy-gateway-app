@@ -38,17 +38,23 @@ global:
       pullSecrets: []
 
 # -- Labels to apply to all resources
-commonLabels: {}
+commonLabels: {}  # @schema additionalProperties: true
 
 serviceType: managed
 
+# -- Override the chart name.
+nameOverride: ""
+
+# -- Override the full name of the chart resources.
+fullnameOverride: ""
+
 podDisruptionBudget:
-  minAvailable: 1
-  # maxUnavailable: 1
+  minAvailable: 1  # @schema type: [integer, string, null]
+  maxUnavailable: null  # @schema type: [integer, string, null]
   unhealthyPodEvictionPolicy: AlwaysAllow
 
 deployment:
-  annotations: {}
+  annotations: {}  # @schema additionalProperties: true
   envoyGateway:
     image:
       # if both this and global.imageRegistry are specified, this has to include both registry and repository explicitly, eg gsoci.azurecr.io/giantswarm/envoyproxy-gateway
@@ -58,13 +64,13 @@ deployment:
     imagePullSecrets: []
     # -- Additional environment variables for the envoy-gateway container.
     extraEnv: []
-    resources:
+    resources:  # @schema skipProperties: true; additionalProperties: true
       limits:
         memory: 1024Mi
       requests:
         cpu: 100m
         memory: 256Mi
-    securityContext:
+    securityContext:  # @schema skipProperties: true; additionalProperties: true
       allowPrivilegeEscalation: false
       capabilities:
         drop:
@@ -81,12 +87,12 @@ deployment:
     #   wasmCacheVolume:
     #     persistentVolumeClaim:
     #       claimName: envoy-gateway-wasm-cache
-    strategy: {}
-    wasmCacheVolume: {}
+    strategy: {}  # @schema additionalProperties: true
+    wasmCacheVolume: {}  # @schema additionalProperties: true
     # Kubernetes best practice for controllers: use a startupProbe with a generous
     # failure threshold to avoid premature liveness/readiness failures during initialization.
     # Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-startup-probes
-    startupProbe:
+    startupProbe:  # @schema skipProperties: true; additionalProperties: true
       httpGet:
         path: /healthz
         port: 8081
@@ -94,21 +100,21 @@ deployment:
       periodSeconds: 1
       successThreshold: 1
       timeoutSeconds: 1
-    livenessProbe:
+    livenessProbe:  # @schema skipProperties: true; additionalProperties: true
       httpGet:
         path: /healthz
         port: 8081
       periodSeconds: 20
       successThreshold: 1
       timeoutSeconds: 1
-    readinessProbe:
+    readinessProbe:  # @schema skipProperties: true; additionalProperties: true
       httpGet:
         path: /readyz
         port: 8081
       periodSeconds: 10
       successThreshold: 1
       timeoutSeconds: 1
-  ports:
+  ports:  # @schema item: object; itemProperties: {}; itemRef: schemas/object.json
     - name: grpc
       port: 18000
       targetPort: 18000
@@ -121,15 +127,15 @@ deployment:
     - name: metrics
       port: 19001
       targetPort: 19001
-  priorityClassName: giantswarm-critical
+  priorityClassName: giantswarm-critical  # @schema type: [string, null]
   replicas: 2
   pod:
-    affinity: {}
-    annotations:
+    affinity: {}  # @schema additionalProperties: true
+    annotations:  # @schema additionalProperties: true
       prometheus.io/scrape: 'true'
       prometheus.io/port: '19001'
-    labels: {}
-    topologySpreadConstraints:
+    labels: {}  # @schema additionalProperties: true
+    topologySpreadConstraints:  # @schema item: object; itemProperties: {}; itemRef: schemas/object.json
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: ScheduleAnyway
@@ -137,7 +143,7 @@ deployment:
           matchLabels:
             app.kubernetes.io/name: envoy-gateway
     tolerations: []
-    nodeSelector: {}
+    nodeSelector: {}  # @schema additionalProperties: true
     # Additional volumeMounts on the deployment definition.
     extraVolumeMounts: []
     # - name: foo
@@ -148,7 +154,7 @@ deployment:
     # - name: foo
     #   configMap:
     #     name: myconfigmap
-    securityContext:
+    securityContext:  # @schema skipProperties: true; additionalProperties: true
       runAsNonRoot: true
       runAsGroup: 65532
       runAsUser: 65532
@@ -159,28 +165,30 @@ deployment:
 service:
   # If set to PreferClose, the Envoy fleet will prioritize connecting to the Envoy Gateway pods that are topologically closest to them.
   trafficDistribution: ""
-  annotations: {}
+  annotations: {}  # @schema additionalProperties: true
   # -- Service type. Can be set to LoadBalancer with specific IP, e.g.:
   # type: LoadBalancer
   # loadBalancerIP: 10.236.90.20
   type: "ClusterIP"
+  # -- Load balancer IP, used when `type` is LoadBalancer.
+  loadBalancerIP: ""
 
 hpa:
   enabled: true
   minReplicas: 2
   maxReplicas: 5
-  metrics:
+  metrics:  # @schema item: object; itemProperties: {}; itemRef: schemas/object.json
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
           averageUtilization: 80
-  behavior: {}
+  behavior: {}  # @schema additionalProperties: true
 
 config:
 # -- EnvoyGateway configuration. Visit https://gateway.envoyproxy.io/docs/api/extension_types/#envoygateway to view all options.
-  envoyGateway:
+  envoyGateway:  # @schema skipProperties: true; additionalProperties: true
     gateway:
       controllerName: gateway.envoyproxy.io/gatewayclass-controller
     provider:
@@ -201,29 +209,29 @@ kubernetesClusterDomain: cluster.local
 # -- Certgen is used to generate the certificates required by EnvoyGateway. If you want to construct a custom certificate, you can generate a custom certificate through Cert-Manager before installing EnvoyGateway. Certgen will not overwrite the custom certificate. Please do not manually modify `values.yaml` to disable certgen, it may cause EnvoyGateway OIDC,OAuth2,etc. to not work as expected.
 certgen:
   job:
-    annotations: {}
+    annotations: {}  # @schema additionalProperties: true
     args: []
     pod:
-      annotations: {}
-      labels: {}
-      securityContext:
+      annotations: {}  # @schema additionalProperties: true
+      labels: {}  # @schema additionalProperties: true
+      securityContext:  # @schema skipProperties: true; additionalProperties: true
         runAsNonRoot: true
         runAsGroup: 65532
         runAsUser: 65532
         fsGroup: 65532
         seccompProfile:
           type: RuntimeDefault
-    resources:
+    resources:  # @schema skipProperties: true; additionalProperties: true
       requests:
         cpu: 50m
         memory: 100Mi
       limits:
         memory: 500Mi
-    affinity: {}
+    affinity: {}  # @schema additionalProperties: true
     tolerations: []
-    nodeSelector: {}
+    nodeSelector: {}  # @schema additionalProperties: true
     ttlSecondsAfterFinished: 30
-    securityContext:
+    securityContext:  # @schema skipProperties: true; additionalProperties: true
       allowPrivilegeEscalation: false
       capabilities:
         drop:
@@ -236,12 +244,12 @@ certgen:
       seccompProfile:
         type: RuntimeDefault
   rbac:
-    annotations: {}
-    labels: {}
+    annotations: {}  # @schema additionalProperties: true
+    labels: {}  # @schema additionalProperties: true
 
 topologyInjector:
   enabled: true
-  annotations: {}
+  annotations: {}  # @schema additionalProperties: true
 
 ciliumNetworkPolicy:
   # -- Allow envoy-gateway control plane pods to communicate with the outside world. This can be required in certain cases with SecurityPolicies trying to contact external providers for additional OIDC or JWT configuration.
