@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Prepare for generated CI: the values schema is generated from annotated values and kept out of the upstream sync, and free-form upstream objects stay open.
+
 ### Removed
 
 - Remove Kong from the performance tests and the `perf-report` skill. The `keyauth` suite now runs against Envoy Gateway only.
