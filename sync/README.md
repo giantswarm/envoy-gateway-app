@@ -21,8 +21,8 @@ Scenario: Upstream released a new chart version and you want to update our chart
 ## Changes to default `values.yaml`
 
 - Update any value you want as default in the `sync/patches/values/values.yaml` file.
-- Update the schema in the same directory.
 - Run `sync/sync.sh`.
+- Regenerate `helm/envoy-gateway/values.schema.json` from the values and their `# @schema` annotations with the `helm-schema-envoy-gateway` pre-commit hook (`devctl gen precommit`). The sync leaves the schema untouched.
 
 ## General chart changes
 
@@ -66,12 +66,10 @@ The `patch.sh` script is being called by `sync/sync.sh` and contains code to tra
 
 ### values
 
-- Add GS values
-- Add values.schema.json.
+- Add GS values, with `# @schema` annotations for the generated values.schema.json.
 - Set resources requests and limits for certgen Job.
 
 TODO:
-- Generate values.schema.json in sync.sh
 - Discuss with upstream to include as default values.
 
 ### pss-comply
